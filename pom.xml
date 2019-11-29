@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright (c) 2019 Red Hat, Inc.
+    This program and the accompanying materials are made
+    available under the terms of the Eclipse Public License 2.0
+    which is available at:
+
+        https://www.eclipse.org/legal/epl-2.0/
+
+    SPDX-License-Identifier: EPL-2.0
+
+    Contributors:
+      Red Hat, Inc. - initial API and implementation
+
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.eclipse.jkube.integration-tests</groupId>
+  <artifactId>jkube-integration-tests-project</artifactId>
+  <version>${revision}</version>
+  <name>${global.name} :: Parent</name>
+  <packaging>pom</packaging>
+
+
+  <properties>
+    <revision>0.0.1-SNAPSHOT</revision>
+    <java.version>1.8</java.version>
+    <global.name>JKube :: Integration Tests</global.name>
+    <apache.maven.maven-compiler-plugin.version>3.8.1</apache.maven.maven-compiler-plugin.version>
+    <apache.maven-failsafe-plugin.version>3.0.0-M3</apache.maven-failsafe-plugin.version>
+    <apache.maven.maven-invoker.version>3.0.1</apache.maven.maven-invoker.version>
+    <fabric8.kubernetes-client.version>4.6.2</fabric8.kubernetes-client.version>
+    <jkube.version>0.1-SNAPSHOT</jkube.version>
+    <com.fasterxml.jackson.core.version>2.10.0</com.fasterxml.jackson.core.version>
+    <com.fasterxml.jackson.dataformat.yaml.version>2.10.0</com.fasterxml.jackson.dataformat.yaml.version>
+    <junit.version>5.5.1</junit.version>
+    <hamcrest.version>2.0.0.0</hamcrest.version>
+    <spring-boot.version>2.2.0.RELEASE</spring-boot.version>
+  </properties>
+
+  <modules>
+    <module>projects-to-be-tested/generators/spring-boot/multi-profile</module>
+    <module>projects-to-be-tested/zero-config/spring-boot</module>
+    <module>it</module>
+  </modules>
+
+  <dependencyManagement>
+    <dependencies>
+      <!-- Dependencies only for debugging purposes -->
+      <dependency>
+        <groupId>io.jkube</groupId>
+        <artifactId>k8s-maven-plugin</artifactId>
+        <version>${jkube.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.jkube</groupId>
+        <artifactId>oc-maven-plugin</artifactId>
+        <version>${jkube.version}</version>
+      </dependency>
+      <!-- ***************************************  -->
+      <dependency>
+        <groupId>org.apache.maven.shared</groupId>
+        <artifactId>maven-invoker</artifactId>
+        <version>${apache.maven.maven-invoker.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.fabric8</groupId>
+        <artifactId>openshift-client</artifactId>
+        <version>${fabric8.kubernetes-client.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-core</artifactId>
+        <version>${com.fasterxml.jackson.core.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.fasterxml.jackson.dataformat</groupId>
+        <artifactId>jackson-dataformat-yaml</artifactId>
+        <version>${com.fasterxml.jackson.dataformat.yaml.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter</artifactId>
+        <version>${spring-boot.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-web</artifactId>
+        <version>${spring-boot.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-test</artifactId>
+        <version>${spring-boot.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.junit.jupiter</groupId>
+        <artifactId>junit-jupiter</artifactId>
+        <version>${junit.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.hamcrest</groupId>
+        <artifactId>java-hamcrest</artifactId>
+        <version>${hamcrest.version}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>${apache.maven.maven-compiler-plugin.version}</version>
+          <configuration>
+            <source>${java.version}</source>
+            <target>${java.version}</target>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-failsafe-plugin</artifactId>
+          <version>${apache.maven-failsafe-plugin.version}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-maven-plugin</artifactId>
+          <version>${spring-boot.version}</version>
+        </plugin>
+        <plugin>
+          <groupId>io.jkube</groupId>
+          <artifactId>k8s-maven-plugin</artifactId>
+          <version>${jkube.version}</version>
+        </plugin>
+        <plugin>
+          <groupId>io.jkube</groupId>
+          <artifactId>oc-maven-plugin</artifactId>
+          <version>${jkube.version}</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+</project>
