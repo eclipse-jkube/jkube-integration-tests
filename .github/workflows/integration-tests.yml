@@ -55,7 +55,7 @@ jobs:
       - name: Checkout JKube (Dispatched Revision)
         if: github.event.action == 'jkube_webhook'
         run: |
-          git clone "${{ github.event.client_payload.repository }}" \
+          git clone "https://github.com/${{ github.event.client_payload.repository }}.git" \
           && cd ./jkube \
           && git checkout "${{ github.event.client_payload.revision }}" \
           && cd ..
@@ -101,7 +101,7 @@ jobs:
       - name: Checkout JKube (Dispatched Revision)
         if: github.event.action == 'jkube_webhook'
         run: |
-          git clone "${{ github.event.client_payload.repository }}" \
+          git clone "https://github.com/${{ github.event.client_payload.repository }}.git" \
           && cd ./jkube \
           && git checkout "${{ github.event.client_payload.revision }}" \
           && cd ..
