@@ -34,9 +34,6 @@ jobs:
         minikube: [v1.5.1]
         kubernetes: [v1.16.2,v1.12.0]
     steps:
-      - name: On jkube_webhook set branch
-        if: github.event.action == 'jkube_webhook'
-        run: export JKUBE_REVISION=${{ github.event.client_payload.revision }}
       - name: Checkout
         uses: actions/checkout@v1
       - name: Setup Minikube-Kubernetes
@@ -48,11 +45,19 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: '11'
-      - name: Checkout jkube
+      - name: Checkout JKube (Default Revision)
+        if: github.event.action != 'jkube_webhook'
         run: |
           git clone "$JKUBE_REPOSITORY" \
           && cd ./jkube \
-          && git  checkout "$JKUBE_REVISION" \
+          && git checkout "$JKUBE_REVISION" \
+          && cd ..
+      - name: Checkout JKube (Dispatched Revision)
+        if: github.event.action == 'jkube_webhook'
+        run: |
+          git clone "$JKUBE_REPOSITORY" \
+          && cd ./jkube \
+          && git checkout "${{ github.event.client_payload.revision }}" \
           && cd ..
       - name: Install jkube VCS Revision
         run: mvn -f ./jkube -B -DskipTests clean install
@@ -76,9 +81,6 @@ jobs:
       matrix:
         openshift: [v3.11.0,v3.9.0]
     steps:
-      - name: On jkube_webhook set branch
-        if: github.event.action == 'jkube_webhook'
-        run: export JKUBE_REVISION=${{ github.event.client_payload.revision }}
       - name: Checkout
         uses: actions/checkout@v1
       - name: Setup OpenShift
@@ -89,11 +91,19 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: '11'
-      - name: Checkout jkube
+      - name: Checkout JKube (Default Revision)
+        if: github.event.action != 'jkube_webhook'
         run: |
           git clone "$JKUBE_REPOSITORY" \
           && cd ./jkube \
           && git checkout "$JKUBE_REVISION" \
+          && cd ..
+      - name: Checkout JKube (Dispatched Revision)
+        if: github.event.action == 'jkube_webhook'
+        run: |
+          git clone "$JKUBE_REPOSITORY" \
+          && cd ./jkube \
+          && git checkout "${{ github.event.client_payload.revision }}" \
           && cd ..
       - name: Install jkube VCS Revision
         run: mvn -f ./jkube -B -DskipTests clean install
