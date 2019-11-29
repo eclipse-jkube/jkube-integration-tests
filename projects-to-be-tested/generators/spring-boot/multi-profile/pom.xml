@@ -69,11 +69,11 @@
         </executions>
       </plugin>
       <plugin>
-        <groupId>io.jkube</groupId>
+        <groupId>org.eclipse.jkube</groupId>
         <artifactId>k8s-maven-plugin</artifactId>
       </plugin>
       <plugin>
-        <groupId>io.jkube</groupId>
+        <groupId>org.eclipse.jkube</groupId>
         <artifactId>oc-maven-plugin</artifactId>
       </plugin>
     </plugins>
