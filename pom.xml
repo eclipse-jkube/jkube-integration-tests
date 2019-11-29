@@ -51,12 +51,12 @@
     <dependencies>
       <!-- Dependencies only for debugging purposes -->
       <dependency>
-        <groupId>io.jkube</groupId>
+        <groupId>org.eclipse.jkube</groupId>
         <artifactId>k8s-maven-plugin</artifactId>
         <version>${jkube.version}</version>
       </dependency>
       <dependency>
-        <groupId>io.jkube</groupId>
+        <groupId>org.eclipse.jkube</groupId>
         <artifactId>oc-maven-plugin</artifactId>
         <version>${jkube.version}</version>
       </dependency>
@@ -131,12 +131,12 @@
           <version>${spring-boot.version}</version>
         </plugin>
         <plugin>
-          <groupId>io.jkube</groupId>
+          <groupId>org.eclipse.jkube</groupId>
           <artifactId>k8s-maven-plugin</artifactId>
           <version>${jkube.version}</version>
         </plugin>
         <plugin>
-          <groupId>io.jkube</groupId>
+          <groupId>org.eclipse.jkube</groupId>
           <artifactId>oc-maven-plugin</artifactId>
           <version>${jkube.version}</version>
         </plugin>
