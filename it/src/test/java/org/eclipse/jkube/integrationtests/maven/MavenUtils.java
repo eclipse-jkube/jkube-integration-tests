@@ -24,10 +24,15 @@ import org.apache.maven.shared.invoker.MavenInvocationException;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Optional;
+import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class MavenUtils {
+
+  private static final String JKUBE_VERSION_SYSTEM_PROPERTY = "jkubeVersion";
+  private static final String JKUBE_VERSION_MAVEN_PROPERTY = "jkube.version";
 
   private static String mavenLocation;
 
@@ -46,6 +51,11 @@ public class MavenUtils {
       throws IOException, InterruptedException, MavenInvocationException {
 
     invocationRequest.setBatchMode(true);
+    if (invocationRequest.getProperties() == null) {
+      invocationRequest.setProperties(new Properties());
+    }
+    Optional.ofNullable(System.getProperty(JKUBE_VERSION_SYSTEM_PROPERTY)).ifPresent(jkubeVersion ->
+        invocationRequest.getProperties().put(JKUBE_VERSION_MAVEN_PROPERTY, jkubeVersion));
     final Invoker invoker = new DefaultInvoker();
     invoker.setMavenHome(new File(getMavenLocation()));
     return invoker.execute(invocationRequest);

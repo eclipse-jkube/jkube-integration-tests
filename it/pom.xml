@@ -73,6 +73,14 @@
             </goals>
           </execution>
         </executions>
+        <configuration>
+          <systemProperties>
+            <property>
+              <name>jkubeVersion</name>
+              <value>${jkube.version}</value>
+            </property>
+          </systemProperties>
+        </configuration>
       </plugin>
     </plugins>
   </build>
