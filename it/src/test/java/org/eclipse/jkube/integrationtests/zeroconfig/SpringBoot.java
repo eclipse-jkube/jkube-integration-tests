@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.function.Function;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -69,11 +70,10 @@ abstract class SpringBoot {
     final Optional<Pod> matchingPod = kc.pods().list().getItems().stream()
       .filter(p -> p.getMetadata().getName().startsWith("zero-config-spring-boot"))
       .findAny();
-    if (matchingPod.isPresent()) {
-      final ContainerStatus lastContainerStatus = matchingPod.get().getStatus()
-        .getContainerStatuses().iterator().next();
-      assertThat(lastContainerStatus.getState().getTerminated(), notNullValue());
-    }
+    final Function<Pod, Pod> refreshPod = pod ->
+      kc.pods().withName(pod.getMetadata().getName()).get();
+    matchingPod.map(refreshPod).ifPresent(updatedPod ->
+      assertThat(updatedPod.getMetadata().getDeletionTimestamp(), notNullValue()));
     final boolean servicesExist = kc.services().list().getItems().stream()
       .anyMatch(s -> s.getMetadata().getName().startsWith("zero-config-spring-boot"));
     assertThat(servicesExist, equalTo(false));
