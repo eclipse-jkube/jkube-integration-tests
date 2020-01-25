@@ -33,7 +33,7 @@
     <apache.maven-failsafe-plugin.version>3.0.0-M3</apache.maven-failsafe-plugin.version>
     <apache.maven.maven-invoker.version>3.0.1</apache.maven.maven-invoker.version>
     <fabric8.kubernetes-client.version>4.6.2</fabric8.kubernetes-client.version>
-    <jkube.version>0.1.0</jkube.version>
+    <jkube.version>0.1.1-SNAPSHOT</jkube.version>
     <com.fasterxml.jackson.core.version>2.10.0</com.fasterxml.jackson.core.version>
     <com.fasterxml.jackson.dataformat.yaml.version>2.10.0</com.fasterxml.jackson.dataformat.yaml.version>
     <junit.version>5.5.1</junit.version>
@@ -47,6 +47,24 @@
     <module>it</module>
   </modules>
 
+  <repositories>
+    <repository>
+      <id>central</id>
+      <url>https://repo1.maven.org/maven2</url>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
+  <pluginRepositories>
+    <pluginRepository>
+      <id>central</id>
+      <url>https://repo1.maven.org/maven2</url>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </pluginRepository>
+  </pluginRepositories>
   <dependencyManagement>
     <dependencies>
       <!-- Dependencies only for debugging purposes -->
