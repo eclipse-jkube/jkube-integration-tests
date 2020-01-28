@@ -13,7 +13,6 @@
  */
 package org.eclipse.jkube.integrationtests.zeroconfig;
 
-import io.fabric8.kubernetes.api.model.ContainerStatus;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.Service;
 import io.fabric8.kubernetes.api.model.ServicePort;
@@ -28,6 +27,7 @@ import java.util.Collections;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -66,9 +66,10 @@ abstract class SpringBoot {
     assertThat(servicePort.getNodePort(), nullValue());
   }
 
-  final void assertThatShouldDeleteAllAppliedResources(KubernetesClient kc) throws Exception {
+  final void assertThatShouldDeleteAllAppliedResources(KubernetesClient kc) {
     final Optional<Pod> matchingPod = kc.pods().list().getItems().stream()
       .filter(p -> p.getMetadata().getName().startsWith("zero-config-spring-boot"))
+      .filter(((Predicate<Pod>)(p -> p.getMetadata().getName().endsWith("-build"))).negate())
       .findAny();
     final Function<Pod, Pod> refreshPod = pod ->
       kc.pods().withName(pod.getMetadata().getName()).get();

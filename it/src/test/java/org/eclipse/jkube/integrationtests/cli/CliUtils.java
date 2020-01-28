@@ -14,6 +14,7 @@
 package org.eclipse.jkube.integrationtests.cli;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 
 public class CliUtils {
@@ -34,7 +35,8 @@ public class CliUtils {
         .redirectErrorStream(true)
         .command(processCommand)
         .start();
-    final Scanner scanner = new Scanner(process.getInputStream()).useDelimiter("\\A");
+    final Scanner scanner = new Scanner(process.getInputStream(), StandardCharsets.UTF_8.name())
+            .useDelimiter("\\A");
     final String output = scanner.hasNext() ? scanner.next() : "";
     final int exitCode = process.waitFor();
     return new CliResult(exitCode, output);
