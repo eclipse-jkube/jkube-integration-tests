@@ -51,6 +51,7 @@ public class MavenUtils {
       throws IOException, InterruptedException, MavenInvocationException {
 
     invocationRequest.setBatchMode(true);
+    invocationRequest.setDebug(true);
     if (invocationRequest.getProperties() == null) {
       invocationRequest.setProperties(new Properties());
     }
@@ -58,6 +59,7 @@ public class MavenUtils {
         invocationRequest.getProperties().put(JKUBE_VERSION_MAVEN_PROPERTY, jkubeVersion));
     final Invoker invoker = new DefaultInvoker();
     invoker.setMavenHome(new File(getMavenLocation()));
+    invoker.setOutputHandler(new ThreadedSystemOutHandler());
     return invoker.execute(invocationRequest);
   }
 
