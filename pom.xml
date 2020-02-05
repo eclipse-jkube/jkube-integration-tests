@@ -30,9 +30,10 @@
     <java.version>1.8</java.version>
     <global.name>JKube :: Integration Tests</global.name>
     <apache.maven.maven-compiler-plugin.version>3.8.1</apache.maven.maven-compiler-plugin.version>
+    <apache.maven.maven-war-plugin.version>2.6</apache.maven.maven-war-plugin.version>
     <apache.maven-failsafe-plugin.version>3.0.0-M3</apache.maven-failsafe-plugin.version>
     <apache.maven.maven-invoker.version>3.0.1</apache.maven.maven-invoker.version>
-    <fabric8.kubernetes-client.version>4.6.2</fabric8.kubernetes-client.version>
+    <fabric8.kubernetes-client.version>4.7.1</fabric8.kubernetes-client.version>
     <jkube.version>0.1.1-SNAPSHOT</jkube.version>
     <com.fasterxml.jackson.core.version>2.10.0</com.fasterxml.jackson.core.version>
     <com.fasterxml.jackson.dataformat.yaml.version>2.10.0</com.fasterxml.jackson.dataformat.yaml.version>
@@ -42,8 +43,9 @@
   </properties>
 
   <modules>
-    <module>projects-to-be-tested/generators/spring-boot/multi-profile</module>
-    <module>projects-to-be-tested/zero-config/spring-boot</module>
+    <module>projects-to-be-tested/spring-boot/multi-profile</module>
+    <module>projects-to-be-tested/spring-boot/zero-config</module>
+    <module>projects-to-be-tested/webapp/zero-config</module>
     <module>it</module>
   </modules>
 
@@ -137,6 +139,11 @@
             <source>${java.version}</source>
             <target>${java.version}</target>
           </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-war-plugin</artifactId>
+          <version>${apache.maven.maven-war-plugin.version}</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
