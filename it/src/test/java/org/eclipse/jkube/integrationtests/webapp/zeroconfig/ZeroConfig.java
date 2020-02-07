@@ -2,7 +2,6 @@ package org.eclipse.jkube.integrationtests.webapp.zeroconfig;
 
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.Service;
-import io.fabric8.kubernetes.api.model.ServicePort;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import org.apache.maven.shared.invoker.InvocationResult;
 import org.apache.maven.shared.invoker.MavenInvocationException;
@@ -13,7 +12,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
@@ -24,12 +22,13 @@ import java.util.function.Supplier;
 import static org.eclipse.jkube.integrationtests.assertions.LabelAssertion.assertGlobalLabels;
 import static org.eclipse.jkube.integrationtests.assertions.LabelAssertion.assertLabels;
 import static org.eclipse.jkube.integrationtests.assertions.PodAssertion.assertPod;
+import static org.eclipse.jkube.integrationtests.assertions.ServiceAssertion.assertService;
+import static org.eclipse.jkube.integrationtests.assertions.ServiceAssertion.awaitService;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.startsWith;
 
 public class ZeroConfig {
@@ -44,19 +43,12 @@ public class ZeroConfig {
     assertThat(pod.getMetadata().getName(), startsWith("webapp-zero-config"));
     assertStandardLabels(pod.getMetadata()::getLabels);
     assertPod(kc, pod).logContains("Catalina.start Server startup", 10);
-    final Service service = kc.services()
-      .inNamespace(pod.getMetadata().getNamespace())
-      .withName("webapp-zero-config")
-      .waitUntilCondition(Objects::nonNull, 10L, TimeUnit.SECONDS);
-    assertThat(service, notNullValue());
+    final Service service = awaitService(kc, pod.getMetadata().getNamespace(), "webapp-zero-config");
     assertStandardLabels(service.getMetadata()::getLabels);
     assertThat(service.getMetadata().getLabels(), hasEntry("expose", "true"));
     assertStandardLabels(service.getSpec()::getSelector);
     assertThat(service.getSpec().getPorts(), hasSize(1));
-    final ServicePort servicePort = service.getSpec().getPorts().iterator().next() ;
-    assertThat(servicePort.getName(), equalTo("http"));
-    assertThat(servicePort.getPort(), equalTo(8080));
-    assertThat(servicePort.getNodePort(), nullValue());
+    assertService(kc, service).assertPort("http", 8080, false);
   }
 
   final void assertThatShouldDeleteAllAppliedResources(KubernetesClient kc) {
@@ -73,13 +65,13 @@ public class ZeroConfig {
     assertThat(servicesExist, equalTo(false));
   }
 
-  InvocationResult maven(String goal)
+  static InvocationResult maven(String goal)
     throws IOException, InterruptedException, MavenInvocationException {
 
     return maven(goal, new Properties());
   }
 
-  final InvocationResult maven(String goal, Properties properties)
+  static InvocationResult maven(String goal, Properties properties)
     throws IOException, InterruptedException, MavenInvocationException {
 
     return MavenUtils.execute(i -> {

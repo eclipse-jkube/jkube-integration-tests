@@ -1,4 +1,4 @@
-package org.eclipse.jkube.integrationtests.webapp.zeroconfig;
+package org.eclipse.jkube.integrationtests.vertx;
 
 import io.fabric8.kubernetes.api.model.Container;
 import io.fabric8.kubernetes.api.model.PodTemplateSpec;
@@ -31,7 +31,7 @@ import static org.hamcrest.Matchers.hasSize;
 
 @Tag(KUBERNETES)
 @TestMethodOrder(OrderAnnotation.class)
-class ZeroConfigK8sITCase extends ZeroConfig {
+public class VertxK8sITCase extends Vertx {
 
   private KubernetesClient k;
 
@@ -54,7 +54,7 @@ class ZeroConfigK8sITCase extends ZeroConfig {
     final InvocationResult invocationResult = maven("k8s:build");
     // Then
     assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
-    assertImageWasRecentlyBuilt("integration-tests", "webapp-zero-config");
+    assertImageWasRecentlyBuilt("integration-tests", "vertx-simplest");
   }
 
   @Test
@@ -69,9 +69,10 @@ class ZeroConfigK8sITCase extends ZeroConfig {
       String.format("../%s/target/classes/META-INF", PROJECT_ZERO_CONFIG));
     assertThat(metaInfDirectory.exists(), equalTo(true));
     assertThat(new File(metaInfDirectory, "jkube/kubernetes.yml"). exists(), equalTo(true));
-    assertThat(new File(metaInfDirectory, "jkube/kubernetes/webapp-zero-config-deployment.yml"). exists(), equalTo(true));
-    assertThat(new File(metaInfDirectory, "jkube/kubernetes/webapp-zero-config-service.yml"). exists(), equalTo(true));
+    assertThat(new File(metaInfDirectory, "jkube/kubernetes/vertx-simplest-deployment.yml"). exists(), equalTo(true));
+    assertThat(new File(metaInfDirectory, "jkube/kubernetes/vertx-simplest-service.yml"). exists(), equalTo(true));
   }
+
 
   @Test
   @Order(3)
@@ -84,7 +85,7 @@ class ZeroConfigK8sITCase extends ZeroConfig {
     assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
     assertThatShouldApplyResources(k);
     final Optional<Deployment> deployment = k.apps().deployments().list().getItems().stream()
-      .filter(d -> d.getMetadata().getName().startsWith("webapp-zero-config"))
+      .filter(d -> d.getMetadata().getName().startsWith("vertx-simplest"))
       .findFirst();
     assertThat(deployment.isPresent(), equalTo(true));
     assertStandardLabels(deployment.get().getMetadata()::getLabels);
@@ -95,14 +96,15 @@ class ZeroConfigK8sITCase extends ZeroConfig {
     assertStandardLabels(ptSpec.getMetadata()::getLabels);
     assertThat(ptSpec.getSpec().getContainers(), hasSize(1));
     final Container ptContainer = ptSpec.getSpec().getContainers().iterator().next();
-    assertThat(ptContainer.getImage(), equalTo("integration-tests/webapp-zero-config:latest"));
-    assertThat(ptContainer.getName(), equalTo("webapp"));
-    assertThat(ptContainer.getPorts(), hasSize(2));
+    assertThat(ptContainer.getImage(), equalTo("integration-tests/vertx-simplest:latest"));
+    assertThat(ptContainer.getName(), equalTo("vertx"));
+    assertThat(ptContainer.getPorts(), hasSize(3));
     assertThat(ptContainer.getPorts(), hasItems(allOf(
       hasProperty("name", equalTo("http")),
       hasProperty("containerPort", equalTo(8080))
     )));
   }
+
 
   @Test
   @Order(4)
@@ -114,8 +116,7 @@ class ZeroConfigK8sITCase extends ZeroConfig {
     assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
     assertThatShouldDeleteAllAppliedResources(k);
     final boolean deploymentsExists = k.apps().deployments().list().getItems().stream()
-      .anyMatch(d -> d.getMetadata().getName().startsWith("webapp-zero-config"));
+      .anyMatch(d -> d.getMetadata().getName().startsWith("vertx-simplest"));
     assertThat(deploymentsExists, equalTo(false));
   }
-
 }
