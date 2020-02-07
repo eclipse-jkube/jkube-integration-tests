@@ -51,7 +51,6 @@ public class MavenUtils {
       throws IOException, InterruptedException, MavenInvocationException {
 
     invocationRequest.setBatchMode(true);
-    invocationRequest.setDebug(true);
     if (invocationRequest.getProperties() == null) {
       invocationRequest.setProperties(new Properties());
     }

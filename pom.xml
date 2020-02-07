@@ -40,11 +40,14 @@
     <junit.version>5.5.1</junit.version>
     <hamcrest.version>2.0.0.0</hamcrest.version>
     <spring-boot.version>2.2.0.RELEASE</spring-boot.version>
+    <vertx.version>3.8.5</vertx.version>
+    <vertx.plugin.version>1.0.22</vertx.plugin.version>
   </properties>
 
   <modules>
     <module>projects-to-be-tested/spring-boot/multi-profile</module>
     <module>projects-to-be-tested/spring-boot/zero-config</module>
+    <module>projects-to-be-tested/vertx/simplest</module>
     <module>projects-to-be-tested/webapp/zero-config</module>
     <module>it</module>
   </modules>
@@ -87,11 +90,6 @@
         <version>${apache.maven.maven-invoker.version}</version>
       </dependency>
       <dependency>
-        <groupId>io.fabric8</groupId>
-        <artifactId>openshift-client</artifactId>
-        <version>${fabric8.kubernetes-client.version}</version>
-      </dependency>
-      <dependency>
         <groupId>com.fasterxml.jackson.core</groupId>
         <artifactId>jackson-core</artifactId>
         <version>${com.fasterxml.jackson.core.version}</version>
@@ -100,6 +98,18 @@
         <groupId>com.fasterxml.jackson.dataformat</groupId>
         <artifactId>jackson-dataformat-yaml</artifactId>
         <version>${com.fasterxml.jackson.dataformat.yaml.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.fabric8</groupId>
+        <artifactId>openshift-client</artifactId>
+        <version>${fabric8.kubernetes-client.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.vertx</groupId>
+        <artifactId>vertx-dependencies</artifactId>
+        <version>${vertx.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
       </dependency>
       <dependency>
         <groupId>org.springframework.boot</groupId>
@@ -111,20 +121,24 @@
         <artifactId>spring-boot-starter-web</artifactId>
         <version>${spring-boot.version}</version>
       </dependency>
+      <!-- Test dependencies -->
       <dependency>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-test</artifactId>
         <version>${spring-boot.version}</version>
+        <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>org.junit.jupiter</groupId>
         <artifactId>junit-jupiter</artifactId>
         <version>${junit.version}</version>
+        <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>org.hamcrest</groupId>
         <artifactId>java-hamcrest</artifactId>
         <version>${hamcrest.version}</version>
+        <scope>test</scope>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -164,6 +178,11 @@
           <groupId>org.eclipse.jkube</groupId>
           <artifactId>oc-maven-plugin</artifactId>
           <version>${jkube.version}</version>
+        </plugin>
+        <plugin>
+          <groupId>io.reactiverse</groupId>
+          <artifactId>vertx-maven-plugin</artifactId>
+          <version>${vertx.plugin.version}</version>
         </plugin>
       </plugins>
     </pluginManagement>

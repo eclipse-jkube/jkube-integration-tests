@@ -7,14 +7,10 @@ import io.fabric8.kubernetes.client.dsl.PodResource;
 
 import java.util.concurrent.TimeUnit;
 
-public class PodAssertion {
-
-  private final KubernetesClient kubernetesClient;
-  private final Pod pod;
+public class PodAssertion extends KubernetesClientAssertion<Pod> {
 
   private PodAssertion(KubernetesClient kubernetesClient, Pod pod) {
-    this.kubernetesClient = kubernetesClient;
-    this.pod = pod;
+    super(kubernetesClient, pod);
   }
 
   public static PodAssertion assertPod(KubernetesClient kubernetesClient, Pod pod) {
@@ -35,6 +31,7 @@ public class PodAssertion {
 
   private PodResource<Pod, DoneablePod> podResource() {
     return kubernetesClient.pods()
-      .inNamespace(pod.getMetadata().getNamespace()).withName(pod.getMetadata().getName());
+      .inNamespace(kubernetesResource.getMetadata().getNamespace())
+      .withName(kubernetesResource.getMetadata().getName());
   }
 }

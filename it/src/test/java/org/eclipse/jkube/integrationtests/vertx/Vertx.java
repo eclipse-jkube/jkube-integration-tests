@@ -1,17 +1,4 @@
-/**
- * Copyright (c) 2019 Red Hat, Inc.
- * This program and the accompanying materials are made
- * available under the terms of the Eclipse Public License 2.0
- * which is available at:
- *
- *     https://www.eclipse.org/legal/epl-2.0/
- *
- * SPDX-License-Identifier: EPL-2.0
- *
- * Contributors:
- *   Red Hat, Inc. - initial API and implementation
- */
-package org.eclipse.jkube.integrationtests.springboot.zeroconfig;
+package org.eclipse.jkube.integrationtests.vertx;
 
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.Service;
@@ -44,29 +31,31 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.startsWith;
 
-abstract class ZeroConfig {
+public class Vertx {
 
-  static final String PROJECT_ZERO_CONFIG = "projects-to-be-tested/spring-boot/zero-config";
+  static final String PROJECT_ZERO_CONFIG = "projects-to-be-tested/vertx/simplest";
 
-  final void assertThatShouldApplyResources(KubernetesClient kc) throws InterruptedException {
+  final void assertThatShouldApplyResources(KubernetesClient kc) throws Exception {
     final PodReadyWatcher podWatcher = new PodReadyWatcher();
-    kc.pods().withLabel("app", "spring-boot-zero-config").watch(podWatcher);
+    kc.pods().withLabel("app", "vertx-simplest").watch(podWatcher);
     final Pod pod = podWatcher.await(30L, TimeUnit.SECONDS);
     assertThat(pod, notNullValue());
-    assertThat(pod.getMetadata().getName(), startsWith("spring-boot-zero-config"));
+    assertThat(pod.getMetadata().getName(), startsWith("vertx-simplest"));
     assertStandardLabels(pod.getMetadata()::getLabels);
-    assertPod(kc, pod).logContains("Started ZeroConfigApplication in", 20);
-    final Service service = awaitService(kc, pod.getMetadata().getNamespace(), "spring-boot-zero-config");
+    assertPod(kc, pod).logContains("Succeeded in deploying verticle", 10);
+    final Service service = awaitService(kc, pod.getMetadata().getNamespace(), "vertx-simplest");
     assertStandardLabels(service.getMetadata()::getLabels);
     assertThat(service.getMetadata().getLabels(), hasEntry("expose", "true"));
     assertStandardLabels(service.getSpec()::getSelector);
     assertThat(service.getSpec().getPorts(), hasSize(1));
-    assertService(kc, service).assertPort("http", 8080, false);
+    assertThat(service.getSpec().getType(), equalTo("NodePort"));
+    assertService(kc, service).assertPort("http", 8080, true);
+    assertService(kc, service).assertNodePortResponse("http", equalTo("Hello from JKube!"));
   }
 
   final void assertThatShouldDeleteAllAppliedResources(KubernetesClient kc) {
     final Optional<Pod> matchingPod = kc.pods().list().getItems().stream()
-      .filter(p -> p.getMetadata().getName().startsWith("spring-boot-zero-config"))
+      .filter(p -> p.getMetadata().getName().startsWith("vertx-simplest"))
       .filter(((Predicate<Pod>)(p -> p.getMetadata().getName().endsWith("-build"))).negate())
       .findAny();
     final Function<Pod, Pod> refreshPod = pod ->
@@ -74,17 +63,17 @@ abstract class ZeroConfig {
     matchingPod.map(refreshPod).ifPresent(updatedPod ->
       assertThat(updatedPod.getMetadata().getDeletionTimestamp(), notNullValue()));
     final boolean servicesExist = kc.services().list().getItems().stream()
-      .anyMatch(s -> s.getMetadata().getName().startsWith("spring-boot-zero-config"));
+      .anyMatch(s -> s.getMetadata().getName().startsWith("vertx-simplest"));
     assertThat(servicesExist, equalTo(false));
   }
 
-  InvocationResult maven(String goal)
+  static InvocationResult maven(String goal)
     throws IOException, InterruptedException, MavenInvocationException {
 
     return maven(goal, new Properties());
   }
 
-  final InvocationResult maven(String goal, Properties properties)
+  static InvocationResult maven(String goal, Properties properties)
     throws IOException, InterruptedException, MavenInvocationException {
 
     return MavenUtils.execute(i -> {
@@ -97,6 +86,6 @@ abstract class ZeroConfig {
 
   static void assertStandardLabels(Supplier<Map<String, String>> labelSupplier) {
     assertGlobalLabels(labelSupplier);
-    assertLabels(labelSupplier, hasEntry("app", "spring-boot-zero-config"));
+    assertLabels(labelSupplier, hasEntry("app", "vertx-simplest"));
   }
 }
