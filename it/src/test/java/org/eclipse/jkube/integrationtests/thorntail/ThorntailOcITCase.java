@@ -1,4 +1,4 @@
-package org.eclipse.jkube.integrationtests.vertx;
+package org.eclipse.jkube.integrationtests.thorntail;
 
 import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.openshift.api.model.ImageStream;
@@ -23,7 +23,7 @@ import static org.hamcrest.Matchers.notNullValue;
 
 @Tag(OPEN_SHIFT)
 @TestMethodOrder(OrderAnnotation.class)
-public class VertxOcITCase extends Vertx {
+public class ThorntailOcITCase extends Thorntail {
 
   private OpenShiftClient oc;
 
@@ -46,7 +46,7 @@ public class VertxOcITCase extends Vertx {
     final InvocationResult invocationResult = maven("oc:build");
     // Then
     assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
-    final ImageStream is = oc.imageStreams().withName("vertx-simplest").get();
+    final ImageStream is = oc.imageStreams().withName("thorntail-microprofile").get();
     assertThat(is, notNullValue());
     assertThat(is.getStatus().getTags().iterator().next().getTag(), equalTo("latest"));
   }
@@ -60,12 +60,12 @@ public class VertxOcITCase extends Vertx {
     // Then
     assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
     final File metaInfDirectory = new File(
-      String.format("../%s/target/classes/META-INF", PROJECT_VERTX));
+      String.format("../%s/target/classes/META-INF", PROJECT_THORNTAIL));
     assertThat(metaInfDirectory.exists(), equalTo(true));
     assertThat(new File(metaInfDirectory, "jkube/openshift.yml"). exists(), equalTo(true));
-    assertThat(new File(metaInfDirectory, "jkube/openshift/vertx-simplest-deploymentconfig.yml"). exists(), equalTo(true));
-    assertThat(new File(metaInfDirectory, "jkube/openshift/vertx-simplest-route.yml"). exists(), equalTo(true));
-    assertThat(new File(metaInfDirectory, "jkube/openshift/vertx-simplest-service.yml"). exists(), equalTo(true));
+    assertThat(new File(metaInfDirectory, "jkube/openshift/thorntail-microprofile-deploymentconfig.yml"). exists(), equalTo(true));
+    assertThat(new File(metaInfDirectory, "jkube/openshift/thorntail-microprofile-route.yml"). exists(), equalTo(true));
+    assertThat(new File(metaInfDirectory, "jkube/openshift/thorntail-microprofile-service.yml"). exists(), equalTo(true));
   }
 
   @Test
