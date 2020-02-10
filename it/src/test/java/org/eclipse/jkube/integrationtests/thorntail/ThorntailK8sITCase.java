@@ -1,4 +1,4 @@
-package org.eclipse.jkube.integrationtests.vertx;
+package org.eclipse.jkube.integrationtests.thorntail;
 
 import io.fabric8.kubernetes.api.model.Container;
 import io.fabric8.kubernetes.api.model.PodTemplateSpec;
@@ -31,7 +31,7 @@ import static org.hamcrest.Matchers.hasSize;
 
 @Tag(KUBERNETES)
 @TestMethodOrder(OrderAnnotation.class)
-public class VertxK8sITCase extends Vertx {
+public class ThorntailK8sITCase extends Thorntail {
 
   private KubernetesClient k;
 
@@ -54,7 +54,7 @@ public class VertxK8sITCase extends Vertx {
     final InvocationResult invocationResult = maven("k8s:build");
     // Then
     assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
-    assertImageWasRecentlyBuilt("integration-tests", "vertx-simplest");
+    assertImageWasRecentlyBuilt("integration-tests", "thorntail-microprofile");
   }
 
   @Test
@@ -66,11 +66,11 @@ public class VertxK8sITCase extends Vertx {
     // Then
     assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
     final File metaInfDirectory = new File(
-      String.format("../%s/target/classes/META-INF", PROJECT_VERTX));
+      String.format("../%s/target/classes/META-INF", PROJECT_THORNTAIL));
     assertThat(metaInfDirectory.exists(), equalTo(true));
     assertThat(new File(metaInfDirectory, "jkube/kubernetes.yml"). exists(), equalTo(true));
-    assertThat(new File(metaInfDirectory, "jkube/kubernetes/vertx-simplest-deployment.yml"). exists(), equalTo(true));
-    assertThat(new File(metaInfDirectory, "jkube/kubernetes/vertx-simplest-service.yml"). exists(), equalTo(true));
+    assertThat(new File(metaInfDirectory, "jkube/kubernetes/thorntail-microprofile-deployment.yml"). exists(), equalTo(true));
+    assertThat(new File(metaInfDirectory, "jkube/kubernetes/thorntail-microprofile-service.yml"). exists(), equalTo(true));
   }
 
   @Test
@@ -84,7 +84,7 @@ public class VertxK8sITCase extends Vertx {
     assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
     assertThatShouldApplyResources(k);
     final Optional<Deployment> deployment = k.apps().deployments().list().getItems().stream()
-      .filter(d -> d.getMetadata().getName().startsWith("vertx-simplest"))
+      .filter(d -> d.getMetadata().getName().startsWith("thorntail-microprofile"))
       .findFirst();
     assertThat(deployment.isPresent(), equalTo(true));
     assertStandardLabels(deployment.get().getMetadata()::getLabels);
@@ -95,15 +95,18 @@ public class VertxK8sITCase extends Vertx {
     assertStandardLabels(ptSpec.getMetadata()::getLabels);
     assertThat(ptSpec.getSpec().getContainers(), hasSize(1));
     final Container ptContainer = ptSpec.getSpec().getContainers().iterator().next();
-    assertThat(ptContainer.getImage(), equalTo("integration-tests/vertx-simplest:latest"));
-    assertThat(ptContainer.getName(), equalTo("vertx"));
+    assertThat(ptContainer.getImage(), equalTo("integration-tests/thorntail-microprofile:latest"));
+    assertThat(ptContainer.getName(), equalTo("thorntail-v2"));
     assertThat(ptContainer.getPorts(), hasSize(3));
     assertThat(ptContainer.getPorts(), hasItems(allOf(
       hasProperty("name", equalTo("http")),
       hasProperty("containerPort", equalTo(8080))
     )));
+    assertThat(ptContainer.getEnv(), hasItems(allOf(
+      hasProperty("name", equalTo("JAVA_OPTIONS")),
+      hasProperty("value", equalTo("-Djava.net.preferIPv4Stack=true"))
+    )));
   }
-
 
   @Test
   @Order(4)
@@ -115,7 +118,7 @@ public class VertxK8sITCase extends Vertx {
     assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
     assertThatShouldDeleteAllAppliedResources(k);
     final boolean deploymentsExists = k.apps().deployments().list().getItems().stream()
-      .anyMatch(d -> d.getMetadata().getName().startsWith("vertx-simplest"));
+      .anyMatch(d -> d.getMetadata().getName().startsWith("thorntail-microprofile"));
     assertThat(deploymentsExists, equalTo(false));
   }
 }

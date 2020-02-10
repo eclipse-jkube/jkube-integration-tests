@@ -40,6 +40,7 @@
     <junit.version>5.5.1</junit.version>
     <hamcrest.version>2.0.0.0</hamcrest.version>
     <spring-boot.version>2.2.0.RELEASE</spring-boot.version>
+    <thorntail.version>2.5.0.Final</thorntail.version>
     <vertx.version>3.8.5</vertx.version>
     <vertx.plugin.version>1.0.22</vertx.plugin.version>
   </properties>
@@ -47,6 +48,7 @@
   <modules>
     <module>projects-to-be-tested/spring-boot/multi-profile</module>
     <module>projects-to-be-tested/spring-boot/zero-config</module>
+    <module>projects-to-be-tested/thorntail/microprofile</module>
     <module>projects-to-be-tested/vertx/simplest</module>
     <module>projects-to-be-tested/webapp/zero-config</module>
     <module>it</module>
@@ -105,6 +107,11 @@
         <version>${fabric8.kubernetes-client.version}</version>
       </dependency>
       <dependency>
+        <groupId>io.thorntail</groupId>
+        <artifactId>microprofile-openapi</artifactId>
+        <version>${thorntail.version}</version>
+      </dependency>
+      <dependency>
         <groupId>io.vertx</groupId>
         <artifactId>vertx-dependencies</artifactId>
         <version>${vertx.version}</version>
@@ -146,6 +153,16 @@
     <pluginManagement>
       <plugins>
         <plugin>
+          <groupId>io.reactiverse</groupId>
+          <artifactId>vertx-maven-plugin</artifactId>
+          <version>${vertx.plugin.version}</version>
+        </plugin>
+        <plugin>
+          <groupId>io.thorntail</groupId>
+          <artifactId>thorntail-maven-plugin</artifactId>
+          <version>${thorntail.version}</version>
+        </plugin>
+        <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
           <version>${apache.maven.maven-compiler-plugin.version}</version>
@@ -178,11 +195,6 @@
           <groupId>org.eclipse.jkube</groupId>
           <artifactId>oc-maven-plugin</artifactId>
           <version>${jkube.version}</version>
-        </plugin>
-        <plugin>
-          <groupId>io.reactiverse</groupId>
-          <artifactId>vertx-maven-plugin</artifactId>
-          <version>${vertx.plugin.version}</version>
         </plugin>
       </plugins>
     </pluginManagement>
