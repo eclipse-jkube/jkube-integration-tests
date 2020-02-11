@@ -11,11 +11,12 @@
  * Contributors:
  *   Red Hat, Inc. - initial API and implementation
  */
-package org.eclipse.jkube.integrationtests.thorntail.microprofile;
+package org.eclipse.jkube.integrationtests;
 
-import javax.ws.rs.ApplicationPath;
-import javax.ws.rs.core.Application;
+public class Locks {
 
-@ApplicationPath("/")
-public class MicroProfileApplication extends Application {
+  public static final String APPLY = "apply";
+
+  private Locks() {
+  }
 }

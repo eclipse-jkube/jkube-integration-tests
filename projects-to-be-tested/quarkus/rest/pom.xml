@@ -26,45 +26,38 @@
     <relativePath>../../../pom.xml</relativePath>
   </parent>
 
-  <artifactId>spring-boot-zero-config</artifactId>
-  <name>${global.name} :: Spring Boot :: Zero Config</name>
+  <artifactId>quarkus-rest</artifactId>
+  <name>${global.name} :: Quarkus :: Rest</name>
   <description>
-    Spring Boot with Zero Config project
+    Quarkus REST JSON project
   </description>
 
   <dependencies>
-    <!-- Dependencies only for debugging purposes -->
     <dependency>
-      <groupId>org.eclipse.jkube</groupId>
-      <artifactId>k8s-maven-plugin</artifactId>
-      <scope>compile</scope>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-arc</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.eclipse.jkube</groupId>
-      <artifactId>oc-maven-plugin</artifactId>
-      <scope>compile</scope>
-    </dependency>
-    <!-- ***************************************  -->
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter</artifactId>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-resteasy</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-web</artifactId>
-      <scope>compile</scope>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-resteasy-jackson</artifactId>
     </dependency>
   </dependencies>
 
   <build>
     <plugins>
       <plugin>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-maven-plugin</artifactId>
+        <groupId>io.quarkus</groupId>
+        <artifactId>quarkus-maven-plugin</artifactId>
+        <version>${quarkus.version}</version>
         <executions>
           <execution>
+            <phase>package</phase>
             <goals>
-              <goal>repackage</goal>
+              <goal>build</goal>
             </goals>
           </execution>
         </executions>
@@ -72,10 +65,28 @@
       <plugin>
         <groupId>org.eclipse.jkube</groupId>
         <artifactId>k8s-maven-plugin</artifactId>
+        <configuration>
+          <enricher>
+            <config>
+              <jkube-service>
+                <type>NodePort</type>
+              </jkube-service>
+            </config>
+          </enricher>
+        </configuration>
       </plugin>
       <plugin>
         <groupId>org.eclipse.jkube</groupId>
         <artifactId>oc-maven-plugin</artifactId>
+        <configuration>
+            <enricher>
+              <config>
+                <jkube-service>
+                  <type>NodePort</type>
+                </jkube-service>
+              </config>
+            </enricher>
+        </configuration>
       </plugin>
     </plugins>
   </build>

@@ -11,11 +11,14 @@
  * Contributors:
  *   Red Hat, Inc. - initial API and implementation
  */
-package org.eclipse.jkube.integrationtests.thorntail.microprofile;
+package org.eclipse.jkube.integrationtests.quarkus.rest;
 
-import javax.ws.rs.ApplicationPath;
-import javax.ws.rs.core.Application;
+import javax.inject.Singleton;
 
-@ApplicationPath("/")
-public class MicroProfileApplication extends Application {
+@Singleton
+public class CoolApplicationService {
+
+  CoolApplication getCoolApplication() {
+    return new CoolApplication("JKube", "Subatomic JKube really whips the lama's ass!");
+  }
 }

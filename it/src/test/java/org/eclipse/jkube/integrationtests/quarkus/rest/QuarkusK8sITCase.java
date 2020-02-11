@@ -11,7 +11,7 @@
  * Contributors:
  *   Red Hat, Inc. - initial API and implementation
  */
-package org.eclipse.jkube.integrationtests.vertx;
+package org.eclipse.jkube.integrationtests.quarkus.rest;
 
 import io.fabric8.kubernetes.api.model.Container;
 import io.fabric8.kubernetes.api.model.PodTemplateSpec;
@@ -47,7 +47,7 @@ import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 
 @Tag(KUBERNETES)
 @TestMethodOrder(OrderAnnotation.class)
-public class VertxK8sITCase extends Vertx {
+public class QuarkusK8sITCase extends Quarkus {
 
   private KubernetesClient k;
 
@@ -67,10 +67,10 @@ public class VertxK8sITCase extends Vertx {
   @DisplayName("k8s:build, should create image")
   void k8sBuild() throws Exception {
     // When
-    final InvocationResult invocationResult = maven("k8s:build");
+    final InvocationResult invocationResult = maven("package k8s:build");
     // Then
     assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
-    assertImageWasRecentlyBuilt("integration-tests", "vertx-simplest");
+    assertImageWasRecentlyBuilt("integration-tests", "quarkus-rest");
   }
 
   @Test
@@ -82,17 +82,17 @@ public class VertxK8sITCase extends Vertx {
     // Then
     assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
     final File metaInfDirectory = new File(
-      String.format("../%s/target/classes/META-INF", PROJECT_VERTX));
+      String.format("../%s/target/classes/META-INF", PROJECT_QUARKUS));
     assertThat(metaInfDirectory.exists(), equalTo(true));
     assertThat(new File(metaInfDirectory, "jkube/kubernetes.yml"). exists(), equalTo(true));
-    assertThat(new File(metaInfDirectory, "jkube/kubernetes/vertx-simplest-deployment.yml"). exists(), equalTo(true));
-    assertThat(new File(metaInfDirectory, "jkube/kubernetes/vertx-simplest-service.yml"). exists(), equalTo(true));
+    assertThat(new File(metaInfDirectory, "jkube/kubernetes/quarkus-rest-deployment.yml"). exists(), equalTo(true));
+    assertThat(new File(metaInfDirectory, "jkube/kubernetes/quarkus-rest-service.yml"). exists(), equalTo(true));
   }
 
   @Test
   @Order(3)
-  @ResourceLock(value = APPLY, mode = READ_WRITE)
   @DisplayName("k8s:apply, should deploy pod and service")
+  @ResourceLock(value = APPLY, mode = READ_WRITE)
   @SuppressWarnings("unchecked")
   void k8sApply() throws Exception {
     // When
@@ -101,7 +101,7 @@ public class VertxK8sITCase extends Vertx {
     assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
     assertThatShouldApplyResources(k);
     final Optional<Deployment> deployment = k.apps().deployments().list().getItems().stream()
-      .filter(d -> d.getMetadata().getName().startsWith("vertx-simplest"))
+      .filter(d -> d.getMetadata().getName().startsWith("quarkus-rest"))
       .findFirst();
     assertThat(deployment.isPresent(), equalTo(true));
     assertStandardLabels(deployment.get().getMetadata()::getLabels);
@@ -112,15 +112,14 @@ public class VertxK8sITCase extends Vertx {
     assertStandardLabels(ptSpec.getMetadata()::getLabels);
     assertThat(ptSpec.getSpec().getContainers(), hasSize(1));
     final Container ptContainer = ptSpec.getSpec().getContainers().iterator().next();
-    assertThat(ptContainer.getImage(), equalTo("integration-tests/vertx-simplest:latest"));
-    assertThat(ptContainer.getName(), equalTo("vertx"));
-    assertThat(ptContainer.getPorts(), hasSize(3));
+    assertThat(ptContainer.getImage(), equalTo("integration-tests/quarkus-rest:latest"));
+    assertThat(ptContainer.getName(), equalTo("quarkus"));
+    assertThat(ptContainer.getPorts(), hasSize(1));
     assertThat(ptContainer.getPorts(), hasItems(allOf(
       hasProperty("name", equalTo("http")),
       hasProperty("containerPort", equalTo(8080))
     )));
   }
-
 
   @Test
   @Order(4)
@@ -132,7 +131,7 @@ public class VertxK8sITCase extends Vertx {
     assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
     assertThatShouldDeleteAllAppliedResources(k);
     final boolean deploymentsExists = k.apps().deployments().list().getItems().stream()
-      .anyMatch(d -> d.getMetadata().getName().startsWith("vertx-simplest"));
+      .anyMatch(d -> d.getMetadata().getName().startsWith("quarkus-rest"));
     assertThat(deploymentsExists, equalTo(false));
   }
 }

@@ -38,7 +38,9 @@
     <com.fasterxml.jackson.core.version>2.10.0</com.fasterxml.jackson.core.version>
     <com.fasterxml.jackson.dataformat.yaml.version>2.10.0</com.fasterxml.jackson.dataformat.yaml.version>
     <junit.version>5.5.1</junit.version>
+    <license-maven-plugin.version>3.0</license-maven-plugin.version>
     <hamcrest.version>2.0.0.0</hamcrest.version>
+    <quarkus.version>1.2.0.Final</quarkus.version>
     <spring-boot.version>2.2.0.RELEASE</spring-boot.version>
     <thorntail.version>2.5.0.Final</thorntail.version>
     <vertx.version>3.8.5</vertx.version>
@@ -46,6 +48,7 @@
   </properties>
 
   <modules>
+    <module>projects-to-be-tested/quarkus/rest</module>
     <module>projects-to-be-tested/spring-boot/multi-profile</module>
     <module>projects-to-be-tested/spring-boot/zero-config</module>
     <module>projects-to-be-tested/thorntail/microprofile</module>
@@ -107,16 +110,29 @@
         <version>${fabric8.kubernetes-client.version}</version>
       </dependency>
       <dependency>
+        <groupId>io.quarkus</groupId>
+        <artifactId>quarkus-arc</artifactId>
+        <version>${quarkus.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.quarkus</groupId>
+        <artifactId>quarkus-resteasy</artifactId>
+        <version>${quarkus.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.quarkus</groupId>
+        <artifactId>quarkus-resteasy-jackson</artifactId>
+        <version>${quarkus.version}</version>
+      </dependency>
+      <dependency>
         <groupId>io.thorntail</groupId>
         <artifactId>microprofile-openapi</artifactId>
         <version>${thorntail.version}</version>
       </dependency>
       <dependency>
         <groupId>io.vertx</groupId>
-        <artifactId>vertx-dependencies</artifactId>
+        <artifactId>vertx-core</artifactId>
         <version>${vertx.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
       </dependency>
       <dependency>
         <groupId>org.springframework.boot</groupId>
@@ -129,12 +145,6 @@
         <version>${spring-boot.version}</version>
       </dependency>
       <!-- Test dependencies -->
-      <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-test</artifactId>
-        <version>${spring-boot.version}</version>
-        <scope>test</scope>
-      </dependency>
       <dependency>
         <groupId>org.junit.jupiter</groupId>
         <artifactId>junit-jupiter</artifactId>
@@ -152,6 +162,16 @@
   <build>
     <pluginManagement>
       <plugins>
+        <plugin>
+          <groupId>com.mycila</groupId>
+          <artifactId>license-maven-plugin</artifactId>
+          <version>${license-maven-plugin.version}</version>
+        </plugin>
+        <plugin>
+          <groupId>io.quarkus</groupId>
+          <artifactId>quarkus-maven-plugin</artifactId>
+          <version>${quarkus.version}</version>
+        </plugin>
         <plugin>
           <groupId>io.reactiverse</groupId>
           <artifactId>vertx-maven-plugin</artifactId>
@@ -198,5 +218,26 @@
         </plugin>
       </plugins>
     </pluginManagement>
+    <plugins>
+      <plugin>
+        <groupId>com.mycila</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+        <version>3.0</version>
+        <configuration>
+          <aggregate>true</aggregate>
+          <header>header.txt</header>
+          <properties>
+            <owner>Red Hat, Inc.</owner>
+          </properties>
+          <excludes>
+            <exclude>.editorconfig</exclude>
+            <exclude>**/.gitkeep</exclude>
+            <exclude>.mvn/wrapper/**/*</exclude>
+            <exclude>mvnw</exclude>
+            <exclude>mvnw.cmd</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
+    </plugins>
   </build>
 </project>

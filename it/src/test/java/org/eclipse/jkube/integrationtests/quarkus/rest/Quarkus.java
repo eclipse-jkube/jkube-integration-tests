@@ -11,7 +11,7 @@
  * Contributors:
  *   Red Hat, Inc. - initial API and implementation
  */
-package org.eclipse.jkube.integrationtests.vertx;
+package org.eclipse.jkube.integrationtests.quarkus.rest;
 
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.Service;
@@ -44,31 +44,31 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.startsWith;
 
-public class Vertx {
+public class Quarkus {
 
-  static final String PROJECT_VERTX = "projects-to-be-tested/vertx/simplest";
+  static final String PROJECT_QUARKUS = "projects-to-be-tested/quarkus/rest";
 
   final void assertThatShouldApplyResources(KubernetesClient kc) throws Exception {
     final PodReadyWatcher podWatcher = new PodReadyWatcher();
-    kc.pods().withLabel("app", "vertx-simplest").watch(podWatcher);
+    kc.pods().withLabel("app", "quarkus-rest").watch(podWatcher);
     final Pod pod = podWatcher.await(30L, TimeUnit.SECONDS);
     assertThat(pod, notNullValue());
-    assertThat(pod.getMetadata().getName(), startsWith("vertx-simplest"));
+    assertThat(pod.getMetadata().getName(), startsWith("quarkus-rest"));
     assertStandardLabels(pod.getMetadata()::getLabels);
-    assertPod(kc, pod).logContains("Succeeded in deploying verticle", 10);
-    final Service service = awaitService(kc, pod.getMetadata().getNamespace(), "vertx-simplest");
+    assertPod(kc, pod).logContains("quarkus-rest 0.0.0-SNAPSHOT (running on Quarkus 1.2.0.Final) started in", 10);
+    final Service service = awaitService(kc, pod.getMetadata().getNamespace(), "quarkus-rest");
     assertStandardLabels(service.getMetadata()::getLabels);
     assertThat(service.getMetadata().getLabels(), hasEntry("expose", "true"));
     assertStandardLabels(service.getSpec()::getSelector);
     assertThat(service.getSpec().getPorts(), hasSize(1));
-    assertThat(service.getSpec().getType(), equalTo("NodePort"));
     assertService(kc, service).assertPort("http", 8080, true);
-    assertService(kc, service).assertNodePortResponse("http", equalTo("Hello from JKube!"));
+    assertService(kc, service).assertNodePortResponse("http",
+      equalTo("{\"applicationName\":\"JKube\",\"message\":\"Subatomic JKube really whips the lama's ass!\"}"));
   }
 
   final void assertThatShouldDeleteAllAppliedResources(KubernetesClient kc) {
     final Optional<Pod> matchingPod = kc.pods().list().getItems().stream()
-      .filter(p -> p.getMetadata().getName().startsWith("vertx-simplest"))
+      .filter(p -> p.getMetadata().getName().startsWith("quarkus-latest"))
       .filter(((Predicate<Pod>)(p -> p.getMetadata().getName().endsWith("-build"))).negate())
       .findAny();
     final Function<Pod, Pod> refreshPod = pod ->
@@ -76,7 +76,7 @@ public class Vertx {
     matchingPod.map(refreshPod).ifPresent(updatedPod ->
       assertThat(updatedPod.getMetadata().getDeletionTimestamp(), notNullValue()));
     final boolean servicesExist = kc.services().list().getItems().stream()
-      .anyMatch(s -> s.getMetadata().getName().startsWith("vertx-simplest"));
+      .anyMatch(s -> s.getMetadata().getName().startsWith("quarkus-latest"));
     assertThat(servicesExist, equalTo(false));
   }
 
@@ -91,7 +91,7 @@ public class Vertx {
 
     return MavenUtils.execute(i -> {
       i.setBaseDirectory(new File("../"));
-      i.setProjects(Collections.singletonList(PROJECT_VERTX));
+      i.setProjects(Collections.singletonList(PROJECT_QUARKUS));
       i.setGoals(Collections.singletonList(goal));
       i.setProperties(properties);
     });
@@ -99,6 +99,6 @@ public class Vertx {
 
   static void assertStandardLabels(Supplier<Map<String, String>> labelSupplier) {
     assertGlobalLabels(labelSupplier);
-    assertLabels(labelSupplier, hasEntry("app", "vertx-simplest"));
+    assertLabels(labelSupplier, hasEntry("app", "quarkus-rest"));
   }
 }
