@@ -56,23 +56,20 @@
           </execution>
         </executions>
       </plugin>
-      <plugin>
-        <groupId>org.eclipse.jkube</groupId>
-        <artifactId>k8s-maven-plugin</artifactId>
-        <configuration>
-          <enricher>
-            <config>
-              <jkube-service>
-                <type>NodePort</type>
-              </jkube-service>
-            </config>
-          </enricher>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.eclipse.jkube</groupId>
-        <artifactId>oc-maven-plugin</artifactId>
-          <configuration>
+    </plugins>
+  </build>
+  <profiles>
+    <profile>
+      <id>Kubernetes</id>
+      <properties>
+        <jkube.environment>k8s</jkube.environment>
+      </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.eclipse.jkube</groupId>
+            <artifactId>k8s-maven-plugin</artifactId>
+            <configuration>
               <enricher>
                 <config>
                   <jkube-service>
@@ -80,9 +77,34 @@
                   </jkube-service>
                 </config>
               </enricher>
-          </configuration>
-      </plugin>
-    </plugins>
-  </build>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>OpenShift</id>
+      <properties>
+        <jkube.environment>oc</jkube.environment>
+      </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.eclipse.jkube</groupId>
+            <artifactId>oc-maven-plugin</artifactId>
+            <configuration>
+              <enricher>
+                <config>
+                  <jkube-service>
+                    <type>NodePort</type>
+                  </jkube-service>
+                </config>
+              </enricher>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 
 </project>

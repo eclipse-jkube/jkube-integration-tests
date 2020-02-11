@@ -16,17 +16,11 @@ package org.eclipse.jkube.integrationtests.springboot.zeroconfig;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.Service;
 import io.fabric8.kubernetes.client.KubernetesClient;
-import org.apache.maven.shared.invoker.InvocationResult;
-import org.apache.maven.shared.invoker.MavenInvocationException;
 import org.eclipse.jkube.integrationtests.PodReadyWatcher;
-import org.eclipse.jkube.integrationtests.maven.MavenUtils;
+import org.eclipse.jkube.integrationtests.maven.BaseMavenCase;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -44,9 +38,14 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.startsWith;
 
-abstract class ZeroConfig {
+abstract class ZeroConfig extends BaseMavenCase {
 
   static final String PROJECT_ZERO_CONFIG = "projects-to-be-tested/spring-boot/zero-config";
+
+  @Override
+  protected String getProject() {
+    return PROJECT_ZERO_CONFIG;
+  }
 
   final void assertThatShouldApplyResources(KubernetesClient kc) throws InterruptedException {
     final PodReadyWatcher podWatcher = new PodReadyWatcher();
@@ -76,23 +75,6 @@ abstract class ZeroConfig {
     final boolean servicesExist = kc.services().list().getItems().stream()
       .anyMatch(s -> s.getMetadata().getName().startsWith("spring-boot-zero-config"));
     assertThat(servicesExist, equalTo(false));
-  }
-
-  InvocationResult maven(String goal)
-    throws IOException, InterruptedException, MavenInvocationException {
-
-    return maven(goal, new Properties());
-  }
-
-  final InvocationResult maven(String goal, Properties properties)
-    throws IOException, InterruptedException, MavenInvocationException {
-
-    return MavenUtils.execute(i -> {
-      i.setBaseDirectory(new File("../"));
-      i.setProjects(Collections.singletonList(PROJECT_ZERO_CONFIG));
-      i.setGoals(Collections.singletonList(goal));
-      i.setProperties(properties);
-    });
   }
 
   static void assertStandardLabels(Supplier<Map<String, String>> labelSupplier) {

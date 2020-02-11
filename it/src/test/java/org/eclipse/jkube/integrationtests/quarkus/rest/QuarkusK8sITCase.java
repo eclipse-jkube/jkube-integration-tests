@@ -67,7 +67,7 @@ public class QuarkusK8sITCase extends Quarkus {
   @DisplayName("k8s:build, should create image")
   void k8sBuild() throws Exception {
     // When
-    final InvocationResult invocationResult = maven("package k8s:build");
+    final InvocationResult invocationResult = maven("k8s:build");
     // Then
     assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
     assertImageWasRecentlyBuilt("integration-tests", "quarkus-rest");

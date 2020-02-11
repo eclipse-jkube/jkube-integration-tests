@@ -15,9 +15,9 @@ package org.eclipse.jkube.integrationtests.springboot.multiprofile;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import org.eclipse.jkube.integrationtests.maven.MavenUtils;
 import org.apache.maven.shared.invoker.InvocationResult;
 import org.apache.maven.shared.invoker.MavenInvocationException;
+import org.eclipse.jkube.integrationtests.maven.BaseMavenCase;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
@@ -25,10 +25,10 @@ import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Properties;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -40,7 +40,7 @@ import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasKey;
 
-class MultiProfileITCase {
+class MultiProfileITCase extends BaseMavenCase {
 
   private static final String PROJECT_MULTI_PROFILE = "projects-to-be-tested/spring-boot/multi-profile";
 
@@ -49,6 +49,11 @@ class MultiProfileITCase {
   @BeforeEach
   void setUp() {
     objectMapper = new ObjectMapper(new YAMLFactory());
+  }
+
+  @Override
+  protected String getProject() {
+    return PROJECT_MULTI_PROFILE;
   }
 
   @Test
@@ -73,7 +78,7 @@ class MultiProfileITCase {
 
   @Test
   @Tag(KUBERNETES)
-  void k8sResource_productionProfile_shouldCreateProductionResources() throws Exception{
+  void k8sResource_productionProfile_shouldCreateProductionResources() throws Exception {
     // When
     final InvocationResult invocationResult = maven("k8s:resource", "Production");
     // Then
@@ -83,7 +88,7 @@ class MultiProfileITCase {
 
   @Test
   @Tag(OPEN_SHIFT)
-  void ocResource_productionProfile_shouldCreateProductionResources() throws Exception{
+  void ocResource_productionProfile_shouldCreateProductionResources() throws Exception {
     // When
     final InvocationResult invocationResult = maven("oc:resource", "Production");
     // Then
@@ -110,14 +115,9 @@ class MultiProfileITCase {
     assertThat(portEntry.get(), equalTo(port));
   }
 
-  private static InvocationResult maven(String goal, String... profiles)
+  private InvocationResult maven(String goal, String... profiles)
       throws IOException, InterruptedException, MavenInvocationException {
 
-    return MavenUtils.execute(i -> {
-      i.setBaseDirectory(new File("../"));
-      i.setProjects(Collections.singletonList(PROJECT_MULTI_PROFILE));
-      i.setGoals(Collections.singletonList(goal));
-      i.setProfiles(Stream.of(profiles).collect(Collectors.toList()));
-    });
+    return maven(goal, new Properties(), i -> i.setProfiles(Stream.of(profiles).collect(Collectors.toList())));
   }
 }

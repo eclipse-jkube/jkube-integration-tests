@@ -28,13 +28,19 @@ import static org.hamcrest.Matchers.notNullValue;
 public class DockerAssertion {
 
   public static void assertImageWasRecentlyBuilt(String repository, String name) throws IOException, InterruptedException {
+    assertImageWasRecentlyBuilt(repository, name, "latest");
+  }
+
+  public static void assertImageWasRecentlyBuilt(String repository, String name, String tag) throws IOException, InterruptedException {
     final List<DockerUtils.DockerImage> dockerImages = DockerUtils.dockerImages();
     assertThat(dockerImages, hasSize(greaterThanOrEqualTo(1)));
     final DockerUtils.DockerImage mostRecentImage = dockerImages.stream()
-      .filter(di -> di.getRepository().contains(name)).findFirst().orElse(null);
+      .filter(di -> di.getRepository().contains("/" + name))
+      .filter(di -> di.getTag().equals(tag))
+      .findFirst().orElse(null);
     assertThat(mostRecentImage, notNullValue());
     assertThat(mostRecentImage.getRepository(), equalTo(String.format("%s/%s",repository, name)));
-    assertThat(mostRecentImage.getTag(), equalTo("latest"));
+    assertThat(mostRecentImage.getTag(), equalTo(tag));
     assertThat(mostRecentImage.getCreatedSince(), containsString("second"));
   }
 }

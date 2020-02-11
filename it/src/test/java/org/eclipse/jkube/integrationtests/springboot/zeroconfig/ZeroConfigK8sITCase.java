@@ -137,13 +137,4 @@ class ZeroConfigK8sITCase extends ZeroConfig {
       .anyMatch(d -> d.getMetadata().getName().startsWith("spring-boot-zero-config"));
     assertThat(deploymentsExists, equalTo(false));
   }
-
-  @Override
-  final InvocationResult maven(String goal)
-      throws IOException, InterruptedException, MavenInvocationException {
-
-    final Properties properties = new Properties();
-    properties.setProperty("jkube.mode", "kubernetes");
-    return maven(goal, properties);
-  }
 }

@@ -11,7 +11,7 @@
  * Contributors:
  *   Red Hat, Inc. - initial API and implementation
  */
-package org.eclipse.jkube.integrationtests.vertx;
+package org.eclipse.jkube.integrationtests.springboot.complete;
 
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.Service;
@@ -38,36 +38,36 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.startsWith;
 
-public class Vertx extends BaseMavenCase {
+public class Complete extends BaseMavenCase {
 
-  static final String PROJECT_VERTX = "projects-to-be-tested/vertx/simplest";
+  static final String PROJECT_COMPLETE = "projects-to-be-tested/spring-boot/complete";
 
   @Override
   protected String getProject() {
-    return PROJECT_VERTX;
+    return PROJECT_COMPLETE;
   }
 
   final void assertThatShouldApplyResources(KubernetesClient kc) throws Exception {
     final PodReadyWatcher podWatcher = new PodReadyWatcher();
-    kc.pods().withLabel("app", "vertx-simplest").watch(podWatcher);
-    final Pod pod = podWatcher.await(30L, TimeUnit.SECONDS);
+    kc.pods().withLabel("app", "spring-boot-complete").watch(podWatcher);
+    final Pod pod = podWatcher.await(60L, TimeUnit.SECONDS);
     assertThat(pod, notNullValue());
-    assertThat(pod.getMetadata().getName(), startsWith("vertx-simplest"));
+    assertThat(pod.getMetadata().getName(), startsWith("spring-boot-complete"));
     assertStandardLabels(pod.getMetadata()::getLabels);
-    assertPod(kc, pod).logContains("Succeeded in deploying verticle", 10);
-    final Service service = awaitService(kc, pod.getMetadata().getNamespace(), "vertx-simplest");
+    assertPod(kc, pod).logContains("CompleteApplication   : Started CompleteApplication in", 60);
+    final Service service = awaitService(kc, pod.getMetadata().getNamespace(), "spring-boot-complete");
     assertStandardLabels(service.getMetadata()::getLabels);
-    assertThat(service.getMetadata().getLabels(), hasEntry("expose", "true"));
     assertStandardLabels(service.getSpec()::getSelector);
     assertThat(service.getSpec().getPorts(), hasSize(1));
     assertThat(service.getSpec().getType(), equalTo("NodePort"));
-    assertService(kc, service).assertPort("http", 8080, true);
-    assertService(kc, service).assertNodePortResponse("http", equalTo("Hello from JKube!"));
+    assertService(kc, service).assertPort("us-cli", 8082, true);
+//    assertService(kc, service).assertNodePortResponse("http", equalTo("JKube from Thorntail rocks!"));
+    // TODO: Add specific assertions
   }
 
   final void assertThatShouldDeleteAllAppliedResources(KubernetesClient kc) {
     final Optional<Pod> matchingPod = kc.pods().list().getItems().stream()
-      .filter(p -> p.getMetadata().getName().startsWith("vertx-simplest"))
+      .filter(p -> p.getMetadata().getName().startsWith("spring-boot-complete"))
       .filter(((Predicate<Pod>)(p -> p.getMetadata().getName().endsWith("-build"))).negate())
       .findAny();
     final Function<Pod, Pod> refreshPod = pod ->
@@ -75,12 +75,12 @@ public class Vertx extends BaseMavenCase {
     matchingPod.map(refreshPod).ifPresent(updatedPod ->
       assertThat(updatedPod.getMetadata().getDeletionTimestamp(), notNullValue()));
     final boolean servicesExist = kc.services().list().getItems().stream()
-      .anyMatch(s -> s.getMetadata().getName().startsWith("vertx-simplest"));
+      .anyMatch(s -> s.getMetadata().getName().startsWith("spring-boot-complete"));
     assertThat(servicesExist, equalTo(false));
   }
 
   static void assertStandardLabels(Supplier<Map<String, String>> labelSupplier) {
     assertGlobalLabels(labelSupplier);
-    assertLabels(labelSupplier, hasEntry("app", "vertx-simplest"));
+    assertLabels(labelSupplier, hasEntry("app", "spring-boot-complete"));
   }
 }
