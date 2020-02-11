@@ -1,3 +1,16 @@
+/**
+ * Copyright (c) 2019 Red Hat, Inc.
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at:
+ *
+ *     https://www.eclipse.org/legal/epl-2.0/
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ *
+ * Contributors:
+ *   Red Hat, Inc. - initial API and implementation
+ */
 package org.eclipse.jkube.integrationtests.webapp.zeroconfig;
 
 import io.fabric8.kubernetes.client.DefaultKubernetesClient;
@@ -12,15 +25,18 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.parallel.ResourceLock;
 
 import java.io.File;
 import java.util.Properties;
 
+import static org.eclipse.jkube.integrationtests.Hacks.hackToPreventNullPointerInRegistryServiceCreateAuthConfig;
+import static org.eclipse.jkube.integrationtests.Locks.APPLY;
 import static org.eclipse.jkube.integrationtests.Tags.OPEN_SHIFT;
 import static org.eclipse.jkube.integrationtests.assertions.DockerAssertion.assertImageWasRecentlyBuilt;
-import static org.eclipse.jkube.integrationtests.cli.CliUtils.runCommand;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 
 @Tag(OPEN_SHIFT)
 @TestMethodOrder(OrderAnnotation.class)
@@ -44,7 +60,7 @@ class ZeroConfigOcITCase extends ZeroConfig {
   @DisplayName("oc:build, in docker mode, should create image")
   void ocBuild() throws Exception {
     // Given
-    hackToPreventNullPointerInRegistryServiceCreateAuthConfig();
+    hackToPreventNullPointerInRegistryServiceCreateAuthConfig("fabric8/tomcat-9:1.2.1");
     final Properties properties = new Properties();
     properties.setProperty("jkube.mode", "kubernetes"); // S2I doesn't support webapp yet
     // When
@@ -76,6 +92,7 @@ class ZeroConfigOcITCase extends ZeroConfig {
 
   @Test
   @Order(3)
+  @ResourceLock(value = APPLY, mode = READ_WRITE)
   @DisplayName("oc:apply, should deploy pod and service")
   void ocApply() throws Exception {
     // When
@@ -96,24 +113,4 @@ class ZeroConfigOcITCase extends ZeroConfig {
     assertThatShouldDeleteAllAppliedResources(oc);
   }
 
-  /**
-   * Source docker image is not pullable from OpenShift Build (fabric8/tomcat-9:1.2.1).
-   *
-   * This is caused by a bug in JKube when using Kuberentes mode with oc-maven-plugin.
-   *
-   * This hacks pulls the image using docker cli previously so that the build won't fail.
-   * TODO: Remove once issue is fixed in JKube (NullPointerException: RegistryService#createAuthConfig)
-   * <pre>
-   *  Caused by: java.lang.NullPointerException
-   *       at org.eclipse.jkube.kit.build.service.docker.RegistryService.createAuthConfig (RegistryService.java:153)
-   *       at org.eclipse.jkube.kit.build.service.docker.RegistryService.pullImageWithPolicy (RegistryService.java:112)
-   *       at org.eclipse.jkube.kit.build.service.docker.BuildService.autoPullBaseImage (BuildService.java:262)
-   *       at org.eclipse.jkube.kit.build.service.docker.BuildService.buildImage (BuildService.java:74)
-   *       at org.eclipse.jkube.kit.config.service.kubernetes.DockerBuildService.build (DockerBuildService.java:49)
-   *       at org.eclipse.jkube.maven.plugin.mojo.build.AbstractDockerMojo.buildAndTag (AbstractDockerMojo.java:687)
-   * </pre>
-   */
-  private static void hackToPreventNullPointerInRegistryServiceCreateAuthConfig() throws Exception {
-    runCommand("docker pull fabric8/tomcat-9:1.2.1");
-  }
 }

@@ -11,10 +11,9 @@
  * Contributors:
  *   Red Hat, Inc. - initial API and implementation
  */
-package org.eclipse.jkube.integrationtests.springboot.zeroconfig;
+package org.eclipse.jkube.integrationtests.quarkus.rest;
 
 import io.fabric8.kubernetes.client.DefaultKubernetesClient;
-import io.fabric8.openshift.api.model.ImageStream;
 import io.fabric8.openshift.client.OpenShiftClient;
 import org.apache.maven.shared.invoker.InvocationResult;
 import org.hamcrest.Matchers;
@@ -29,17 +28,19 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.parallel.ResourceLock;
 
 import java.io.File;
+import java.util.Properties;
 
+import static org.eclipse.jkube.integrationtests.Hacks.hackToPreventNullPointerInRegistryServiceCreateAuthConfig;
 import static org.eclipse.jkube.integrationtests.Locks.APPLY;
 import static org.eclipse.jkube.integrationtests.Tags.OPEN_SHIFT;
+import static org.eclipse.jkube.integrationtests.assertions.DockerAssertion.assertImageWasRecentlyBuilt;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 
 @Tag(OPEN_SHIFT)
 @TestMethodOrder(OrderAnnotation.class)
-class ZeroConfigOcITCase extends ZeroConfig {
+public class QuarkusOcITCase extends Quarkus {
 
   private OpenShiftClient oc;
 
@@ -56,32 +57,37 @@ class ZeroConfigOcITCase extends ZeroConfig {
 
   @Test
   @Order(1)
-  @DisplayName("oc:build, should create image")
+  @DisplayName("oc:build, in docker mode, should create image")
   void ocBuild() throws Exception {
+    // Given
+    hackToPreventNullPointerInRegistryServiceCreateAuthConfig("openjdk:11");
+    final Properties properties = new Properties();
+    properties.setProperty("jkube.mode", "kubernetes"); // S2I doesn't support quarkus yet
     // When
-    final InvocationResult invocationResult = maven("oc:build");
+    final InvocationResult invocationResult = maven("package oc:build", properties);
     // Then
     assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
-    final ImageStream is = oc.imageStreams().withName("spring-boot-zero-config").get();
-    assertThat(is, notNullValue());
-    assertThat(is.getStatus().getTags().iterator().next().getTag(), equalTo("latest"));
+    assertImageWasRecentlyBuilt("integration-tests", "quarkus-rest");
   }
 
   @Test
   @Order(2)
   @DisplayName("oc:resource, should create manifests")
   void ocResource() throws Exception {
+    // Given
+    final Properties properties = new Properties();
+    properties.setProperty("jkube.mode", "kubernetes"); // S2I doesn't support quarkus yet
     // When
-    final InvocationResult invocationResult = maven("oc:resource");
+    final InvocationResult invocationResult = maven("oc:resource", properties);
     // Then
     assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
     final File metaInfDirectory = new File(
-      String.format("../%s/target/classes/META-INF", PROJECT_ZERO_CONFIG));
+      String.format("../%s/target/classes/META-INF", PROJECT_QUARKUS));
     assertThat(metaInfDirectory.exists(), equalTo(true));
     assertThat(new File(metaInfDirectory, "jkube/openshift.yml"). exists(), equalTo(true));
-    assertThat(new File(metaInfDirectory, "jkube/openshift/spring-boot-zero-config-deploymentconfig.yml"). exists(), equalTo(true));
-    assertThat(new File(metaInfDirectory, "jkube/openshift/spring-boot-zero-config-route.yml"). exists(), equalTo(true));
-    assertThat(new File(metaInfDirectory, "jkube/openshift/spring-boot-zero-config-service.yml"). exists(), equalTo(true));
+    assertThat(new File(metaInfDirectory, "jkube/openshift/quarkus-rest-deploymentconfig.yml"). exists(), equalTo(true));
+    assertThat(new File(metaInfDirectory, "jkube/openshift/quarkus-rest-route.yml"). exists(), equalTo(true));
+    assertThat(new File(metaInfDirectory, "jkube/openshift/quarkus-rest-service.yml"). exists(), equalTo(true));
   }
 
   @Test

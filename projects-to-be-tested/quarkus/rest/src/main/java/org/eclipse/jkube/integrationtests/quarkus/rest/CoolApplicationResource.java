@@ -11,20 +11,28 @@
  * Contributors:
  *   Red Hat, Inc. - initial API and implementation
  */
-package org.eclipse.jkube.integrationtests.thorntail.microprofile;
+package org.eclipse.jkube.integrationtests.quarkus.rest;
 
+import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-@Path("")
-public class MicroProfileResource {
+@Path("/")
+public class CoolApplicationResource {
+
+  private CoolApplicationService coolApplicationService;
 
   @GET
-  @Produces(MediaType.TEXT_PLAIN)
+  @Produces(MediaType.APPLICATION_JSON)
   public Response get() {
-    return Response.ok("JKube from Thorntail rocks!").build();
+    return Response.ok(coolApplicationService.getCoolApplication()).build();
+  }
+
+  @Inject
+  public void setCoolApplicationService(CoolApplicationService coolApplicationService) {
+    this.coolApplicationService = coolApplicationService;
   }
 }
