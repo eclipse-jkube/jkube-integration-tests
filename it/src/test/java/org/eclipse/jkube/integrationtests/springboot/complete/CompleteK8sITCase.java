@@ -11,7 +11,7 @@
  * Contributors:
  *   Red Hat, Inc. - initial API and implementation
  */
-package org.eclipse.jkube.integrationtests.thorntail;
+package org.eclipse.jkube.integrationtests.springboot.complete;
 
 import io.fabric8.kubernetes.api.model.Container;
 import io.fabric8.kubernetes.api.model.PodTemplateSpec;
@@ -49,7 +49,7 @@ import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 
 @Tag(KUBERNETES)
 @TestMethodOrder(OrderAnnotation.class)
-public class ThorntailK8sITCase extends Thorntail {
+public class CompleteK8sITCase extends Complete {
 
   private KubernetesClient k;
 
@@ -77,7 +77,7 @@ public class ThorntailK8sITCase extends Thorntail {
     final InvocationResult invocationResult = maven("k8s:build");
     // Then
     assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
-    assertImageWasRecentlyBuilt("integration-tests", "thorntail-microprofile");
+    assertImageWasRecentlyBuilt("integration-tests", "spring-boot-complete");
   }
 
   @Test
@@ -89,11 +89,12 @@ public class ThorntailK8sITCase extends Thorntail {
     // Then
     assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
     final File metaInfDirectory = new File(
-      String.format("../%s/target/classes/META-INF", PROJECT_THORNTAIL));
+      String.format("../%s/target/classes/META-INF", PROJECT_COMPLETE));
     assertThat(metaInfDirectory.exists(), equalTo(true));
     assertThat(new File(metaInfDirectory, "jkube/kubernetes.yml"). exists(), equalTo(true));
-    assertThat(new File(metaInfDirectory, "jkube/kubernetes/thorntail-microprofile-deployment.yml"). exists(), equalTo(true));
-    assertThat(new File(metaInfDirectory, "jkube/kubernetes/thorntail-microprofile-service.yml"). exists(), equalTo(true));
+    assertThat(new File(metaInfDirectory, "jkube/kubernetes/password-secret.yml"). exists(), equalTo(true));
+    assertThat(new File(metaInfDirectory, "jkube/kubernetes/spring-boot-complete-deployment.yml"). exists(), equalTo(true));
+    assertThat(new File(metaInfDirectory, "jkube/kubernetes/spring-boot-complete-service.yml"). exists(), equalTo(true));
   }
 
   @Test
@@ -108,7 +109,7 @@ public class ThorntailK8sITCase extends Thorntail {
     assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
     assertThatShouldApplyResources(k);
     final Optional<Deployment> deployment = k.apps().deployments().list().getItems().stream()
-      .filter(d -> d.getMetadata().getName().startsWith("thorntail-microprofile"))
+      .filter(d -> d.getMetadata().getName().startsWith("spring-boot-complete"))
       .findFirst();
     assertThat(deployment.isPresent(), equalTo(true));
     assertStandardLabels(deployment.get().getMetadata()::getLabels);
@@ -119,16 +120,12 @@ public class ThorntailK8sITCase extends Thorntail {
     assertStandardLabels(ptSpec.getMetadata()::getLabels);
     assertThat(ptSpec.getSpec().getContainers(), hasSize(1));
     final Container ptContainer = ptSpec.getSpec().getContainers().iterator().next();
-    assertThat(ptContainer.getImage(), equalTo("integration-tests/thorntail-microprofile:latest"));
-    assertThat(ptContainer.getName(), equalTo("thorntail-v2"));
+    assertThat(ptContainer.getImage(), equalTo("integration-tests/spring-boot-complete:latest"));
+    assertThat(ptContainer.getName(), equalTo("spring-boot"));
     assertThat(ptContainer.getPorts(), hasSize(3));
     assertThat(ptContainer.getPorts(), hasItems(allOf(
-      hasProperty("name", equalTo("http")),
-      hasProperty("containerPort", equalTo(8080))
-    )));
-    assertThat(ptContainer.getEnv(), hasItems(allOf(
-      hasProperty("name", equalTo("JAVA_OPTIONS")),
-      hasProperty("value", equalTo("-Djava.net.preferIPv4Stack=true"))
+      hasProperty("name", equalTo("us-cli")),
+      hasProperty("containerPort", equalTo(8082))
     )));
   }
 
@@ -142,7 +139,7 @@ public class ThorntailK8sITCase extends Thorntail {
     assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
     assertThatShouldDeleteAllAppliedResources(k);
     final boolean deploymentsExists = k.apps().deployments().list().getItems().stream()
-      .anyMatch(d -> d.getMetadata().getName().startsWith("thorntail-microprofile"));
+      .anyMatch(d -> d.getMetadata().getName().startsWith("spring-boot-complete"));
     assertThat(deploymentsExists, equalTo(false));
   }
 }

@@ -29,6 +29,8 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.parallel.ResourceLock;
 
 import java.io.File;
+import java.util.Collections;
+import java.util.List;
 
 import static org.eclipse.jkube.integrationtests.Locks.APPLY;
 import static org.eclipse.jkube.integrationtests.Tags.OPEN_SHIFT;
@@ -52,6 +54,11 @@ public class ThorntailOcITCase extends Thorntail {
   void tearDown() {
     oc.close();
     oc = null;
+  }
+
+  @Override
+  protected List<String> getProfiles() {
+    return Collections.singletonList(OPEN_SHIFT);
   }
 
   @Test

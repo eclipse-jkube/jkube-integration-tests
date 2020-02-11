@@ -16,17 +16,11 @@ package org.eclipse.jkube.integrationtests.quarkus.rest;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.Service;
 import io.fabric8.kubernetes.client.KubernetesClient;
-import org.apache.maven.shared.invoker.InvocationResult;
-import org.apache.maven.shared.invoker.MavenInvocationException;
 import org.eclipse.jkube.integrationtests.PodReadyWatcher;
-import org.eclipse.jkube.integrationtests.maven.MavenUtils;
+import org.eclipse.jkube.integrationtests.maven.BaseMavenCase;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -44,9 +38,14 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.startsWith;
 
-public class Quarkus {
+public class Quarkus extends BaseMavenCase {
 
   static final String PROJECT_QUARKUS = "projects-to-be-tested/quarkus/rest";
+
+  @Override
+  protected String getProject() {
+    return PROJECT_QUARKUS;
+  }
 
   final void assertThatShouldApplyResources(KubernetesClient kc) throws Exception {
     final PodReadyWatcher podWatcher = new PodReadyWatcher();
@@ -63,7 +62,7 @@ public class Quarkus {
     assertThat(service.getSpec().getPorts(), hasSize(1));
     assertService(kc, service).assertPort("http", 8080, true);
     assertService(kc, service).assertNodePortResponse("http",
-      equalTo("{\"applicationName\":\"JKube\",\"message\":\"Subatomic JKube really whips the lama's ass!\"}"));
+      equalTo("{\"applicationName\":\"JKube\",\"message\":\"Subatomic JKube really whips the llama's ass!\"}"));
   }
 
   final void assertThatShouldDeleteAllAppliedResources(KubernetesClient kc) {
@@ -78,23 +77,6 @@ public class Quarkus {
     final boolean servicesExist = kc.services().list().getItems().stream()
       .anyMatch(s -> s.getMetadata().getName().startsWith("quarkus-latest"));
     assertThat(servicesExist, equalTo(false));
-  }
-
-  static InvocationResult maven(String goal)
-    throws IOException, InterruptedException, MavenInvocationException {
-
-    return maven(goal, new Properties());
-  }
-
-  static InvocationResult maven(String goal, Properties properties)
-    throws IOException, InterruptedException, MavenInvocationException {
-
-    return MavenUtils.execute(i -> {
-      i.setBaseDirectory(new File("../"));
-      i.setProjects(Collections.singletonList(PROJECT_QUARKUS));
-      i.setGoals(Collections.singletonList(goal));
-      i.setProperties(properties);
-    });
   }
 
   static void assertStandardLabels(Supplier<Map<String, String>> labelSupplier) {

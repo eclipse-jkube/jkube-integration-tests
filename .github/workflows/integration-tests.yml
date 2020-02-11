@@ -60,7 +60,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        openshift: [v3.11.0]
+        openshift: [v3.9.0]
     steps:
       - name: Checkout
         uses: actions/checkout@v1

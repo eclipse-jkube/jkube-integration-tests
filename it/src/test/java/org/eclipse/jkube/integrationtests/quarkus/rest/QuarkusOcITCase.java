@@ -64,7 +64,7 @@ public class QuarkusOcITCase extends Quarkus {
     final Properties properties = new Properties();
     properties.setProperty("jkube.mode", "kubernetes"); // S2I doesn't support quarkus yet
     // When
-    final InvocationResult invocationResult = maven("package oc:build", properties);
+    final InvocationResult invocationResult = maven("oc:build", properties);
     // Then
     assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
     assertImageWasRecentlyBuilt("integration-tests", "quarkus-rest");

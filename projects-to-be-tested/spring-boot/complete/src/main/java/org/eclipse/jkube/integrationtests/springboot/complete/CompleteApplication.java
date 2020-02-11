@@ -11,14 +11,16 @@
  * Contributors:
  *   Red Hat, Inc. - initial API and implementation
  */
-package org.eclipse.jkube.integrationtests.quarkus.rest;
+package org.eclipse.jkube.integrationtests.springboot.complete;
 
-import javax.inject.Singleton;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-@Singleton
-public class CoolApplicationService {
+@SpringBootApplication
+public class CompleteApplication {
 
-  CoolApplication getCoolApplication() {
-    return new CoolApplication("JKube", "Subatomic JKube really whips the llama's ass!");
+  public static void main(String[] args) {
+    SpringApplication.run(CompleteApplication.class, args);
   }
+
 }

@@ -49,6 +49,7 @@
 
   <modules>
     <module>projects-to-be-tested/quarkus/rest</module>
+    <module>projects-to-be-tested/spring-boot/complete</module>
     <module>projects-to-be-tested/spring-boot/multi-profile</module>
     <module>projects-to-be-tested/spring-boot/zero-config</module>
     <module>projects-to-be-tested/thorntail/microprofile</module>
