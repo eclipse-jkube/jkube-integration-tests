@@ -14,6 +14,7 @@
 package org.eclipse.jkube.integrationtests.quarkus.rest;
 
 import io.fabric8.kubernetes.client.DefaultKubernetesClient;
+import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.openshift.client.OpenShiftClient;
 import org.apache.maven.shared.invoker.InvocationResult;
 import org.hamcrest.Matchers;
@@ -31,7 +32,7 @@ import java.io.File;
 import java.util.Properties;
 
 import static org.eclipse.jkube.integrationtests.Hacks.hackToPreventNullPointerInRegistryServiceCreateAuthConfig;
-import static org.eclipse.jkube.integrationtests.Locks.APPLY;
+import static org.eclipse.jkube.integrationtests.Locks.CLUSTER_APPLY;
 import static org.eclipse.jkube.integrationtests.Tags.OPEN_SHIFT;
 import static org.eclipse.jkube.integrationtests.assertions.DockerAssertion.assertImageWasRecentlyBuilt;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -40,7 +41,7 @@ import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 
 @Tag(OPEN_SHIFT)
 @TestMethodOrder(OrderAnnotation.class)
-public class QuarkusOcITCase extends Quarkus {
+class QuarkusOcITCase extends Quarkus {
 
   private OpenShiftClient oc;
 
@@ -53,6 +54,11 @@ public class QuarkusOcITCase extends Quarkus {
   void tearDown() {
     oc.close();
     oc = null;
+  }
+
+  @Override
+  public KubernetesClient getKubernetesClient() {
+    return oc;
   }
 
   @Test
@@ -92,7 +98,7 @@ public class QuarkusOcITCase extends Quarkus {
 
   @Test
   @Order(3)
-  @ResourceLock(value = APPLY, mode = READ_WRITE)
+  @ResourceLock(value = CLUSTER_APPLY, mode = READ_WRITE)
   @DisplayName("oc:apply, should deploy pod and service")
   void ocApply() throws Exception {
     // When
@@ -110,6 +116,6 @@ public class QuarkusOcITCase extends Quarkus {
     final InvocationResult invocationResult = maven("oc:undeploy");
     // Then
     assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
-    assertThatShouldDeleteAllAppliedResources(oc);
+    assertThatShouldDeleteAllAppliedResources(this);
   }
 }

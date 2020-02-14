@@ -13,6 +13,7 @@
  */
 package org.eclipse.jkube.integrationtests.assertions;
 
+import org.eclipse.jkube.integrationtests.JKubeCase;
 import org.hamcrest.Matcher;
 
 import java.util.Map;
@@ -23,6 +24,21 @@ import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.hasEntry;
 
 public class LabelAssertion {
+
+  private final JKubeCase jKubeCase;
+
+  private LabelAssertion(JKubeCase jKubeCase) {
+    this.jKubeCase = jKubeCase;
+  }
+
+  public static LabelAssertion assertLabels(JKubeCase jKubeCase) {
+    return new LabelAssertion(jKubeCase);
+  }
+
+  public void assertStandardLabels(Supplier<Map<String, String>> labelSupplier) {
+    assertGlobalLabels(labelSupplier);
+    assertLabels(labelSupplier, hasEntry("app", jKubeCase.getApplication()));
+  }
 
   public static void assertGlobalLabels(Supplier<Map<String, String>> labelSupplier) {
     assertLabels(labelSupplier, allOf(

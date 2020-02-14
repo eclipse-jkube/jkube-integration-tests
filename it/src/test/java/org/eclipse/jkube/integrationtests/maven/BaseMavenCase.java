@@ -13,8 +13,10 @@
  */
 package org.eclipse.jkube.integrationtests.maven;
 
+import io.fabric8.kubernetes.api.model.Pod;
 import org.apache.maven.shared.invoker.InvocationResult;
 import org.apache.maven.shared.invoker.MavenInvocationException;
+import org.eclipse.jkube.integrationtests.JKubeCase;
 
 import java.io.File;
 import java.io.IOException;
@@ -22,13 +24,30 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
-public abstract class BaseMavenCase {
+import static org.eclipse.jkube.integrationtests.assertions.ServiceAssertion.assertServiceExists;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.notNullValue;
 
-  protected abstract String getProject();
+public abstract class BaseMavenCase implements MavenProject {
 
   protected List<String> getProfiles() {
     return Collections.emptyList();
+  }
+
+  protected static void assertThatShouldDeleteAllAppliedResources(JKubeCase jKubeCase) {
+    final Optional<Pod> matchingPod = jKubeCase.getKubernetesClient().pods().list().getItems().stream()
+      .filter(p -> p.getMetadata().getName().startsWith(jKubeCase.getApplication()))
+      .filter(((Predicate<Pod>)(p -> p.getMetadata().getName().endsWith("-build"))).negate())
+      .findAny();
+    final Function<Pod, Pod> refreshPod = pod ->
+      jKubeCase.getKubernetesClient().pods().withName(pod.getMetadata().getName()).get();
+    matchingPod.map(refreshPod).ifPresent(updatedPod ->
+      assertThat(updatedPod.getMetadata().getDeletionTimestamp(), notNullValue()));
+    assertServiceExists(jKubeCase, equalTo(false));
   }
 
   protected InvocationResult maven(String goal)

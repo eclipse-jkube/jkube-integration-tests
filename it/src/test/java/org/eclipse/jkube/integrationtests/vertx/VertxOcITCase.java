@@ -14,6 +14,7 @@
 package org.eclipse.jkube.integrationtests.vertx;
 
 import io.fabric8.kubernetes.client.DefaultKubernetesClient;
+import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.openshift.api.model.ImageStream;
 import io.fabric8.openshift.client.OpenShiftClient;
 import org.apache.maven.shared.invoker.InvocationResult;
@@ -30,7 +31,7 @@ import org.junit.jupiter.api.parallel.ResourceLock;
 
 import java.io.File;
 
-import static org.eclipse.jkube.integrationtests.Locks.APPLY;
+import static org.eclipse.jkube.integrationtests.Locks.CLUSTER_APPLY;
 import static org.eclipse.jkube.integrationtests.Tags.OPEN_SHIFT;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -39,7 +40,7 @@ import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 
 @Tag(OPEN_SHIFT)
 @TestMethodOrder(OrderAnnotation.class)
-public class VertxOcITCase extends Vertx {
+class VertxOcITCase extends Vertx {
 
   private OpenShiftClient oc;
 
@@ -54,9 +55,14 @@ public class VertxOcITCase extends Vertx {
     oc = null;
   }
 
+  @Override
+  public KubernetesClient getKubernetesClient() {
+    return oc;
+  }
+
   @Test
   @Order(1)
-  @DisplayName("oc:build, in docker mode, should create image")
+  @DisplayName("oc:build, should create image")
   void ocBuild() throws Exception {
     // When
     final InvocationResult invocationResult = maven("oc:build");
@@ -86,7 +92,7 @@ public class VertxOcITCase extends Vertx {
 
   @Test
   @Order(3)
-  @ResourceLock(value = APPLY, mode = READ_WRITE)
+  @ResourceLock(value = CLUSTER_APPLY, mode = READ_WRITE)
   @DisplayName("oc:apply, should deploy pod and service")
   void ocApply() throws Exception {
     // When
@@ -104,6 +110,6 @@ public class VertxOcITCase extends Vertx {
     final InvocationResult invocationResult = maven("oc:undeploy");
     // Then
     assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
-    assertThatShouldDeleteAllAppliedResources(oc);
+    assertThatShouldDeleteAllAppliedResources(this);
   }
 }

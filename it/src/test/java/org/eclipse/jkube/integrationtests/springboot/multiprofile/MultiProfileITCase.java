@@ -52,7 +52,7 @@ class MultiProfileITCase extends BaseMavenCase {
   }
 
   @Override
-  protected String getProject() {
+  public String getProject() {
     return PROJECT_MULTI_PROFILE;
   }
 

@@ -16,6 +16,7 @@ package org.eclipse.jkube.integrationtests.assertions;
 import io.fabric8.kubernetes.api.model.KubernetesResource;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import okhttp3.OkHttpClient;
+import org.eclipse.jkube.integrationtests.JKubeCase;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -31,15 +32,27 @@ public class KubernetesClientAssertion<T extends KubernetesResource> {
     return okHttpClient;
   }
 
-  final KubernetesClient kubernetesClient;
-  final T kubernetesResource;
+  private final JKubeCase jKubeCase;
+  private final T kubernetesResource;
 
-  KubernetesClientAssertion(KubernetesClient kubernetesClient, T kubernetesResource) {
-    this.kubernetesClient = kubernetesClient;
+  KubernetesClientAssertion(JKubeCase jKubeCase, T kubernetesResource) {
+    this.jKubeCase = jKubeCase;
     this.kubernetesResource = kubernetesResource;
   }
 
   final String getClusterHost() throws MalformedURLException {
-    return new URL(kubernetesClient.getConfiguration().getMasterUrl()).getHost();
+    return new URL(jKubeCase.getKubernetesClient().getConfiguration().getMasterUrl()).getHost();
+  }
+
+  public T getKubernetesResource() {
+    return kubernetesResource;
+  }
+
+  public KubernetesClient getKubernetesClient() {
+    return jKubeCase.getKubernetesClient();
+  }
+
+  public String getApplication() {
+    return jKubeCase.getApplication();
   }
 }

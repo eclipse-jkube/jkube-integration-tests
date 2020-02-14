@@ -13,11 +13,11 @@
  */
 package org.eclipse.jkube.integrationtests;
 
-public class Locks {
+import io.fabric8.kubernetes.client.KubernetesClient;
 
-  public static final String CLUSTER_APPLY = "cluster.apply";
-  public static final String SPRINGBOOT_COMPLETE_K8s = "springboot.complete.k8s";
+public interface JKubeCase {
 
-  private Locks() {
-  }
+  KubernetesClient getKubernetesClient();
+
+  String getApplication();
 }
