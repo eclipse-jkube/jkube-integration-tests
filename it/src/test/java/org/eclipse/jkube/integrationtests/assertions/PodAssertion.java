@@ -15,22 +15,51 @@ package org.eclipse.jkube.integrationtests.assertions;
 
 import io.fabric8.kubernetes.api.model.DoneablePod;
 import io.fabric8.kubernetes.api.model.Pod;
-import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.dsl.PodResource;
+import io.fabric8.openshift.client.OpenShiftClient;
+import org.eclipse.jkube.integrationtests.JKubeCase;
+import org.eclipse.jkube.integrationtests.PodReadyWatcher;
 
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
+
+import static org.eclipse.jkube.integrationtests.assertions.LabelAssertion.assertLabels;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.startsWith;
 
 public class PodAssertion extends KubernetesClientAssertion<Pod> {
 
-  private PodAssertion(KubernetesClient kubernetesClient, Pod pod) {
-    super(kubernetesClient, pod);
+  private PodAssertion(JKubeCase jKubeCase, Pod pod) {
+    super(jKubeCase, pod);
   }
 
-  public static PodAssertion assertPod(KubernetesClient kubernetesClient, Pod pod) {
-    return new PodAssertion(kubernetesClient, pod);
+  public static Function<JKubeCase, PodAssertion> assertPod(Pod pod) {
+    return jKubeCase -> new PodAssertion(jKubeCase, pod);
   }
 
-  public void logContains(CharSequence sequence, long timeoutSeconds) throws InterruptedException {
+  public static PodAssertion awaitPod(JKubeCase jKubeCase) throws InterruptedException{
+    final PodReadyWatcher podWatcher = new PodReadyWatcher();
+    jKubeCase.getKubernetesClient().pods().withLabel("app", jKubeCase.getApplication()).watch(podWatcher);
+    final Pod pod = podWatcher.await(60L, TimeUnit.SECONDS);
+    // TODO: Remove when We know why it failed
+    if (pod == null) {
+      System.err.printf("%s pod await failed%n", jKubeCase.getApplication());
+      jKubeCase.getKubernetesClient().adapt(OpenShiftClient.class).deploymentConfigs().list().getItems()
+        .forEach(dc -> System.err.printf("%s: %s%n",dc.getMetadata().getName(), dc.getStatus().toString()));
+      jKubeCase.getKubernetesClient().pods().list().getItems().forEach(p -> {
+          System.err.printf("Pods available: %s%n", p.getMetadata().getName());
+          System.err.printf("Labels: %s%n", p.getMetadata().getLabels());
+        }
+      );
+    }
+    assertThat(pod, notNullValue());
+    assertThat(pod.getMetadata().getName(), startsWith(jKubeCase.getApplication()));
+    assertLabels(jKubeCase).assertStandardLabels(pod.getMetadata()::getLabels);
+    return assertPod(pod).apply(jKubeCase);
+  }
+
+  public PodAssertion logContains(CharSequence sequence, long timeoutSeconds) throws InterruptedException {
     podResource().waitUntilCondition(conditionPod -> {
         try {
           return podResource().getLog().contains(sequence);
@@ -40,11 +69,12 @@ public class PodAssertion extends KubernetesClientAssertion<Pod> {
         return false;
       },
       timeoutSeconds, TimeUnit.SECONDS);
+    return this;
   }
 
   private PodResource<Pod, DoneablePod> podResource() {
-    return kubernetesClient.pods()
-      .inNamespace(kubernetesResource.getMetadata().getNamespace())
-      .withName(kubernetesResource.getMetadata().getName());
+    return getKubernetesClient().pods()
+      .inNamespace(getKubernetesResource().getMetadata().getNamespace())
+      .withName(getKubernetesResource().getMetadata().getName());
   }
 }

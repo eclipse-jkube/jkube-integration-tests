@@ -36,9 +36,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static org.eclipse.jkube.integrationtests.Locks.APPLY;
+import static org.eclipse.jkube.integrationtests.Locks.CLUSTER_APPLY;
 import static org.eclipse.jkube.integrationtests.Tags.KUBERNETES;
 import static org.eclipse.jkube.integrationtests.assertions.DockerAssertion.assertImageWasRecentlyBuilt;
+import static org.eclipse.jkube.integrationtests.assertions.LabelAssertion.assertLabels;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.equalTo;
@@ -49,7 +50,7 @@ import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 
 @Tag(KUBERNETES)
 @TestMethodOrder(OrderAnnotation.class)
-public class ThorntailK8sITCase extends Thorntail {
+class ThorntailK8sITCase extends Thorntail {
 
   private KubernetesClient k;
 
@@ -62,6 +63,11 @@ public class ThorntailK8sITCase extends Thorntail {
   void tearDown() {
     k.close();
     k = null;
+  }
+
+  @Override
+  public KubernetesClient getKubernetesClient() {
+    return k;
   }
 
   @Override
@@ -98,7 +104,7 @@ public class ThorntailK8sITCase extends Thorntail {
 
   @Test
   @Order(3)
-  @ResourceLock(value = APPLY, mode = READ_WRITE)
+  @ResourceLock(value = CLUSTER_APPLY, mode = READ_WRITE)
   @DisplayName("k8s:apply, should deploy pod and service")
   @SuppressWarnings("unchecked")
   void k8sApply() throws Exception {
@@ -111,12 +117,12 @@ public class ThorntailK8sITCase extends Thorntail {
       .filter(d -> d.getMetadata().getName().startsWith("thorntail-microprofile"))
       .findFirst();
     assertThat(deployment.isPresent(), equalTo(true));
-    assertStandardLabels(deployment.get().getMetadata()::getLabels);
+    assertLabels(this).assertStandardLabels(deployment.get().getMetadata()::getLabels);
     final DeploymentSpec deploymentSpec = deployment.get().getSpec();
     assertThat(deploymentSpec.getReplicas(), equalTo(1));
-    assertStandardLabels(deploymentSpec.getSelector()::getMatchLabels);
+    assertLabels(this).assertStandardLabels(deploymentSpec.getSelector()::getMatchLabels);
     final PodTemplateSpec ptSpec = deploymentSpec.getTemplate();
-    assertStandardLabels(ptSpec.getMetadata()::getLabels);
+    assertLabels(this).assertStandardLabels(ptSpec.getMetadata()::getLabels);
     assertThat(ptSpec.getSpec().getContainers(), hasSize(1));
     final Container ptContainer = ptSpec.getSpec().getContainers().iterator().next();
     assertThat(ptContainer.getImage(), equalTo("integration-tests/thorntail-microprofile:latest"));
@@ -140,7 +146,7 @@ public class ThorntailK8sITCase extends Thorntail {
     final InvocationResult invocationResult = maven("k8s:undeploy");
     // Then
     assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
-    assertThatShouldDeleteAllAppliedResources(k);
+    assertThatShouldDeleteAllAppliedResources(this);
     final boolean deploymentsExists = k.apps().deployments().list().getItems().stream()
       .anyMatch(d -> d.getMetadata().getName().startsWith("thorntail-microprofile"));
     assertThat(deploymentsExists, equalTo(false));

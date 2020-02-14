@@ -33,7 +33,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
-import static org.eclipse.jkube.integrationtests.Locks.APPLY;
+import static org.eclipse.jkube.integrationtests.Locks.CLUSTER_APPLY;
+import static org.eclipse.jkube.integrationtests.Locks.SPRINGBOOT_COMPLETE_K8s;
 import static org.eclipse.jkube.integrationtests.Tags.KUBERNETES;
 import static org.eclipse.jkube.integrationtests.assertions.DockerAssertion.assertImageWasRecentlyBuilt;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -43,7 +44,7 @@ import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 
 @Tag(KUBERNETES)
 @TestMethodOrder(OrderAnnotation.class)
-public class CompleteDockerITCase extends Complete {
+class CompleteDockerITCase extends Complete {
 
   private static final String DOCKER_ASSEMBLY_PROFILE = "Docker-Assembly";
 
@@ -61,6 +62,16 @@ public class CompleteDockerITCase extends Complete {
   }
 
   @Override
+  public KubernetesClient getKubernetesClient() {
+    return k;
+  }
+
+  @Override
+  public String getApplication() {
+    return "docker-spring-boot-complete";
+  }
+
+  @Override
   protected List<String> getProfiles() {
     return Collections.singletonList(DOCKER_ASSEMBLY_PROFILE);
   }
@@ -73,8 +84,8 @@ public class CompleteDockerITCase extends Complete {
     final InvocationResult invocationResult = maven("k8s:build");
     // Then
     assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
-    assertImageWasRecentlyBuilt("integration-tests", "docker-spring-boot-complete");
-    assertImageWasRecentlyBuilt("integration-tests", "docker-spring-boot-complete", "1337");
+    assertImageWasRecentlyBuilt("integration-tests", getApplication());
+    assertImageWasRecentlyBuilt("integration-tests", getApplication(), "1337");
     final File dockerDirectory = new File(
       String.format("../%s/target/docker/integration-tests/docker-spring-boot-complete", PROJECT_COMPLETE));
     assertThat(dockerDirectory.exists(), equalTo(true));
@@ -95,6 +106,7 @@ public class CompleteDockerITCase extends Complete {
   }
   @Test
   @Order(2)
+  @ResourceLock(value = SPRINGBOOT_COMPLETE_K8s, mode = READ_WRITE)
   @DisplayName("k8s:resource, should create manifests in specific directory")
   void k8sResource() throws Exception {
     // Given
@@ -115,7 +127,7 @@ public class CompleteDockerITCase extends Complete {
 
   @Test
   @Order(3)
-  @ResourceLock(value = APPLY, mode = READ_WRITE)
+  @ResourceLock(value = CLUSTER_APPLY, mode = READ_WRITE)
   @DisplayName("k8s:apply, should deploy pod and service form manifests in specific directory")
   void k8sApply() throws Exception {
     // Given
@@ -139,9 +151,9 @@ public class CompleteDockerITCase extends Complete {
     final InvocationResult invocationResult = maven("k8s:undeploy", properties);
     // Then
     assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
-//    assertThatShouldDeleteAllAppliedResources(k); TODO: make abstract
+    assertThatShouldDeleteAllAppliedResources(this);
     final boolean deploymentsExists = k.apps().deployments().list().getItems().stream()
-      .anyMatch(d -> d.getMetadata().getName().startsWith("docker-spring-boot-complete"));
+      .anyMatch(d -> d.getMetadata().getName().startsWith(getApplication()));
     assertThat(deploymentsExists, equalTo(false));
   }
 }

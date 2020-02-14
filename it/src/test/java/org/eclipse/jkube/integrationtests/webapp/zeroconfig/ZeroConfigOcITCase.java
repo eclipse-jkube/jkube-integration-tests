@@ -14,6 +14,7 @@
 package org.eclipse.jkube.integrationtests.webapp.zeroconfig;
 
 import io.fabric8.kubernetes.client.DefaultKubernetesClient;
+import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.openshift.client.OpenShiftClient;
 import org.apache.maven.shared.invoker.InvocationResult;
 import org.hamcrest.Matchers;
@@ -31,7 +32,7 @@ import java.io.File;
 import java.util.Properties;
 
 import static org.eclipse.jkube.integrationtests.Hacks.hackToPreventNullPointerInRegistryServiceCreateAuthConfig;
-import static org.eclipse.jkube.integrationtests.Locks.APPLY;
+import static org.eclipse.jkube.integrationtests.Locks.CLUSTER_APPLY;
 import static org.eclipse.jkube.integrationtests.Tags.OPEN_SHIFT;
 import static org.eclipse.jkube.integrationtests.assertions.DockerAssertion.assertImageWasRecentlyBuilt;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -53,6 +54,11 @@ class ZeroConfigOcITCase extends ZeroConfig {
   void tearDown() {
     oc.close();
     oc = null;
+  }
+
+  @Override
+  public KubernetesClient getKubernetesClient() {
+    return oc;
   }
 
   @Test
@@ -92,7 +98,7 @@ class ZeroConfigOcITCase extends ZeroConfig {
 
   @Test
   @Order(3)
-  @ResourceLock(value = APPLY, mode = READ_WRITE)
+  @ResourceLock(value = CLUSTER_APPLY, mode = READ_WRITE)
   @DisplayName("oc:apply, should deploy pod and service")
   void ocApply() throws Exception {
     // When
@@ -110,7 +116,7 @@ class ZeroConfigOcITCase extends ZeroConfig {
     final InvocationResult invocationResult = maven("oc:undeploy");
     // Then
     assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
-    assertThatShouldDeleteAllAppliedResources(oc);
+    assertThatShouldDeleteAllAppliedResources(this);
   }
 
 }

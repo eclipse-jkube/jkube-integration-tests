@@ -14,6 +14,7 @@
 package org.eclipse.jkube.integrationtests.springboot.zeroconfig;
 
 import io.fabric8.kubernetes.client.DefaultKubernetesClient;
+import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.openshift.api.model.ImageStream;
 import io.fabric8.openshift.client.OpenShiftClient;
 import org.apache.maven.shared.invoker.InvocationResult;
@@ -30,7 +31,7 @@ import org.junit.jupiter.api.parallel.ResourceLock;
 
 import java.io.File;
 
-import static org.eclipse.jkube.integrationtests.Locks.APPLY;
+import static org.eclipse.jkube.integrationtests.Locks.CLUSTER_APPLY;
 import static org.eclipse.jkube.integrationtests.Tags.OPEN_SHIFT;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -52,6 +53,11 @@ class ZeroConfigOcITCase extends ZeroConfig {
   void tearDown() {
     oc.close();
     oc = null;
+  }
+
+  @Override
+  public KubernetesClient getKubernetesClient() {
+    return oc;
   }
 
   @Test
@@ -86,7 +92,7 @@ class ZeroConfigOcITCase extends ZeroConfig {
 
   @Test
   @Order(3)
-  @ResourceLock(value = APPLY, mode = READ_WRITE)
+  @ResourceLock(value = CLUSTER_APPLY, mode = READ_WRITE)
   @DisplayName("oc:apply, should deploy pod and service")
   void ocApply() throws Exception {
     // When
@@ -104,6 +110,6 @@ class ZeroConfigOcITCase extends ZeroConfig {
     final InvocationResult invocationResult = maven("oc:undeploy");
     // Then
     assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
-    assertThatShouldDeleteAllAppliedResources(oc);
+    assertThatShouldDeleteAllAppliedResources(this);
   }
 }

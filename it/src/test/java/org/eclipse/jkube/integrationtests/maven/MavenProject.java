@@ -11,13 +11,8 @@
  * Contributors:
  *   Red Hat, Inc. - initial API and implementation
  */
-package org.eclipse.jkube.integrationtests;
+package org.eclipse.jkube.integrationtests.maven;
 
-public class Locks {
-
-  public static final String CLUSTER_APPLY = "cluster.apply";
-  public static final String SPRINGBOOT_COMPLETE_K8s = "springboot.complete.k8s";
-
-  private Locks() {
-  }
+public interface MavenProject {
+  String getProject();
 }

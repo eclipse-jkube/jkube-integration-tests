@@ -21,7 +21,6 @@ spec:
           gitRepo:
             repository: 'https://github.com/eclipse/jkube.git'
             revision: '0.1.0'
-            directory: .
       containers:
         - command: ["java"]
           args: ["-jar", "/deployments/spring-boot-complete-0.0.0-SNAPSHOT.jar"]
