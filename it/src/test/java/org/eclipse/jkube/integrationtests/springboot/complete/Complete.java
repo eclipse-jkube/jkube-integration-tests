@@ -14,8 +14,8 @@
 package org.eclipse.jkube.integrationtests.springboot.complete;
 
 import io.fabric8.kubernetes.api.model.Pod;
-import io.fabric8.kubernetes.client.KubernetesClient;
 import org.eclipse.jkube.integrationtests.JKubeCase;
+import org.eclipse.jkube.integrationtests.assertions.ServiceAssertion;
 import org.eclipse.jkube.integrationtests.maven.BaseMavenCase;
 
 import static org.eclipse.jkube.integrationtests.assertions.PodAssertion.assertPod;
@@ -37,15 +37,13 @@ abstract class Complete extends BaseMavenCase implements JKubeCase {
     return "spring-boot-complete";
   }
 
-  final void assertThatShouldApplyResources(KubernetesClient kc) throws Exception {
+  final ServiceAssertion assertThatShouldApplyResources() throws Exception {
     final Pod pod = awaitPod(this).getKubernetesResource();
     assertPod(pod).apply(this).logContains("CompleteApplication   : Started CompleteApplication in", 60);
-    awaitService(this, pod.getMetadata().getNamespace())
+    return awaitService(this, pod.getMetadata().getNamespace())
       .assertIsNodePort()
       .assertPorts(hasSize(1))
       .assertPort("us-cli", 8082, true);
-//    assertService(kc, service).assertNodePortResponse("http", equalTo("JKube from Thorntail rocks!"));
-    // TODO: Add specific assertions
   }
 
 }

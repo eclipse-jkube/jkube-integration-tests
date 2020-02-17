@@ -36,7 +36,7 @@ abstract class ZeroConfig extends BaseMavenCase implements JKubeCase {
     return "spring-boot-zero-config";
   }
 
-  final void assertThatShouldApplyResources(KubernetesClient kc) throws InterruptedException {
+  final Pod assertThatShouldApplyResources() throws InterruptedException {
     final Pod pod = awaitPod(this)
       .logContains("Started ZeroConfigApplication in", 40)
       .getKubernetesResource();
@@ -44,6 +44,7 @@ abstract class ZeroConfig extends BaseMavenCase implements JKubeCase {
       .assertExposed()
       .assertPorts(hasSize(1))
       .assertPort("http", 8080, false);
+    return pod;
   }
 
 }

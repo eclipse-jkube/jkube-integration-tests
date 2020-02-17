@@ -26,4 +26,4 @@ spec:
           args: ["-jar", "/deployments/spring-boot-complete-0.0.0-SNAPSHOT.jar"]
           volumeMounts:
             - name: jkube
-              mountPath: /app/jkube
+              mountPath: /app/

@@ -38,7 +38,7 @@ abstract class Vertx extends BaseMavenCase implements JKubeCase {
     return "vertx-simplest";
   }
 
-  final void assertThatShouldApplyResources(KubernetesClient kc) throws Exception {
+  final Pod assertThatShouldApplyResources() throws Exception {
     final Pod pod = awaitPod(this).getKubernetesResource();
     assertPod(pod).apply(this).logContains("Succeeded in deploying verticle", 10);
     awaitService(this, pod.getMetadata().getNamespace())
@@ -47,6 +47,7 @@ abstract class Vertx extends BaseMavenCase implements JKubeCase {
       .assertPorts(hasSize(1))
       .assertPort("http", 8080, true)
       .assertNodePortResponse("http", equalTo("Hello from JKube!"));
+    return pod;
   }
 
 }

@@ -41,7 +41,7 @@ public class PodAssertion extends KubernetesClientAssertion<Pod> {
   public static PodAssertion awaitPod(JKubeCase jKubeCase) throws InterruptedException{
     final PodReadyWatcher podWatcher = new PodReadyWatcher();
     jKubeCase.getKubernetesClient().pods().withLabel("app", jKubeCase.getApplication()).watch(podWatcher);
-    final Pod pod = podWatcher.await(60L, TimeUnit.SECONDS);
+    final Pod pod = podWatcher.await(DEFAULT_AWAIT_TIME_SECONDS, TimeUnit.SECONDS);
     // TODO: Remove when We know why it failed
     if (pod == null) {
       System.err.printf("%s pod await failed%n", jKubeCase.getApplication());

@@ -20,6 +20,7 @@ import okhttp3.Response;
 import org.eclipse.jkube.integrationtests.JKubeCase;
 import org.hamcrest.Matcher;
 
+import java.net.URL;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
@@ -46,18 +47,16 @@ public class ServiceAssertion extends KubernetesClientAssertion<Service> {
   }
 
   public static void assertServiceExists(JKubeCase jKubeCase, Matcher<Boolean> existsMatcher) {
-    final boolean servicesExist = jKubeCase.getKubernetesClient().services().list().getItems().stream()
+    final boolean servicesExists = jKubeCase.getKubernetesClient().services().list().getItems().stream()
       .anyMatch(s -> s.getMetadata().getName().startsWith(jKubeCase.getApplication()));
-    assertThat(servicesExist, existsMatcher);
+    assertThat(servicesExists, existsMatcher);
   }
 
-  public static ServiceAssertion awaitService(JKubeCase jKubeCase, String namespace)
-    throws InterruptedException {
-
+  public static ServiceAssertion awaitService(JKubeCase jKubeCase, String namespace) throws InterruptedException {
     final Service service = jKubeCase.getKubernetesClient().services()
       .inNamespace(namespace)
       .withName(jKubeCase.getApplication())
-      .waitUntilCondition(Objects::nonNull, 10L, TimeUnit.SECONDS);
+      .waitUntilCondition(Objects::nonNull, DEFAULT_AWAIT_TIME_SECONDS, TimeUnit.SECONDS);
     assertThat(service, notNullValue());
     assertLabels(jKubeCase).assertStandardLabels(service.getMetadata()::getLabels);
     assertLabels(jKubeCase).assertStandardLabels(service.getSpec()::getSelector);
@@ -88,7 +87,9 @@ public class ServiceAssertion extends KubernetesClientAssertion<Service> {
     return this;
   }
 
-  public ServiceAssertion assertNodePortResponse(String name, Matcher<? super String> responseBodyMatcher) throws Exception {
+  public ServiceAssertion assertNodePortResponse(String name, Matcher<? super String> responseBodyMatcher, String... path)
+    throws Exception {
+
     final ServicePort port = getKubernetesResource().getSpec().getPorts().stream()
       .filter(sp -> sp.getName().equals(name))
       .filter(sp -> sp.getNodePort() != null)
@@ -96,7 +97,7 @@ public class ServiceAssertion extends KubernetesClientAssertion<Service> {
     assertThat(port, notNullValue());
     final Response response = httpClient().newCall(new Request.Builder()
       .get()
-      .url(String.format("http://%s:%s/", getClusterHost(), port.getNodePort())).build())
+      .url(String.format("http://%s:%s/%s", getClusterHost(), port.getNodePort(), String.join("/", path))).build())
       .execute();
     assertThat(response.body(), notNullValue());
     assertThat(response.body().string(), responseBodyMatcher);
