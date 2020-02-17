@@ -23,6 +23,8 @@ import java.net.URL;
 
 public class KubernetesClientAssertion<T extends KubernetesResource> {
 
+  static final long DEFAULT_AWAIT_TIME_SECONDS = 60L;
+
   private static OkHttpClient okHttpClient;
 
   synchronized static OkHttpClient httpClient() {

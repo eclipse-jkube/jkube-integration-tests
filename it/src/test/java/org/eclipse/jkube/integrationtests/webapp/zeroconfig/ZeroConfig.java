@@ -37,13 +37,14 @@ abstract class ZeroConfig extends BaseMavenCase implements JKubeCase {
     return "webapp-zero-config";
   }
 
-  final void assertThatShouldApplyResources(KubernetesClient kc) throws InterruptedException {
+  final Pod assertThatShouldApplyResources() throws InterruptedException {
     final Pod pod = awaitPod(this).getKubernetesResource();
     assertPod(pod).apply(this).logContains("Catalina.start Server startup", 10);
     awaitService(this, pod.getMetadata().getNamespace())
       .assertExposed()
       .assertPorts(hasSize(1))
       .assertPort("http", 8080, false);
+    return pod;
   }
 
 }

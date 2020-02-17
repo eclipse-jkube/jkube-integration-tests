@@ -106,7 +106,7 @@ class ThorntailOcITCase extends Thorntail {
     final InvocationResult invocationResult = maven("oc:apply");
     // Then
     assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
-    assertThatShouldApplyResources(oc);
+    assertThatShouldApplyResources();
   }
 
   @Test
