@@ -15,7 +15,7 @@ package org.eclipse.jkube.integrationtests;
 
 public class Locks {
 
-  public static final String CLUSTER_APPLY = "cluster.apply";
+  public static final String CLUSTER_RESOURCE_INTENSIVE = "cluster.resource.intensive.operation";
   public static final String SPRINGBOOT_COMPLETE_K8s = "springboot.complete.k8s";
 
   private Locks() {

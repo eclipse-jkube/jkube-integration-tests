@@ -30,7 +30,7 @@ import org.junit.jupiter.api.parallel.ResourceLock;
 
 import java.io.File;
 
-import static org.eclipse.jkube.integrationtests.Locks.CLUSTER_APPLY;
+import static org.eclipse.jkube.integrationtests.Locks.CLUSTER_RESOURCE_INTENSIVE;
 import static org.eclipse.jkube.integrationtests.Tags.KUBERNETES;
 import static org.eclipse.jkube.integrationtests.assertions.DeploymentAssertion.assertDeploymentExists;
 import static org.eclipse.jkube.integrationtests.assertions.DeploymentAssertion.awaitDeployment;
@@ -94,7 +94,7 @@ class VertxK8sITCase extends Vertx {
 
   @Test
   @Order(3)
-  @ResourceLock(value = CLUSTER_APPLY, mode = READ_WRITE)
+  @ResourceLock(value = CLUSTER_RESOURCE_INTENSIVE, mode = READ_WRITE)
   @DisplayName("k8s:apply, should deploy pod and service")
   @SuppressWarnings("unchecked")
   void k8sApply() throws Exception {

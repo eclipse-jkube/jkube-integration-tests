@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright (c) 2019 Red Hat, Inc.
+    This program and the accompanying materials are made
+    available under the terms of the Eclipse Public License 2.0
+    which is available at:
+
+        https://www.eclipse.org/legal/epl-2.0/
+
+    SPDX-License-Identifier: EPL-2.0
+
+    Contributors:
+      Red Hat, Inc. - initial API and implementation
+
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.eclipse.jkube.integration-tests</groupId>
+    <artifactId>jkube-integration-tests-project</artifactId>
+    <version>${revision}</version>
+    <relativePath>../../../pom.xml</relativePath>
+  </parent>
+
+  <artifactId>quarkus-native</artifactId>
+  <name>${global.name} :: Quarkus :: GraalVM Native</name>
+  <description>
+    Quarkus GraalVM Native project
+  </description>
+
+  <dependencies>
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-arc</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-resteasy</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>io.smallrye</groupId>
+          <artifactId>smallrye-config</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-resteasy-jackson</artifactId>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>io.quarkus</groupId>
+        <artifactId>quarkus-maven-plugin</artifactId>
+        <version>${quarkus.version}</version>
+        <executions>
+          <execution>
+            <id>package</id>
+            <phase>package</phase>
+            <goals>
+              <goal>build</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>native-image</id>
+            <goals>
+              <goal>native-image</goal>
+            </goals>
+            <configuration>
+              <enableHttpUrlHandler>true</enableHttpUrlHandler>
+              <dockerBuild>true</dockerBuild>
+              <additionalBuildArgs>
+                <additionalBuildArg>--allow-incomplete-classpath</additionalBuildArg>
+                <additionalBuildArg>-H:IncludeResources=.*\.json$</additionalBuildArg>
+              </additionalBuildArgs>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.eclipse.jkube</groupId>
+        <artifactId>k8s-maven-plugin</artifactId>
+        <configuration>
+          <enricher>
+            <config>
+              <jkube-service>
+                <type>NodePort</type>
+              </jkube-service>
+            </config>
+          </enricher>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.eclipse.jkube</groupId>
+        <artifactId>oc-maven-plugin</artifactId>
+        <configuration>
+            <enricher>
+              <config>
+                <jkube-service>
+                  <type>NodePort</type>
+                </jkube-service>
+              </config>
+            </enricher>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+  <profiles>
+    <profile>
+      <id>native</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <properties>
+        <jkube.generator.name>integration-tests/quarkus-native-is-amazing</jkube.generator.name>
+        <jkube.generator.quarkus.nativeImage>true</jkube.generator.quarkus.nativeImage>
+      </properties>
+    </profile>
+  </profiles>
+</project>

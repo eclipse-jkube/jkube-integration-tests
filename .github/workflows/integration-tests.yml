@@ -24,19 +24,20 @@ env:
 
 jobs:
   minikube:
-    name: Integration Tests in Minikube Cluster
+    name: K8S
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
-        minikube: [v1.5.1]
         kubernetes: [v1.16.2,v1.17.2]
+        suite: ['quarkus','springboot','other']
     steps:
       - name: Checkout
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2.0.0
       - name: Setup Minikube-Kubernetes
         uses: manusa/actions-setup-minikube@v1.0.0
         with:
-          minikube version: ${{ matrix.minikube }}
+          minikube version: v1.5.1
           kubernetes version: ${{ matrix.kubernetes }}
       - name: Setup Java 11
         uses: actions/setup-java@v1
@@ -54,16 +55,18 @@ jobs:
           cd $JKUBE_DIR \
           && JKUBE_VERSION=$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec) \
           && cd .. \
-          && ./mvnw -B -PKubernetes clean verify -Djkube.version="$JKUBE_VERSION"
+          && ./mvnw -B -PKubernetes,${{ matrix.suite }} clean verify -Djkube.version="$JKUBE_VERSION"
   openshift:
-    name: Integration Tests in OpenShift Cluster
+    name: OpenShift
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         openshift: [v3.9.0,v3.11.0]
+        suite: ['quarkus','springboot','other']
     steps:
       - name: Checkout
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2.0.0
       - name: Setup OpenShift
         uses: manusa/actions-setup-openshift@v1.0.1
         with:
@@ -84,4 +87,4 @@ jobs:
           cd $JKUBE_DIR \
           && JKUBE_VERSION=$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec) \
           && cd .. \
-          && ./mvnw -B -POpenShift clean verify -Djkube.version="$JKUBE_VERSION" -Djunit.jupiter.execution.parallel.config.fixed.parallelism=2
+          && ./mvnw -B -POpenShift,${{ matrix.suite }} clean verify -Djkube.version="$JKUBE_VERSION" -Djunit.jupiter.execution.parallel.config.fixed.parallelism=2

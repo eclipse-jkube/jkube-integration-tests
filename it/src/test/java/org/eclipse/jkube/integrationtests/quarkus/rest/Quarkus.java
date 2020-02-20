@@ -14,7 +14,6 @@
 package org.eclipse.jkube.integrationtests.quarkus.rest;
 
 import io.fabric8.kubernetes.api.model.Pod;
-import io.fabric8.kubernetes.client.KubernetesClient;
 import org.eclipse.jkube.integrationtests.JKubeCase;
 import org.eclipse.jkube.integrationtests.maven.BaseMavenCase;
 
@@ -26,11 +25,11 @@ import static org.hamcrest.Matchers.hasSize;
 
 abstract class Quarkus extends BaseMavenCase implements JKubeCase {
 
-  static final String PROJECT_QUARKUS = "projects-to-be-tested/quarkus/rest";
+  static final String PROJECT_QUARKUS_REST = "projects-to-be-tested/quarkus/rest";
 
   @Override
   public String getProject() {
-    return PROJECT_QUARKUS;
+    return PROJECT_QUARKUS_REST;
   }
 
   @Override
@@ -40,7 +39,7 @@ abstract class Quarkus extends BaseMavenCase implements JKubeCase {
 
   final Pod assertThatShouldApplyResources() throws Exception {
     final Pod pod = awaitPod(this).getKubernetesResource();
-    assertPod(pod).apply(this).logContains("quarkus-rest 0.0.0-SNAPSHOT (running on Quarkus 1.2.0.Final) started in", 60);
+    assertPod(pod).apply(this).logContains("quarkus-rest 0.0.0-SNAPSHOT (running on Quarkus 1.2.1.Final) started in", 60);
     awaitService(this, pod.getMetadata().getNamespace())
       .assertIsNodePort()
       .assertExposed()
@@ -50,6 +49,5 @@ abstract class Quarkus extends BaseMavenCase implements JKubeCase {
         equalTo("{\"applicationName\":\"JKube\",\"message\":\"Subatomic JKube really whips the llama's ass!\"}"));
     return pod;
   }
-
 
 }

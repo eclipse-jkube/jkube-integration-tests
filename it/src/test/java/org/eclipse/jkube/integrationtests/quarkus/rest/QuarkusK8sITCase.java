@@ -30,7 +30,7 @@ import org.junit.jupiter.api.parallel.ResourceLock;
 
 import java.io.File;
 
-import static org.eclipse.jkube.integrationtests.Locks.CLUSTER_APPLY;
+import static org.eclipse.jkube.integrationtests.Locks.CLUSTER_RESOURCE_INTENSIVE;
 import static org.eclipse.jkube.integrationtests.Tags.KUBERNETES;
 import static org.eclipse.jkube.integrationtests.assertions.DeploymentAssertion.assertDeploymentExists;
 import static org.eclipse.jkube.integrationtests.assertions.DeploymentAssertion.awaitDeployment;
@@ -85,7 +85,7 @@ class QuarkusK8sITCase extends Quarkus {
     // Then
     assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
     final File metaInfDirectory = new File(
-      String.format("../%s/target/classes/META-INF", PROJECT_QUARKUS));
+      String.format("../%s/target/classes/META-INF", PROJECT_QUARKUS_REST));
     assertThat(metaInfDirectory.exists(), equalTo(true));
     assertThat(new File(metaInfDirectory, "jkube/kubernetes.yml"). exists(), equalTo(true));
     assertThat(new File(metaInfDirectory, "jkube/kubernetes/quarkus-rest-deployment.yml"). exists(), equalTo(true));
@@ -95,7 +95,7 @@ class QuarkusK8sITCase extends Quarkus {
   @Test
   @Order(3)
   @DisplayName("k8s:apply, should deploy pod and service")
-  @ResourceLock(value = CLUSTER_APPLY, mode = READ_WRITE)
+  @ResourceLock(value = CLUSTER_RESOURCE_INTENSIVE, mode = READ_WRITE)
   @SuppressWarnings("unchecked")
   void k8sApply() throws Exception {
     // When
