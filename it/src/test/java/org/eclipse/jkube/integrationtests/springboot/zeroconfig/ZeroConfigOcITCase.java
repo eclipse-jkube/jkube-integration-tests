@@ -31,7 +31,8 @@ import org.junit.jupiter.api.parallel.ResourceLock;
 
 import java.io.File;
 
-import static org.eclipse.jkube.integrationtests.Locks.CLUSTER_APPLY;
+import static org.eclipse.jkube.integrationtests.Locks.CLUSTER_RESOURCE_INTENSIVE;
+import static org.eclipse.jkube.integrationtests.OpenShift.cleanUpCluster;
 import static org.eclipse.jkube.integrationtests.Tags.OPEN_SHIFT;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -62,13 +63,14 @@ class ZeroConfigOcITCase extends ZeroConfig {
 
   @Test
   @Order(1)
+  @ResourceLock(value = CLUSTER_RESOURCE_INTENSIVE, mode = READ_WRITE)
   @DisplayName("oc:build, should create image")
   void ocBuild() throws Exception {
     // When
     final InvocationResult invocationResult = maven("oc:build");
     // Then
     assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
-    final ImageStream is = oc.imageStreams().withName("spring-boot-zero-config").get();
+    final ImageStream is = oc.imageStreams().withName(getApplication()).get();
     assertThat(is, notNullValue());
     assertThat(is.getStatus().getTags().iterator().next().getTag(), equalTo("latest"));
   }
@@ -92,7 +94,7 @@ class ZeroConfigOcITCase extends ZeroConfig {
 
   @Test
   @Order(3)
-  @ResourceLock(value = CLUSTER_APPLY, mode = READ_WRITE)
+  @ResourceLock(value = CLUSTER_RESOURCE_INTENSIVE, mode = READ_WRITE)
   @DisplayName("oc:apply, should deploy pod and service")
   void ocApply() throws Exception {
     // When
@@ -111,5 +113,6 @@ class ZeroConfigOcITCase extends ZeroConfig {
     // Then
     assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
     assertThatShouldDeleteAllAppliedResources(this);
+    cleanUpCluster(oc, this);
   }
 }

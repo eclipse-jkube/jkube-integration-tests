@@ -11,12 +11,14 @@
  * Contributors:
  *   Red Hat, Inc. - initial API and implementation
  */
-package org.eclipse.jkube.integrationtests.springboot.zeroconfig;
+package org.eclipse.jkube.integrationtests.quarkus.na7ive;
 
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import org.apache.maven.shared.invoker.InvocationResult;
+import org.eclipse.jkube.integrationtests.JKubeCase;
+import org.eclipse.jkube.integrationtests.maven.BaseMavenCase;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,6 +37,9 @@ import static org.eclipse.jkube.integrationtests.Tags.KUBERNETES;
 import static org.eclipse.jkube.integrationtests.assertions.DeploymentAssertion.assertDeploymentExists;
 import static org.eclipse.jkube.integrationtests.assertions.DeploymentAssertion.awaitDeployment;
 import static org.eclipse.jkube.integrationtests.assertions.DockerAssertion.assertImageWasRecentlyBuilt;
+import static org.eclipse.jkube.integrationtests.assertions.PodAssertion.assertPod;
+import static org.eclipse.jkube.integrationtests.assertions.PodAssertion.awaitPod;
+import static org.eclipse.jkube.integrationtests.assertions.ServiceAssertion.awaitService;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.equalTo;
@@ -45,7 +50,9 @@ import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 
 @Tag(KUBERNETES)
 @TestMethodOrder(OrderAnnotation.class)
-class ZeroConfigK8sITCase extends ZeroConfig {
+public class QuarkusNativeK8sITCase extends BaseMavenCase implements JKubeCase {
+
+  static final String PROJECT_QUARKUS_NATIVE = "projects-to-be-tested/quarkus/native";
 
   private KubernetesClient k;
 
@@ -61,8 +68,18 @@ class ZeroConfigK8sITCase extends ZeroConfig {
   }
 
   @Override
+  public String getProject() {
+    return PROJECT_QUARKUS_NATIVE;
+  }
+
+  @Override
   public KubernetesClient getKubernetesClient() {
     return k;
+  }
+
+  @Override
+  public String getApplication() {
+    return "quarkus-native";
   }
 
   @Test
@@ -73,7 +90,7 @@ class ZeroConfigK8sITCase extends ZeroConfig {
     final InvocationResult invocationResult = maven("k8s:build");
     // Then
     assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
-    assertImageWasRecentlyBuilt("integration-tests", "spring-boot-zero-config");
+    assertImageWasRecentlyBuilt("integration-tests", "quarkus-native-is-amazing");
   }
 
   @Test
@@ -85,17 +102,17 @@ class ZeroConfigK8sITCase extends ZeroConfig {
     // Then
     assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
     final File metaInfDirectory = new File(
-        String.format("../%s/target/classes/META-INF", PROJECT_ZERO_CONFIG));
+      String.format("../%s/target/classes/META-INF", PROJECT_QUARKUS_NATIVE));
     assertThat(metaInfDirectory.exists(), equalTo(true));
     assertThat(new File(metaInfDirectory, "jkube/kubernetes.yml"). exists(), equalTo(true));
-    assertThat(new File(metaInfDirectory, "jkube/kubernetes/spring-boot-zero-config-deployment.yml"). exists(), equalTo(true));
-    assertThat(new File(metaInfDirectory, "jkube/kubernetes/spring-boot-zero-config-service.yml"). exists(), equalTo(true));
+    assertThat(new File(metaInfDirectory, "jkube/kubernetes/quarkus-native-deployment.yml"). exists(), equalTo(true));
+    assertThat(new File(metaInfDirectory, "jkube/kubernetes/quarkus-native-service.yml"). exists(), equalTo(true));
   }
 
   @Test
   @Order(3)
-  @ResourceLock(value = CLUSTER_RESOURCE_INTENSIVE, mode = READ_WRITE)
   @DisplayName("k8s:apply, should deploy pod and service")
+  @ResourceLock(value = CLUSTER_RESOURCE_INTENSIVE, mode = READ_WRITE)
   @SuppressWarnings("unchecked")
   void k8sApply() throws Exception {
     // When
@@ -107,9 +124,9 @@ class ZeroConfigK8sITCase extends ZeroConfig {
       .assertReplicas(equalTo(1))
       .assertContainers(hasSize(1))
       .assertContainers(hasItems(allOf(
-        hasProperty("image", equalTo("integration-tests/spring-boot-zero-config:latest")),
-        hasProperty("name", equalTo("spring-boot")),
-        hasProperty("ports", hasSize(3)),
+        hasProperty("image", equalTo("integration-tests/quarkus-native-is-amazing:latest")),
+        hasProperty("name", equalTo("quarkus")),
+        hasProperty("ports", hasSize(1)),
         hasProperty("ports", hasItems(allOf(
           hasProperty("name", equalTo("http")),
           hasProperty("containerPort", equalTo(8080))
@@ -127,5 +144,18 @@ class ZeroConfigK8sITCase extends ZeroConfig {
     assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
     assertThatShouldDeleteAllAppliedResources(this);
     assertDeploymentExists(this, equalTo(false));
+  }
+
+  final Pod assertThatShouldApplyResources() throws Exception {
+    final Pod pod = awaitPod(this).getKubernetesResource();
+    assertPod(pod).apply(this).logContains("quarkus-native 0.0.0-SNAPSHOT (running on Quarkus 1.2.1.Final) started in", 60);
+    awaitService(this, pod.getMetadata().getNamespace())
+      .assertIsNodePort()
+      .assertExposed()
+      .assertPorts(hasSize(1))
+      .assertPort("http", 8080, true)
+      .assertNodePortResponse("http",
+        equalTo("JKube with awesome native subatomic superpowers"));
+    return pod;
   }
 }

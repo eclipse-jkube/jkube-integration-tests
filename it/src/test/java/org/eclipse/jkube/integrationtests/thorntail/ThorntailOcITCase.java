@@ -33,7 +33,8 @@ import java.io.File;
 import java.util.Collections;
 import java.util.List;
 
-import static org.eclipse.jkube.integrationtests.Locks.CLUSTER_APPLY;
+import static org.eclipse.jkube.integrationtests.Locks.CLUSTER_RESOURCE_INTENSIVE;
+import static org.eclipse.jkube.integrationtests.OpenShift.cleanUpCluster;
 import static org.eclipse.jkube.integrationtests.Tags.OPEN_SHIFT;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -69,6 +70,7 @@ class ThorntailOcITCase extends Thorntail {
 
   @Test
   @Order(1)
+  @ResourceLock(value = CLUSTER_RESOURCE_INTENSIVE, mode = READ_WRITE)
   @DisplayName("oc:build, should create image")
   void ocBuild() throws Exception {
     // When
@@ -99,7 +101,7 @@ class ThorntailOcITCase extends Thorntail {
 
   @Test
   @Order(3)
-  @ResourceLock(value = CLUSTER_APPLY, mode = READ_WRITE)
+  @ResourceLock(value = CLUSTER_RESOURCE_INTENSIVE, mode = READ_WRITE)
   @DisplayName("oc:apply, should deploy pod and service")
   void ocApply() throws Exception {
     // When
@@ -118,5 +120,6 @@ class ThorntailOcITCase extends Thorntail {
     // Then
     assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
     assertThatShouldDeleteAllAppliedResources(this);
+    cleanUpCluster(oc, this);
   }
 }

@@ -31,7 +31,8 @@ import org.junit.jupiter.api.parallel.ResourceLock;
 
 import java.io.File;
 
-import static org.eclipse.jkube.integrationtests.Locks.CLUSTER_APPLY;
+import static org.eclipse.jkube.integrationtests.Locks.CLUSTER_RESOURCE_INTENSIVE;
+import static org.eclipse.jkube.integrationtests.OpenShift.cleanUpCluster;
 import static org.eclipse.jkube.integrationtests.Tags.OPEN_SHIFT;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -62,6 +63,7 @@ class VertxOcITCase extends Vertx {
 
   @Test
   @Order(1)
+  @ResourceLock(value = CLUSTER_RESOURCE_INTENSIVE, mode = READ_WRITE)
   @DisplayName("oc:build, should create image")
   void ocBuild() throws Exception {
     // When
@@ -92,7 +94,7 @@ class VertxOcITCase extends Vertx {
 
   @Test
   @Order(3)
-  @ResourceLock(value = CLUSTER_APPLY, mode = READ_WRITE)
+  @ResourceLock(value = CLUSTER_RESOURCE_INTENSIVE, mode = READ_WRITE)
   @DisplayName("oc:apply, should deploy pod and service")
   void ocApply() throws Exception {
     // When
@@ -111,5 +113,6 @@ class VertxOcITCase extends Vertx {
     // Then
     assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
     assertThatShouldDeleteAllAppliedResources(this);
+    cleanUpCluster(oc, this);
   }
 }

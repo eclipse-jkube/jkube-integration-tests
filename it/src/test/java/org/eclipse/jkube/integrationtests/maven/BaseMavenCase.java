@@ -20,6 +20,7 @@ import org.eclipse.jkube.integrationtests.JKubeCase;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -35,7 +36,7 @@ import static org.hamcrest.Matchers.notNullValue;
 public abstract class BaseMavenCase implements MavenProject {
 
   protected List<String> getProfiles() {
-    return Collections.emptyList();
+    return new ArrayList<>();
   }
 
   protected static void assertThatShouldDeleteAllAppliedResources(JKubeCase jKubeCase) {
