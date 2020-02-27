@@ -28,3 +28,7 @@ a profile matching the group name defined above must be specified-
 
 e.g. Spring Boot tests when running in an Open Shift cluster `mvn verify -POpenShift,springboot`
 
+**Warning:** If you've run any other suite in your local environment run a "profile-less" `mvn clean`
+command prior to anything else so that all `target` directories get deleted,
+else other profiles will get triggered.
+
