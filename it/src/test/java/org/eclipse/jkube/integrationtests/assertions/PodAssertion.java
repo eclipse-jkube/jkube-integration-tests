@@ -15,6 +15,7 @@ package org.eclipse.jkube.integrationtests.assertions;
 
 import io.fabric8.kubernetes.api.model.DoneablePod;
 import io.fabric8.kubernetes.api.model.Pod;
+import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.dsl.PodResource;
 import io.fabric8.openshift.client.OpenShiftClient;
 import org.eclipse.jkube.integrationtests.JKubeCase;
@@ -38,20 +39,13 @@ public class PodAssertion extends KubernetesClientAssertion<Pod> {
     return jKubeCase -> new PodAssertion(jKubeCase, pod);
   }
 
-  public static PodAssertion awaitPod(JKubeCase jKubeCase) throws InterruptedException{
+  public static PodAssertion awaitPod(JKubeCase jKubeCase) throws InterruptedException {
     final PodReadyWatcher podWatcher = new PodReadyWatcher();
     jKubeCase.getKubernetesClient().pods().withLabel("app", jKubeCase.getApplication()).watch(podWatcher);
-    final Pod pod = podWatcher.await(DEFAULT_AWAIT_TIME_SECONDS, TimeUnit.SECONDS);
-    // TODO: Remove when We know why it failed
-    if (pod == null) {
-      System.err.printf("%s pod await failed%n", jKubeCase.getApplication());
-      jKubeCase.getKubernetesClient().adapt(OpenShiftClient.class).deploymentConfigs().list().getItems()
-        .forEach(dc -> System.err.printf("%s: %s%n",dc.getMetadata().getName(), dc.getStatus().toString()));
-      jKubeCase.getKubernetesClient().pods().list().getItems().forEach(p -> {
-          System.err.printf("Pods available: %s%n", p.getMetadata().getName());
-          System.err.printf("Labels: %s%n", p.getMetadata().getLabels());
-        }
-      );
+    Pod pod = awaitPod(jKubeCase.getKubernetesClient(), jKubeCase.getApplication());
+    if (pod == null && jKubeCase.getKubernetesClient().isAdaptable(OpenShiftClient.class)) {
+      retryDeployment(jKubeCase.getKubernetesClient().adapt(OpenShiftClient.class), jKubeCase.getApplication());
+      pod  = awaitPod(jKubeCase.getKubernetesClient(), jKubeCase.getApplication());
     }
     assertThat(pod, notNullValue());
     assertThat(pod.getMetadata().getName(), startsWith(jKubeCase.getApplication()));
@@ -76,5 +70,23 @@ public class PodAssertion extends KubernetesClientAssertion<Pod> {
     return getKubernetesClient().pods()
       .inNamespace(getKubernetesResource().getMetadata().getNamespace())
       .withName(getKubernetesResource().getMetadata().getName());
+  }
+
+  private static Pod awaitPod(KubernetesClient kc,String appId) throws InterruptedException {
+    final PodReadyWatcher podWatcher = new PodReadyWatcher();
+    kc.pods().withLabel("app", appId).watch(podWatcher);
+    return podWatcher.await(DEFAULT_AWAIT_TIME_SECONDS, TimeUnit.SECONDS);
+  }
+
+  private static void retryDeployment(OpenShiftClient oc, String deploymentConfigName) {
+    System.err.println("\nStatus:");
+    System.err.println(oc.deploymentConfigs().withName(deploymentConfigName).get().getStatus());
+    System.err.println("\nStatus Details:");
+    System.err.println(oc.deploymentConfigs().withName(deploymentConfigName).get().getStatus().getDetails());
+    System.err.println("\nStatus Conditions:");
+    oc.deploymentConfigs().withName(deploymentConfigName).get().getStatus().getConditions().forEach(
+      condition -> System.err.println(condition.toString())
+    );
+    oc.deploymentConfigs().withName(deploymentConfigName).deployLatest();
   }
 }

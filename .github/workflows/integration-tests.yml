@@ -30,7 +30,7 @@ jobs:
       fail-fast: false
       matrix:
         kubernetes: [v1.16.2,v1.17.2]
-        suite: ['quarkus','springboot','other']
+        suite: ['quarkus','quarkus-native','springboot','webapp','other']
     steps:
       - name: Checkout
         uses: actions/checkout@v2.0.0
@@ -63,7 +63,7 @@ jobs:
       fail-fast: false
       matrix:
         openshift: [v3.9.0,v3.11.0]
-        suite: ['quarkus','springboot','other']
+        suite: ['quarkus','springboot','webapp','other']
     steps:
       - name: Checkout
         uses: actions/checkout@v2.0.0
@@ -87,4 +87,4 @@ jobs:
           cd $JKUBE_DIR \
           && JKUBE_VERSION=$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec) \
           && cd .. \
-          && ./mvnw -B -POpenShift,${{ matrix.suite }} clean verify -Djkube.version="$JKUBE_VERSION" -Djunit.jupiter.execution.parallel.config.fixed.parallelism=2
+          && ./mvnw -B -POpenShift,${{ matrix.suite }} clean verify -Djkube.version="$JKUBE_VERSION" -Djunit.jupiter.execution.parallel.config.fixed.parallelism=1
