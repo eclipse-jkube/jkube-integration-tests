@@ -234,8 +234,33 @@
     <profile>
       <id>quarkus</id>
       <modules>
-        <module>projects-to-be-tested/quarkus/native</module>
         <module>projects-to-be-tested/quarkus/rest</module>
+      </modules>
+      <activation>
+        <file>
+          <exists>
+            projects-to-be-tested/quarkus/rest/target
+          </exists>
+        </file>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <configuration>
+              <includes>
+                <include>**/integrationtests/quarkus/rest/**/*ITCase.java</include>
+              </includes>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>quarkus-native</id>
+      <modules>
+        <module>projects-to-be-tested/quarkus/native</module>
       </modules>
       <activation>
         <file>
@@ -251,7 +276,7 @@
             <artifactId>maven-failsafe-plugin</artifactId>
             <configuration>
               <includes>
-                <include>**/integrationtests/quarkus/**/*ITCase.java</include>
+                <include>**/integrationtests/quarkus/native/**/*ITCase.java</include>
               </includes>
             </configuration>
           </plugin>
@@ -287,11 +312,36 @@
       </build>
     </profile>
     <profile>
+      <id>webapp</id>
+      <modules>
+        <module>projects-to-be-tested/webapp/zero-config</module>
+      </modules>
+      <activation>
+        <file>
+          <exists>
+            projects-to-be-tested/webapp/zero-config/target
+          </exists>
+        </file>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <configuration>
+              <includes>
+                <include>**/integrationtests/webapp/**/*ITCase.java</include>
+              </includes>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
       <id>other</id>
       <modules>
         <module>projects-to-be-tested/thorntail/microprofile</module>
         <module>projects-to-be-tested/vertx/simplest</module>
-        <module>projects-to-be-tested/webapp/zero-config</module>
       </modules>
       <activation>
         <file>
@@ -309,7 +359,6 @@
               <includes>
                 <include>**/integrationtests/thorntail/**/*ITCase.java</include>
                 <include>**/integrationtests/vertx/**/*ITCase.java</include>
-                <include>**/integrationtests/webapp/**/*ITCase.java</include>
               </includes>
             </configuration>
           </plugin>
