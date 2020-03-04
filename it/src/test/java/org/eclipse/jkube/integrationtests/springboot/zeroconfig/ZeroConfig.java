@@ -14,9 +14,10 @@
 package org.eclipse.jkube.integrationtests.springboot.zeroconfig;
 
 import io.fabric8.kubernetes.api.model.Pod;
-import io.fabric8.kubernetes.client.KubernetesClient;
 import org.eclipse.jkube.integrationtests.JKubeCase;
 import org.eclipse.jkube.integrationtests.maven.BaseMavenCase;
+
+import java.io.IOException;
 
 import static org.eclipse.jkube.integrationtests.assertions.PodAssertion.awaitPod;
 import static org.eclipse.jkube.integrationtests.assertions.ServiceAssertion.awaitService;
@@ -36,7 +37,7 @@ abstract class ZeroConfig extends BaseMavenCase implements JKubeCase {
     return "spring-boot-zero-config";
   }
 
-  final Pod assertThatShouldApplyResources() throws InterruptedException {
+  final Pod assertThatShouldApplyResources() throws InterruptedException, IOException {
     final Pod pod = awaitPod(this)
       .logContains("Started ZeroConfigApplication in", 40)
       .getKubernetesResource();
