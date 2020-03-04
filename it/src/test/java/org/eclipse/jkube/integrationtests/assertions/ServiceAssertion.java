@@ -20,7 +20,6 @@ import okhttp3.Response;
 import org.eclipse.jkube.integrationtests.JKubeCase;
 import org.hamcrest.Matcher;
 
-import java.net.URL;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;

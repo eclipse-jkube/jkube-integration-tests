@@ -14,9 +14,10 @@
 package org.eclipse.jkube.integrationtests.webapp.zeroconfig;
 
 import io.fabric8.kubernetes.api.model.Pod;
-import io.fabric8.kubernetes.client.KubernetesClient;
 import org.eclipse.jkube.integrationtests.JKubeCase;
 import org.eclipse.jkube.integrationtests.maven.BaseMavenCase;
+
+import java.io.IOException;
 
 import static org.eclipse.jkube.integrationtests.assertions.PodAssertion.assertPod;
 import static org.eclipse.jkube.integrationtests.assertions.PodAssertion.awaitPod;
@@ -37,7 +38,7 @@ abstract class ZeroConfig extends BaseMavenCase implements JKubeCase {
     return "webapp-zero-config";
   }
 
-  final Pod assertThatShouldApplyResources() throws InterruptedException {
+  final Pod assertThatShouldApplyResources() throws InterruptedException, IOException {
     final Pod pod = awaitPod(this).getKubernetesResource();
     assertPod(pod).apply(this).logContains("Catalina.start Server startup", 10);
     awaitService(this, pod.getMetadata().getNamespace())

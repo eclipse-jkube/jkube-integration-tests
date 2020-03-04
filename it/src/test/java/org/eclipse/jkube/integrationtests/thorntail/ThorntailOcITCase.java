@@ -87,7 +87,7 @@ class ThorntailOcITCase extends Thorntail {
   @DisplayName("oc:resource, should create manifests")
   void ocResource() throws Exception {
     // When
-    final InvocationResult invocationResult = maven("oc:resource");
+    final InvocationResult invocationResult = maven("clean oc:resource"); //Clean to free up DiskSpace
     // Then
     assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
     final File metaInfDirectory = new File(

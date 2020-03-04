@@ -49,7 +49,7 @@ jobs:
           && cd $JKUBE_DIR \
           && git checkout "$JKUBE_REVISION"
       - name: Install JKube
-        run: cd $JKUBE_DIR && mvn -f pom.xml -B -DskipTests clean install
+        run: cd $JKUBE_DIR && mvn -f pom.xml -B -DskipTests clean install && rm -rf $JKUBE_DIR
       - name: Install and Run Integration Tests
         run: |
           cd $JKUBE_DIR \
@@ -65,6 +65,13 @@ jobs:
         openshift: [v3.9.0,v3.11.0]
         suite: ['quarkus','springboot','webapp','other']
     steps:
+      - name: Free up Space
+        run: |
+          sudo apt-get remove -y 'linux-headers.*'
+          sudo apt-get remove -y 'mysql.*'
+          sudo apt-get remove -y 'php.*'
+          sudo apt-get remove -y 'ruby.*'
+          df -h
       - name: Checkout
         uses: actions/checkout@v2.0.0
       - name: Setup OpenShift
@@ -81,10 +88,16 @@ jobs:
           && cd $JKUBE_DIR \
           && git checkout "$JKUBE_REVISION"
       - name: Install JKube
-        run: cd $JKUBE_DIR && mvn -f pom.xml -B -DskipTests clean install
+        run: cd $JKUBE_DIR && mvn -f pom.xml -B -DskipTests clean install && rm -rf $JKUBE_DIR
       - name: Install and Run Integration Tests
         run: |
           cd $JKUBE_DIR \
           && JKUBE_VERSION=$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec) \
           && cd .. \
           && ./mvnw -B -POpenShift,${{ matrix.suite }} clean verify -Djkube.version="$JKUBE_VERSION" -Djunit.jupiter.execution.parallel.config.fixed.parallelism=1
+      - name: Cluster Information
+        if: always()
+        run: |
+          oc login -u system:admin
+          oc describe node localhost
+          oc login -u developer
