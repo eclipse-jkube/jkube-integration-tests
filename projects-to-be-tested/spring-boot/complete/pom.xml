@@ -127,15 +127,14 @@
                       <id>spring-boot-complete</id>
                       <files>
                         <file>
-                          <source>${project.basedir}/target/${project.artifactId}-${project.version}.jar</source>
-                          <outputDirectory>.</outputDirectory>
+                          <source>src/main/assembly-test/inlined-file.txt</source>
+                          <outputDirectory>assembly-test/</outputDirectory>
                         </file>
                       </files>
                       <fileSets>
                         <fileSet>
                           <directory>${project.basedir}/src/main/static</directory>
                           <outputDirectory>static/</outputDirectory>
-                          <filtered>true</filtered>
                           <includes>
                             <include>static-file.txt</include>
                           </includes>
