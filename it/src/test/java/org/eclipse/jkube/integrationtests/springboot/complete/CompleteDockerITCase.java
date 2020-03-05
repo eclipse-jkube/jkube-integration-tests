@@ -96,8 +96,12 @@ class CompleteDockerITCase extends Complete {
       String.format("../%s/target/docker/integration-tests/docker-spring-boot-complete", PROJECT_COMPLETE));
     assertThat(dockerDirectory.exists(), equalTo(true));
     assertThat(new File(dockerDirectory, "tmp/docker-build.tar.gz"). exists(), equalTo(true));
+    assertThat(new File(dockerDirectory, "build/maven/assembly-test/inlined-file.txt"). exists(), equalTo(true));
+    assertThat(new File(dockerDirectory, "build/maven/assembly-test/not-considered.txt"). exists(), equalTo(false));
     assertThat(new File(dockerDirectory, "build/maven/static/ignored-file.txt"). exists(), equalTo(false));
     assertThat(new File(dockerDirectory, "build/maven/static/static-file.txt"). exists(), equalTo(true));
+    assertThat(new File(dockerDirectory,
+      "latest/build/maven/jkube-includes/will-be-included-if-no-assemblies-defined.txt").exists(), equalTo(false));
     assertThat(new File(dockerDirectory, "build/maven/spring-boot-complete-0.0.0-SNAPSHOT.jar"). exists(), equalTo(true));
     assertThat(new File(dockerDirectory, "build/Dockerfile"). exists(), equalTo(true));
     final String dockerFileContent = String.join("\n",

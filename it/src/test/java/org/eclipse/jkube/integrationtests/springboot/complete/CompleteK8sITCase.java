@@ -82,6 +82,13 @@ class CompleteK8sITCase extends Complete {
     // Then
     assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
     assertImageWasRecentlyBuilt("integration-tests", "spring-boot-complete");
+    final File dockerDirectory = new File(
+      String.format("../%s/target/docker/integration-tests/spring-boot-complete/", PROJECT_COMPLETE));
+    assertThat(new File(dockerDirectory, "latest/build/maven/assembly-test"). exists(), equalTo(false));
+    assertThat(new File(dockerDirectory, "latest/build/maven/static"). exists(), equalTo(false));
+    assertThat(new File(dockerDirectory, "latest/build/maven/static"). exists(), equalTo(false));
+    assertThat(new File(dockerDirectory,
+      "latest/build/maven/jkube-includes/will-be-included-if-no-assemblies-defined.txt").exists(), equalTo(true));
   }
 
   @Test
