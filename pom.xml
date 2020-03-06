@@ -70,12 +70,12 @@
       <!-- Dependencies only for debugging purposes -->
       <dependency>
         <groupId>org.eclipse.jkube</groupId>
-        <artifactId>k8s-maven-plugin</artifactId>
+        <artifactId>kubernetes-maven-plugin</artifactId>
         <version>${jkube.version}</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.jkube</groupId>
-        <artifactId>oc-maven-plugin</artifactId>
+        <artifactId>openshift-maven-plugin</artifactId>
         <version>${jkube.version}</version>
       </dependency>
       <!-- ***************************************  -->
@@ -198,12 +198,12 @@
         </plugin>
         <plugin>
           <groupId>org.eclipse.jkube</groupId>
-          <artifactId>k8s-maven-plugin</artifactId>
+          <artifactId>kubernetes-maven-plugin</artifactId>
           <version>${jkube.version}</version>
         </plugin>
         <plugin>
           <groupId>org.eclipse.jkube</groupId>
-          <artifactId>oc-maven-plugin</artifactId>
+          <artifactId>openshift-maven-plugin</artifactId>
           <version>${jkube.version}</version>
         </plugin>
       </plugins>
