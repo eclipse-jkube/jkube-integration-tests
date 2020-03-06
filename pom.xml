@@ -276,7 +276,7 @@
             <artifactId>maven-failsafe-plugin</artifactId>
             <configuration>
               <includes>
-                <include>**/integrationtests/quarkus/native/**/*ITCase.java</include>
+                <include>**/integrationtests/quarkus/na7ive/**/*ITCase.java</include>
               </includes>
             </configuration>
           </plugin>
