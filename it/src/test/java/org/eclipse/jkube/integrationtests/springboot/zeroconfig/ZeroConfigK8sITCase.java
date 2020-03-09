@@ -16,7 +16,11 @@ package org.eclipse.jkube.integrationtests.springboot.zeroconfig;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClient;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 import org.apache.maven.shared.invoker.InvocationResult;
+import org.eclipse.jkube.integrationtests.docker.RegistryExtension;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,9 +30,11 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.parallel.ResourceLock;
 
 import java.io.File;
+import java.util.Properties;
 
 import static org.eclipse.jkube.integrationtests.Locks.CLUSTER_RESOURCE_INTENSIVE;
 import static org.eclipse.jkube.integrationtests.Tags.KUBERNETES;
@@ -37,6 +43,7 @@ import static org.eclipse.jkube.integrationtests.assertions.DeploymentAssertion.
 import static org.eclipse.jkube.integrationtests.assertions.DockerAssertion.assertImageWasRecentlyBuilt;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasProperty;
@@ -44,6 +51,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 
 @Tag(KUBERNETES)
+@ExtendWith(RegistryExtension.class)
 @TestMethodOrder(OrderAnnotation.class)
 class ZeroConfigK8sITCase extends ZeroConfig {
 
@@ -78,6 +86,24 @@ class ZeroConfigK8sITCase extends ZeroConfig {
 
   @Test
   @Order(2)
+  @DisplayName("k8s:push, should push image to remote registry")
+  void k8sPush() throws Exception {
+    // Given
+    final Properties properties = new Properties();
+    properties.setProperty("docker.push.registry", "localhost:5000");
+    // When
+    final InvocationResult invocationResult = maven("k8s:push", properties);
+    // Then
+    assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
+    final Response response = new OkHttpClient.Builder().build().newCall(new Request.Builder()
+      .get().url("http://localhost:5000/v2/integration-tests/spring-boot-zero-config/tags/list").build())
+      .execute();
+    assertThat(response.body().string(),
+      containsString("{\"name\":\"integration-tests/spring-boot-zero-config\",\"tags\":[\"latest\"]}"));
+  }
+
+  @Test
+  @Order(3)
   @DisplayName("k8s:resource, should create manifests")
   void k8sResource() throws Exception {
     // When
@@ -93,7 +119,7 @@ class ZeroConfigK8sITCase extends ZeroConfig {
   }
 
   @Test
-  @Order(3)
+  @Order(4)
   @ResourceLock(value = CLUSTER_RESOURCE_INTENSIVE, mode = READ_WRITE)
   @DisplayName("k8s:apply, should deploy pod and service")
   @SuppressWarnings("unchecked")
@@ -118,7 +144,7 @@ class ZeroConfigK8sITCase extends ZeroConfig {
   }
 
   @Test
-  @Order(4)
+  @Order(5)
   @DisplayName("k8s:undeploy, should delete all applied resources")
   void k8sUndeploy() throws Exception {
     // When
