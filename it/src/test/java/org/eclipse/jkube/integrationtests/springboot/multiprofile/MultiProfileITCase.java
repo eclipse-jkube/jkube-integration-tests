@@ -20,6 +20,7 @@ import org.apache.maven.shared.invoker.MavenInvocationException;
 import org.eclipse.jkube.integrationtests.maven.BaseMavenCase;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
@@ -58,7 +59,8 @@ class MultiProfileITCase extends BaseMavenCase {
 
   @Test
   @Tag(KUBERNETES)
-  void k8sResource_defaultProfile_shouldCreateDefaultResources() throws Exception {
+  @DisplayName("k8s:resource, no specified profile, should create default resource manifests")
+  void k8sResource() throws Exception {
     // When
     final InvocationResult invocationResult = maven("k8s:resource");
     // Then
@@ -68,7 +70,8 @@ class MultiProfileITCase extends BaseMavenCase {
 
   @Test
   @Tag(OPEN_SHIFT)
-  void ocResource_defaultProfile_shouldCreateDefaultResources() throws Exception {
+  @DisplayName("oc:resource, no specified default profile, should create default resource manifests")
+  void ocResource() throws Exception {
     // When
     final InvocationResult invocationResult = maven("oc:resource");
     // Then
@@ -78,7 +81,8 @@ class MultiProfileITCase extends BaseMavenCase {
 
   @Test
   @Tag(KUBERNETES)
-  void k8sResource_productionProfile_shouldCreateProductionResources() throws Exception {
+  @DisplayName("k8s:resource, production profile, should create production resource manifests")
+  void k8sResourceProductionProfile() throws Exception {
     // When
     final InvocationResult invocationResult = maven("k8s:resource", "Production");
     // Then
@@ -88,7 +92,8 @@ class MultiProfileITCase extends BaseMavenCase {
 
   @Test
   @Tag(OPEN_SHIFT)
-  void ocResource_productionProfile_shouldCreateProductionResources() throws Exception {
+  @DisplayName("oc:resource, production profile, should create production resource manifests")
+  void ocResourceProductionProfile() throws Exception {
     // When
     final InvocationResult invocationResult = maven("oc:resource", "Production");
     // Then

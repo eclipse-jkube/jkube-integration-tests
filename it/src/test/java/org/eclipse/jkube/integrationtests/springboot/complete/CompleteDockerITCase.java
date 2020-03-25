@@ -39,13 +39,16 @@ import static org.eclipse.jkube.integrationtests.Tags.KUBERNETES;
 import static org.eclipse.jkube.integrationtests.assertions.DeploymentAssertion.assertDeploymentExists;
 import static org.eclipse.jkube.integrationtests.assertions.DeploymentAssertion.awaitDeployment;
 import static org.eclipse.jkube.integrationtests.assertions.DockerAssertion.assertImageWasRecentlyBuilt;
+import static org.eclipse.jkube.integrationtests.assertions.YamlAssertion.yaml;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.anEmptyMap;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.not;
 import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 
 @Tag(KUBERNETES)
@@ -95,15 +98,15 @@ class CompleteDockerITCase extends Complete {
     final File dockerDirectory = new File(
       String.format("../%s/target/docker/integration-tests/docker-spring-boot-complete", PROJECT_COMPLETE));
     assertThat(dockerDirectory.exists(), equalTo(true));
-    assertThat(new File(dockerDirectory, "tmp/docker-build.tar.gz"). exists(), equalTo(true));
-    assertThat(new File(dockerDirectory, "build/maven/assembly-test/inlined-file.txt"). exists(), equalTo(true));
-    assertThat(new File(dockerDirectory, "build/maven/assembly-test/not-considered.txt"). exists(), equalTo(false));
-    assertThat(new File(dockerDirectory, "build/maven/static/ignored-file.txt"). exists(), equalTo(false));
-    assertThat(new File(dockerDirectory, "build/maven/static/static-file.txt"). exists(), equalTo(true));
+    assertThat(new File(dockerDirectory, "tmp/docker-build.tar.gz").exists(), equalTo(true));
+    assertThat(new File(dockerDirectory, "build/maven/assembly-test/inlined-file.txt").exists(), equalTo(true));
+    assertThat(new File(dockerDirectory, "build/maven/assembly-test/not-considered.txt").exists(), equalTo(false));
+    assertThat(new File(dockerDirectory, "build/maven/static/ignored-file.txt").exists(), equalTo(false));
+    assertThat(new File(dockerDirectory, "build/maven/static/static-file.txt").exists(), equalTo(true));
     assertThat(new File(dockerDirectory,
       "latest/build/maven/jkube-includes/will-be-included-if-no-assemblies-defined.txt").exists(), equalTo(false));
-    assertThat(new File(dockerDirectory, "build/maven/spring-boot-complete-0.0.0-SNAPSHOT.jar"). exists(), equalTo(true));
-    assertThat(new File(dockerDirectory, "build/Dockerfile"). exists(), equalTo(true));
+    assertThat(new File(dockerDirectory, "build/maven/spring-boot-complete-0.0.0-SNAPSHOT.jar").exists(), equalTo(true));
+    assertThat(new File(dockerDirectory, "build/Dockerfile").exists(), equalTo(true));
     final String dockerFileContent = String.join("\n",
       Files.readAllLines(new File(dockerDirectory, "build/Dockerfile").toPath()));
     assertThat(dockerFileContent, containsString("FROM adoptopenjdk/openjdk11:alpine-slim"));
@@ -129,10 +132,10 @@ class CompleteDockerITCase extends Complete {
     final File metaInfDirectory = new File(
       String.format("../%s/target/classes/META-INF", PROJECT_COMPLETE));
     assertThat(metaInfDirectory.exists(), equalTo(true));
-    assertThat(new File(metaInfDirectory, "jkube-docker/kubernetes.yml"). exists(), equalTo(true));
-    assertThat(new File(metaInfDirectory, "jkube-docker/kubernetes/password-secret.yml"). exists(), equalTo(false));
-    assertThat(new File(metaInfDirectory, "jkube-docker/kubernetes/docker-spring-boot-complete-deployment.yml"). exists(), equalTo(true));
-    assertThat(new File(metaInfDirectory, "jkube-docker/kubernetes/docker-spring-boot-complete-service.yml"). exists(), equalTo(true));
+    assertListResource(new File(metaInfDirectory, "jkube/kubernetes.yml"));
+    assertThat(new File(metaInfDirectory, "jkube-docker/kubernetes/password-secret.yml").exists(), equalTo(false));
+    assertThat(new File(metaInfDirectory, "jkube-docker/kubernetes/docker-spring-boot-complete-deployment.yml"), yaml(not(anEmptyMap())));
+    assertThat(new File(metaInfDirectory, "jkube-docker/kubernetes/docker-spring-boot-complete-service.yml"), yaml(not(anEmptyMap())));
   }
 
   @Test

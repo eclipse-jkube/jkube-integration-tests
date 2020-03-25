@@ -40,12 +40,16 @@ import static org.eclipse.jkube.integrationtests.assertions.DockerAssertion.asse
 import static org.eclipse.jkube.integrationtests.assertions.PodAssertion.assertPod;
 import static org.eclipse.jkube.integrationtests.assertions.PodAssertion.awaitPod;
 import static org.eclipse.jkube.integrationtests.assertions.ServiceAssertion.awaitService;
+import static org.eclipse.jkube.integrationtests.assertions.YamlAssertion.yaml;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.anEmptyMap;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.not;
 import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 
 @Tag(KUBERNETES)
@@ -104,9 +108,9 @@ public class QuarkusNativeK8sITCase extends BaseMavenCase implements JKubeCase {
     final File metaInfDirectory = new File(
       String.format("../%s/target/classes/META-INF", PROJECT_QUARKUS_NATIVE));
     assertThat(metaInfDirectory.exists(), equalTo(true));
-    assertThat(new File(metaInfDirectory, "jkube/kubernetes.yml"). exists(), equalTo(true));
-    assertThat(new File(metaInfDirectory, "jkube/kubernetes/quarkus-native-deployment.yml"). exists(), equalTo(true));
-    assertThat(new File(metaInfDirectory, "jkube/kubernetes/quarkus-native-service.yml"). exists(), equalTo(true));
+    assertListResource(new File(metaInfDirectory, "jkube/kubernetes.yml"));
+    assertThat(new File(metaInfDirectory, "jkube/kubernetes/quarkus-native-deployment.yml"), yaml(not(anEmptyMap())));
+    assertThat(new File(metaInfDirectory, "jkube/kubernetes/quarkus-native-service.yml"), yaml(not(anEmptyMap())));
   }
 
   @Test

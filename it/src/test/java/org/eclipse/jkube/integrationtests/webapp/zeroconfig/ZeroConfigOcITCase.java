@@ -36,8 +36,11 @@ import static org.eclipse.jkube.integrationtests.Locks.CLUSTER_RESOURCE_INTENSIV
 import static org.eclipse.jkube.integrationtests.OpenShift.cleanUpCluster;
 import static org.eclipse.jkube.integrationtests.Tags.OPEN_SHIFT;
 import static org.eclipse.jkube.integrationtests.assertions.DockerAssertion.assertImageWasRecentlyBuilt;
+import static org.eclipse.jkube.integrationtests.assertions.YamlAssertion.yaml;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.anEmptyMap;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.not;
 import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 
 @Tag(OPEN_SHIFT)
@@ -91,10 +94,10 @@ class ZeroConfigOcITCase extends ZeroConfig {
     final File metaInfDirectory = new File(
       String.format("../%s/target/classes/META-INF", PROJECT_ZERO_CONFIG));
     assertThat(metaInfDirectory.exists(), equalTo(true));
-    assertThat(new File(metaInfDirectory, "jkube/openshift.yml"). exists(), equalTo(true));
-    assertThat(new File(metaInfDirectory, "jkube/openshift/webapp-zero-config-deploymentconfig.yml"). exists(), equalTo(true));
-    assertThat(new File(metaInfDirectory, "jkube/openshift/webapp-zero-config-route.yml"). exists(), equalTo(true));
-    assertThat(new File(metaInfDirectory, "jkube/openshift/webapp-zero-config-service.yml"). exists(), equalTo(true));
+    assertListResource(new File(metaInfDirectory, "jkube/openshift.yml"));
+    assertThat(new File(metaInfDirectory, "jkube/openshift/webapp-zero-config-deploymentconfig.yml"), yaml(not(anEmptyMap())));
+    assertThat(new File(metaInfDirectory, "jkube/openshift/webapp-zero-config-route.yml"), yaml(not(anEmptyMap())));
+    assertThat(new File(metaInfDirectory, "jkube/openshift/webapp-zero-config-service.yml"), yaml(not(anEmptyMap())));
   }
 
   @Test

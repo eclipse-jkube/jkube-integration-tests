@@ -35,12 +35,15 @@ import static org.eclipse.jkube.integrationtests.Tags.KUBERNETES;
 import static org.eclipse.jkube.integrationtests.assertions.DeploymentAssertion.assertDeploymentExists;
 import static org.eclipse.jkube.integrationtests.assertions.DeploymentAssertion.awaitDeployment;
 import static org.eclipse.jkube.integrationtests.assertions.DockerAssertion.assertImageWasRecentlyBuilt;
+import static org.eclipse.jkube.integrationtests.assertions.YamlAssertion.yaml;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.anEmptyMap;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.not;
 import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 
 @Tag(KUBERNETES)
@@ -85,15 +88,29 @@ class QuarkusK8sITCase extends Quarkus {
     // Then
     assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
     final File metaInfDirectory = new File(
-      String.format("../%s/target/classes/META-INF", PROJECT_QUARKUS_REST));
+      String.format("../%s/target/classes/META-INF", getProject()));
     assertThat(metaInfDirectory.exists(), equalTo(true));
-    assertThat(new File(metaInfDirectory, "jkube/kubernetes.yml"). exists(), equalTo(true));
-    assertThat(new File(metaInfDirectory, "jkube/kubernetes/quarkus-rest-deployment.yml"). exists(), equalTo(true));
-    assertThat(new File(metaInfDirectory, "jkube/kubernetes/quarkus-rest-service.yml"). exists(), equalTo(true));
+    assertListResource(new File(metaInfDirectory, "jkube/kubernetes.yml"));
+    assertThat(new File(metaInfDirectory, "jkube/kubernetes/quarkus-rest-deployment.yml"), yaml(not(anEmptyMap())));
+    assertThat(new File(metaInfDirectory, "jkube/kubernetes/quarkus-rest-service.yml"), yaml(not(anEmptyMap())));
   }
 
   @Test
   @Order(3)
+  @DisplayName("k8s:helm, should create Helm charts")
+  void k8sHelm() throws Exception {
+    // When
+    final InvocationResult invocationResult = maven("k8s:helm");
+    // Then
+    assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
+    final File helmDirectory = new File(
+      String.format("../%s/target/jkube/helm/%s/kubernetes", getProject(), getApplication()));
+    assertHelm(helmDirectory);
+    assertThat(new File(helmDirectory, "templates/quarkus-rest-deployment.yaml"), yaml(not(anEmptyMap())));
+  }
+
+  @Test
+  @Order(4)
   @DisplayName("k8s:apply, should deploy pod and service")
   @ResourceLock(value = CLUSTER_RESOURCE_INTENSIVE, mode = READ_WRITE)
   @SuppressWarnings("unchecked")
@@ -118,7 +135,7 @@ class QuarkusK8sITCase extends Quarkus {
   }
 
   @Test
-  @Order(4)
+  @Order(5)
   @DisplayName("k8s:undeploy, should delete all applied resources")
   void k8sUndeploy() throws Exception {
     // When
