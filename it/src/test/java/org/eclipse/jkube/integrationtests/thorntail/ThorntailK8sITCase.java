@@ -37,12 +37,15 @@ import static org.eclipse.jkube.integrationtests.Tags.KUBERNETES;
 import static org.eclipse.jkube.integrationtests.assertions.DeploymentAssertion.assertDeploymentExists;
 import static org.eclipse.jkube.integrationtests.assertions.DeploymentAssertion.awaitDeployment;
 import static org.eclipse.jkube.integrationtests.assertions.DockerAssertion.assertImageWasRecentlyBuilt;
+import static org.eclipse.jkube.integrationtests.assertions.YamlAssertion.yaml;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.anEmptyMap;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.not;
 import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 
 @Tag(KUBERNETES)
@@ -94,9 +97,9 @@ class ThorntailK8sITCase extends Thorntail {
     final File metaInfDirectory = new File(
       String.format("../%s/target/classes/META-INF", PROJECT_THORNTAIL));
     assertThat(metaInfDirectory.exists(), equalTo(true));
-    assertThat(new File(metaInfDirectory, "jkube/kubernetes.yml"). exists(), equalTo(true));
-    assertThat(new File(metaInfDirectory, "jkube/kubernetes/thorntail-microprofile-deployment.yml"). exists(), equalTo(true));
-    assertThat(new File(metaInfDirectory, "jkube/kubernetes/thorntail-microprofile-service.yml"). exists(), equalTo(true));
+    assertListResource(new File(metaInfDirectory, "jkube/kubernetes.yml"));
+    assertThat(new File(metaInfDirectory, "jkube/kubernetes/thorntail-microprofile-deployment.yml"), yaml(not(anEmptyMap())));
+    assertThat(new File(metaInfDirectory, "jkube/kubernetes/thorntail-microprofile-service.yml"), yaml(not(anEmptyMap())));
   }
 
   @Test

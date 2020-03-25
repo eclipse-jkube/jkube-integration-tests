@@ -37,13 +37,16 @@ import static org.eclipse.jkube.integrationtests.Tags.KUBERNETES;
 import static org.eclipse.jkube.integrationtests.assertions.DeploymentAssertion.assertDeploymentExists;
 import static org.eclipse.jkube.integrationtests.assertions.DeploymentAssertion.awaitDeployment;
 import static org.eclipse.jkube.integrationtests.assertions.DockerAssertion.assertImageWasRecentlyBuilt;
+import static org.eclipse.jkube.integrationtests.assertions.YamlAssertion.yaml;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.anEmptyMap;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.not;
 import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 
 @Tag(KUBERNETES)
@@ -84,9 +87,9 @@ class CompleteK8sITCase extends Complete {
     assertImageWasRecentlyBuilt("integration-tests", "spring-boot-complete");
     final File dockerDirectory = new File(
       String.format("../%s/target/docker/integration-tests/spring-boot-complete/", PROJECT_COMPLETE));
-    assertThat(new File(dockerDirectory, "latest/build/maven/assembly-test"). exists(), equalTo(false));
-    assertThat(new File(dockerDirectory, "latest/build/maven/static"). exists(), equalTo(false));
-    assertThat(new File(dockerDirectory, "latest/build/maven/static"). exists(), equalTo(false));
+    assertThat(new File(dockerDirectory, "latest/build/maven/assembly-test").exists(), equalTo(false));
+    assertThat(new File(dockerDirectory, "latest/build/maven/static").exists(), equalTo(false));
+    assertThat(new File(dockerDirectory, "latest/build/maven/static").exists(), equalTo(false));
     assertThat(new File(dockerDirectory,
       "latest/build/maven/jkube-includes/will-be-included-if-no-assemblies-defined.txt").exists(), equalTo(true));
   }
@@ -103,10 +106,10 @@ class CompleteK8sITCase extends Complete {
     final File metaInfDirectory = new File(
       String.format("../%s/target/classes/META-INF", PROJECT_COMPLETE));
     assertThat(metaInfDirectory.exists(), equalTo(true));
-    assertThat(new File(metaInfDirectory, "jkube/kubernetes.yml"). exists(), equalTo(true));
-    assertThat(new File(metaInfDirectory, "jkube/kubernetes/password-secret.yml"). exists(), equalTo(true));
-    assertThat(new File(metaInfDirectory, "jkube/kubernetes/spring-boot-complete-deployment.yml"). exists(), equalTo(true));
-    assertThat(new File(metaInfDirectory, "jkube/kubernetes/spring-boot-complete-service.yml"). exists(), equalTo(true));
+    assertListResource(new File(metaInfDirectory, "jkube/kubernetes.yml"));
+    assertThat(new File(metaInfDirectory, "jkube/kubernetes/password-secret.yml"), yaml(not(anEmptyMap())));
+    assertThat(new File(metaInfDirectory, "jkube/kubernetes/spring-boot-complete-deployment.yml"), yaml(not(anEmptyMap())));
+    assertThat(new File(metaInfDirectory, "jkube/kubernetes/spring-boot-complete-service.yml"), yaml(not(anEmptyMap())));
   }
 
   @Test

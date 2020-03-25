@@ -40,8 +40,11 @@ import java.util.Properties;
 import static org.eclipse.jkube.integrationtests.Locks.CLUSTER_RESOURCE_INTENSIVE;
 import static org.eclipse.jkube.integrationtests.OpenShift.cleanUpCluster;
 import static org.eclipse.jkube.integrationtests.Tags.OPEN_SHIFT;
+import static org.eclipse.jkube.integrationtests.assertions.YamlAssertion.yaml;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.anEmptyMap;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.stringContainsInOrder;
 import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
@@ -91,16 +94,33 @@ class ZeroConfigOcITCase extends ZeroConfig {
     // Then
     assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
     final File metaInfDirectory = new File(
-      String.format("../%s/target/classes/META-INF", PROJECT_ZERO_CONFIG));
+      String.format("../%s/target/classes/META-INF", getProject()));
     assertThat(metaInfDirectory.exists(), equalTo(true));
-    assertThat(new File(metaInfDirectory, "jkube/openshift.yml"). exists(), equalTo(true));
-    assertThat(new File(metaInfDirectory, "jkube/openshift/spring-boot-zero-config-deploymentconfig.yml"). exists(), equalTo(true));
-    assertThat(new File(metaInfDirectory, "jkube/openshift/spring-boot-zero-config-route.yml"). exists(), equalTo(true));
-    assertThat(new File(metaInfDirectory, "jkube/openshift/spring-boot-zero-config-service.yml"). exists(), equalTo(true));
+    assertListResource(new File(metaInfDirectory, "jkube/openshift.yml"));
+    assertThat(new File(metaInfDirectory, "jkube/openshift/spring-boot-zero-config-deploymentconfig.yml"), yaml(not(anEmptyMap())));
+    assertThat(new File(metaInfDirectory, "jkube/openshift/spring-boot-zero-config-route.yml"), yaml(not(anEmptyMap())));
+    assertThat(new File(metaInfDirectory, "jkube/openshift/spring-boot-zero-config-service.yml"), yaml(not(anEmptyMap())));
   }
 
   @Test
   @Order(3)
+  @DisplayName("oc:helm, should create Helm charts")
+  void ocHelm() throws Exception {
+    // When
+    final InvocationResult invocationResult = maven("oc:helm");
+    // Then
+    assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
+    assertThat( new File(String.format("../%s/target/%s-0.0.0-SNAPSHOT-helmshift.tar.gz", getProject(), getApplication()))
+      .exists(), equalTo(true));
+    final File helmDirectory = new File(
+      String.format("../%s/target/jkube/helm/%s/openshift", getProject(), getApplication()));
+    assertHelm(helmDirectory);
+    assertThat(new File(helmDirectory, "templates/spring-boot-zero-config-deploymentconfig.yaml"), yaml(not(anEmptyMap())));
+    assertThat(new File(helmDirectory, "templates/spring-boot-zero-config-route.yaml"), yaml(not(anEmptyMap())));
+  }
+
+  @Test
+  @Order(4)
   @ResourceLock(value = CLUSTER_RESOURCE_INTENSIVE, mode = READ_WRITE)
   @DisplayName("oc:apply, should deploy pod and service")
   void ocApply() throws Exception {
@@ -112,7 +132,7 @@ class ZeroConfigOcITCase extends ZeroConfig {
   }
 
   @Test
-  @Order(4)
+  @Order(5)
   @DisplayName("oc:log, should retrieve log")
   void ocLog() throws Exception {
     // Given
@@ -131,7 +151,7 @@ class ZeroConfigOcITCase extends ZeroConfig {
   }
 
   @Test
-  @Order(5)
+  @Order(6)
   @DisplayName("oc:undeploy, should delete all applied resources")
   void ocUndeploy() throws Exception {
     // When

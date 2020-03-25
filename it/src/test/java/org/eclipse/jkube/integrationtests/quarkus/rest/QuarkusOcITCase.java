@@ -36,8 +36,11 @@ import static org.eclipse.jkube.integrationtests.Locks.CLUSTER_RESOURCE_INTENSIV
 import static org.eclipse.jkube.integrationtests.OpenShift.cleanUpCluster;
 import static org.eclipse.jkube.integrationtests.Tags.OPEN_SHIFT;
 import static org.eclipse.jkube.integrationtests.assertions.DockerAssertion.assertImageWasRecentlyBuilt;
+import static org.eclipse.jkube.integrationtests.assertions.YamlAssertion.yaml;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.anEmptyMap;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.not;
 import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 
 @Tag(OPEN_SHIFT)
@@ -91,16 +94,31 @@ class QuarkusOcITCase extends Quarkus {
     // Then
     assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
     final File metaInfDirectory = new File(
-      String.format("../%s/target/classes/META-INF", PROJECT_QUARKUS_REST));
+      String.format("../%s/target/classes/META-INF", getProject()));
     assertThat(metaInfDirectory.exists(), equalTo(true));
-    assertThat(new File(metaInfDirectory, "jkube/openshift.yml"). exists(), equalTo(true));
-    assertThat(new File(metaInfDirectory, "jkube/openshift/quarkus-rest-deploymentconfig.yml"). exists(), equalTo(true));
-    assertThat(new File(metaInfDirectory, "jkube/openshift/quarkus-rest-route.yml"). exists(), equalTo(true));
-    assertThat(new File(metaInfDirectory, "jkube/openshift/quarkus-rest-service.yml"). exists(), equalTo(true));
+    assertListResource(new File(metaInfDirectory, "jkube/openshift.yml"));
+    assertThat(new File(metaInfDirectory, "jkube/openshift/quarkus-rest-deploymentconfig.yml"), yaml(not(anEmptyMap())));
+    assertThat(new File(metaInfDirectory, "jkube/openshift/quarkus-rest-route.yml"), yaml(not(anEmptyMap())));
+    assertThat(new File(metaInfDirectory, "jkube/openshift/quarkus-rest-service.yml"), yaml(not(anEmptyMap())));
   }
 
   @Test
   @Order(3)
+  @DisplayName("oc:helm, should create Helm charts")
+  void ocHelm() throws Exception {
+    // When
+    final InvocationResult invocationResult = maven("oc:helm");
+    // Then
+    assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
+    final File helmDirectory = new File(
+      String.format("../%s/target/jkube/helm/%s/openshift", getProject(), getApplication()));
+    assertHelm(helmDirectory);
+    assertThat(new File(helmDirectory, "templates/quarkus-rest-deploymentconfig.yaml"), yaml(not(anEmptyMap())));
+    assertThat(new File(helmDirectory, "templates/quarkus-rest-route.yaml"), yaml(not(anEmptyMap())));
+  }
+
+  @Test
+  @Order(4)
   @ResourceLock(value = CLUSTER_RESOURCE_INTENSIVE, mode = READ_WRITE)
   @DisplayName("oc:apply, should deploy pod and service")
   void ocApply() throws Exception {
@@ -112,7 +130,7 @@ class QuarkusOcITCase extends Quarkus {
   }
 
   @Test
-  @Order(4)
+  @Order(5)
   @DisplayName("oc:undeploy, should delete all applied resources")
   void ocUndeploy() throws Exception {
     // When

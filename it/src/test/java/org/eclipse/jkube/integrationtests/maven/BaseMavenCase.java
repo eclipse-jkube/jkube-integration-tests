@@ -29,8 +29,13 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 import static org.eclipse.jkube.integrationtests.assertions.ServiceAssertion.assertServiceExists;
+import static org.eclipse.jkube.integrationtests.assertions.YamlAssertion.yaml;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.anEmptyMap;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasEntry;
+import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 
 public abstract class BaseMavenCase implements MavenProject {
@@ -49,6 +54,14 @@ public abstract class BaseMavenCase implements MavenProject {
     matchingPod.map(refreshPod).ifPresent(updatedPod ->
       assertThat(updatedPod.getMetadata().getDeletionTimestamp(), notNullValue()));
     assertServiceExists(jKubeCase, equalTo(false));
+  }
+
+  protected static void assertListResource(File file) {
+    assertThat(file, yaml(allOf(
+      not(anEmptyMap()),
+      hasEntry("kind", "List"),
+      hasEntry("apiVersion", "v1")
+    )));
   }
 
   protected InvocationResult maven(String goal)

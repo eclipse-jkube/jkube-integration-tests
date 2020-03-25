@@ -34,8 +34,11 @@ import java.io.File;
 import static org.eclipse.jkube.integrationtests.Locks.CLUSTER_RESOURCE_INTENSIVE;
 import static org.eclipse.jkube.integrationtests.OpenShift.cleanUpCluster;
 import static org.eclipse.jkube.integrationtests.Tags.OPEN_SHIFT;
+import static org.eclipse.jkube.integrationtests.assertions.YamlAssertion.yaml;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.anEmptyMap;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 
@@ -86,10 +89,10 @@ class VertxOcITCase extends Vertx {
     final File metaInfDirectory = new File(
       String.format("../%s/target/classes/META-INF", PROJECT_VERTX));
     assertThat(metaInfDirectory.exists(), equalTo(true));
-    assertThat(new File(metaInfDirectory, "jkube/openshift.yml"). exists(), equalTo(true));
-    assertThat(new File(metaInfDirectory, "jkube/openshift/vertx-simplest-deploymentconfig.yml"). exists(), equalTo(true));
-    assertThat(new File(metaInfDirectory, "jkube/openshift/vertx-simplest-route.yml"). exists(), equalTo(true));
-    assertThat(new File(metaInfDirectory, "jkube/openshift/vertx-simplest-service.yml"). exists(), equalTo(true));
+    assertListResource(new File(metaInfDirectory, "jkube/openshift.yml"));
+    assertThat(new File(metaInfDirectory, "jkube/openshift/vertx-simplest-deploymentconfig.yml"), yaml(not(anEmptyMap())));
+    assertThat(new File(metaInfDirectory, "jkube/openshift/vertx-simplest-route.yml"), yaml(not(anEmptyMap())));
+    assertThat(new File(metaInfDirectory, "jkube/openshift/vertx-simplest-service.yml"), yaml(not(anEmptyMap())));
   }
 
   @Test
