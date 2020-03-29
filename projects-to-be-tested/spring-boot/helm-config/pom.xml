@@ -67,6 +67,7 @@
             <version>1.0-KUBERNETES</version>
             <description>Description different to that in the pom.xml</description>
             <home>https://www.home.example.com</home>
+            <keywords>key,words,comma,separated</keywords>
             <engine>v8</engine>
             <sources>
               <source>https://source.1.example.com</source>

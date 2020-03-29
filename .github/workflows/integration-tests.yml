@@ -38,10 +38,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2.0.0
       - name: Setup Minikube-Kubernetes
-        uses: manusa/actions-setup-minikube@v1.0.0
+        uses: manusa/actions-setup-minikube@v1.0.1
         with:
           minikube version: v1.5.1
           kubernetes version: ${{ matrix.kubernetes }}
+          github token: ${{ secrets.GITHUB_TOKEN }}
       - name: Setup Java 11
         uses: actions/setup-java@v1
         with:
