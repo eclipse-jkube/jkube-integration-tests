@@ -33,6 +33,7 @@ import static org.hamcrest.Matchers.aMapWithSize;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.anEmptyMap;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.is;
@@ -84,16 +85,17 @@ public class HelmConfigITCase extends BaseMavenCase {
     final File helmDirectory = new File(
       String.format("../%s/target/jkube/helm/This is the chart name/kubernetes", getProject()));
     assertThat(new File(helmDirectory, "Chart.yaml"), yaml(allOf(
-      aMapWithSize(7),
+      aMapWithSize(8),
       hasEntry("name", "This is the chart name"),
       hasEntry("version", "1.0-KUBERNETES"),
       hasEntry("description", "Description different to that in the pom.xml"),
       hasEntry("home", "https://www.home.example.com"),
       hasEntry("engine", "v8")
     )));
-    assertThat(new File(helmDirectory, "Chart.yaml"), yaml(
-      hasEntry(is("sources"), contains("https://source.1.example.com"))
-    ));
+    assertThat(new File(helmDirectory, "Chart.yaml"), yaml(allOf(
+      hasEntry(is("sources"), contains("https://source.1.example.com")),
+      hasEntry(is("keywords"), containsInAnyOrder("key", "words", "comma", "separated"))
+    )));
     assertThat(new File(helmDirectory, "Chart.yaml"), yaml(
       hasEntry(is("maintainers"), contains(allOf(
         hasEntry("name", "Mr. Ed"),
