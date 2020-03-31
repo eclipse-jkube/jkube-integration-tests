@@ -225,6 +225,7 @@
             <exclude>.mvn/wrapper/**/*</exclude>
             <exclude>mvnw</exclude>
             <exclude>mvnw.cmd</exclude>
+            <exclude>projects-to-be-tested/spring-boot/complete/src/main/**/*.txt</exclude>
           </excludes>
         </configuration>
       </plugin>
