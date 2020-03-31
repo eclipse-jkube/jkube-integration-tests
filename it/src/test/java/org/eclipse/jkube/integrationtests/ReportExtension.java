@@ -13,7 +13,6 @@
  */
 package org.eclipse.jkube.integrationtests;
 
-import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
@@ -24,17 +23,16 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static java.nio.file.StandardOpenOption.APPEND;
 import static org.junit.jupiter.api.extension.ExtensionContext.Namespace.GLOBAL;
 
-public class ReportExtension implements BeforeAllCallback, AfterEachCallback, AfterAllCallback, CloseableResource {
+public class ReportExtension implements BeforeAllCallback, AfterEachCallback, CloseableResource {
 
   private volatile boolean testsStarted = false;
   private AtomicInteger testCount = new AtomicInteger(0);
-  private AtomicBoolean hasException = new AtomicBoolean(false);
+  private AtomicInteger failedTestCount = new AtomicInteger(0);
   private File report;
 
   @Override
@@ -54,22 +52,16 @@ public class ReportExtension implements BeforeAllCallback, AfterEachCallback, Af
   public synchronized void afterEach(ExtensionContext context) throws Exception {
     testCount.incrementAndGet();
     reportTestResult(context);
-  }
-
-  @Override
-  public void afterAll(ExtensionContext context) throws Exception {
     if (context.getExecutionException().isPresent()) {
-      hasException.set(true);
-      writeToReport(String.format("[X] %s Some tests did not pass",
-        context.getTestClass().map(Class::getSimpleName).orElse("ERROR")
-      ));
+      failedTestCount.incrementAndGet();
     }
   }
 
   @Override
   public void close() throws Exception {
-    if (hasException.get()) {
-      writeToReport(String.format("[X] Some tests did not pass (Passed tests %s)", testCount.get()));
+    if (failedTestCount.get() > 0) {
+      writeToReport(String.format("[X] Some tests did not pass (Failed tests %s/%s)",
+        failedTestCount.get(), testCount.get()));
     } else {
       writeToReport(String.format("[\u2713] All tests (%s) passed successfully!!!", testCount.get()));
     }
