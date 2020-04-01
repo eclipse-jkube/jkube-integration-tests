@@ -17,6 +17,7 @@ public class Tags {
 
   public static final String KUBERNETES = "Kubernetes";
   public static final String OPEN_SHIFT = "OpenShift";
+  public static final String WINDOWS = "Windows";
 
   private Tags() {}
 }

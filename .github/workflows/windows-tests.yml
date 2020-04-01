@@ -1,0 +1,85 @@
+#
+# Copyright (c) 2019 Red Hat, Inc.
+# This program and the accompanying materials are made
+# available under the terms of the Eclipse Public License 2.0
+# which is available at:
+#
+#     https://www.eclipse.org/legal/epl-2.0/
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+# Contributors:
+#   Red Hat, Inc. - initial API and implementation
+#
+
+name: JKube Windows Specific Tests
+
+on:
+  push:
+#    branches:
+#      - master
+  pull_request:
+
+env:
+  JKUBE_REPOSITORY: https://github.com/eclipse/jkube.git
+  JKUBE_REVISION: master
+  JKUBE_DIR: jkube
+
+jobs:
+  windows:
+    name: Windows
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2.0.0
+      - name: Setup Java 11
+        uses: actions/setup-java@v1
+        with:
+          java-version: '11'
+#      - name: Enable Linux Containers on Windows 2019 Server
+#        run: |
+#          Install-Module "DockerMsftProvider" -Force
+#          Update-Module "DockerMsftProvider"
+#          Install-Package Docker -ProviderName "DockerMsftProvider" -Update -Force
+#          Set-Content -Value "`{`"experimental`":true`}" -Path C:\ProgramData\docker\config\daemon.json
+#          restart-service docker
+#      - name: Download lcow
+#        run: |
+#          mkdir 'C:\Program Files\Linux Containers'
+#          $tmp = New-TemporaryFile | Rename-Item -NewName { $_ -replace 'tmp$', 'zip' } –PassThru
+#          Invoke-WebRequest -Uri 'https://github.com/linuxkit/lcow/releases/download/v4.14.35-v0.3.9/release.zip' -OutFile $tmp
+#          $tmp | Expand-Archive -DestinationPath 'C:\Program Files\Linux Containers' -Force
+#          $tmp | Remove-Item
+#      - name: Set up kind
+#        run: |
+#          choco install kind
+#          kind create cluster
+      - name: Set up VirtualBox
+        run: |
+          choco install virtualbox --params "/NoDesktopShortcut"
+          refreshenv
+      - name: Set up Multipass
+        run: |
+          choco install multipass
+          refreshenv
+          multipass set local.driver=virtualbox
+      - name: Set up MicroK8s
+        run: |
+          multipass launch --name microk8s-vm --mem 4G --disk 40G
+          multipass exec microk8s-vm -- sudo snap install microk8s --classic
+          multipass exec microk8s-vm -- sudo iptables -P FORWARD ACCEPT
+      - name: Checkout JKube Repository
+        run: |
+          git clone $env:JKUBE_REPOSITORY
+          cd $env:JKUBE_DIR
+          git checkout $env:JKUBE_REVISION
+      - name: Install JKube
+        run: |
+          cd $env:JKUBE_DIR
+          mvn -f pom.xml -B -DskipTests clean install
+      - name: Install and Run Integration Tests
+        run: |
+          cd $env:JKUBE_DIR
+          $env:JKUBE_VERSION = (mvn org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression='project.version' -q -DforceStdout) | Out-String
+          cd ..
+          mvn -B -PWindows clean verify -D'jkube.version'=$env:JKUBE_VERSION
