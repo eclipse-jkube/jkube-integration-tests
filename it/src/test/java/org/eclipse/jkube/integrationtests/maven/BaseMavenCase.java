@@ -70,7 +70,7 @@ public abstract class BaseMavenCase implements MavenProject {
     return maven(goal, new Properties());
   }
 
-  protected final InvocationResult maven(String goal, Properties properties)
+  protected InvocationResult maven(String goal, Properties properties)
     throws IOException, InterruptedException, MavenInvocationException {
 
     return maven(goal, properties, null);
