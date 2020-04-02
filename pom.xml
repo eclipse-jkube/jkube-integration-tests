@@ -370,7 +370,7 @@
     <profile>
       <id>Windows</id>
       <modules>
-        <module>projects-to-be-tested/spring-boot/zero-config</module>
+        <module>projects-to-be-tested/windows</module>
       </modules>
       <build>
         <plugins>

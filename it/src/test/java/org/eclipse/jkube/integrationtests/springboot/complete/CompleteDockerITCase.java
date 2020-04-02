@@ -117,6 +117,7 @@ class CompleteDockerITCase extends Complete {
     assertThat(dockerFileContent, containsString("ENTRYPOINT [\"java\",\"-jar\",\"/deployments/spring-boot-complete-0.0.0-SNAPSHOT.jar\"]"));
     assertThat(dockerFileContent, containsString("USER 1000"));
   }
+
   @Test
   @Order(2)
   @ResourceLock(value = SPRINGBOOT_COMPLETE_K8s, mode = READ_WRITE)
