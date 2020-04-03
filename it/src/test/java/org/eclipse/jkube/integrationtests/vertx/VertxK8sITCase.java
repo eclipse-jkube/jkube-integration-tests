@@ -17,6 +17,8 @@ import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import org.apache.maven.shared.invoker.InvocationResult;
+import org.apache.maven.shared.invoker.PrintStreamHandler;
+import org.eclipse.jkube.integrationtests.maven.MavenUtils;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,7 +30,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.parallel.ResourceLock;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
+import java.util.Properties;
 
 import static org.eclipse.jkube.integrationtests.Locks.CLUSTER_RESOURCE_INTENSIVE;
 import static org.eclipse.jkube.integrationtests.Tags.KUBERNETES;
@@ -44,6 +50,7 @@ import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.stringContainsInOrder;
 import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 
 @Tag(KUBERNETES)
@@ -119,6 +126,26 @@ class VertxK8sITCase extends Vertx {
         )))
       )));
   }
+
+  @Test
+  @Order(4)
+  @DisplayName("k8s:log, should retrieve log")
+  void k8sLog() throws Exception {
+    // Given
+    final Properties properties = new Properties();
+    properties.setProperty("jkube.log.follow", "false");
+    final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    final MavenUtils.InvocationRequestCustomizer irc = invocationRequest -> {
+      invocationRequest.setOutputHandler(new PrintStreamHandler(new PrintStream(baos), true));
+    };
+    // When
+    final InvocationResult invocationResult = maven("k8s:log", properties, irc);
+    // Then
+    assertThat(invocationResult.getExitCode(), equalTo(0));
+    assertThat(baos.toString(StandardCharsets.UTF_8),
+      stringContainsInOrder("Succeeded in deploying verticle"));
+  }
+
 
   @Test
   @Order(4)
