@@ -34,7 +34,7 @@
     <apache.maven-failsafe-plugin.version>3.0.0-M3</apache.maven-failsafe-plugin.version>
     <apache.maven.maven-invoker.version>3.0.1</apache.maven.maven-invoker.version>
     <fabric8.kubernetes-client.version>4.9.0</fabric8.kubernetes-client.version>
-    <jkube.version>0.2.1-SNAPSHOT</jkube.version>
+    <jkube.version>1.0.0-SNAPSHOT</jkube.version>
     <com.fasterxml.jackson.core.version>2.10.0</com.fasterxml.jackson.core.version>
     <com.fasterxml.jackson.dataformat.yaml.version>2.10.0</com.fasterxml.jackson.dataformat.yaml.version>
     <junit.version>5.5.1</junit.version>
@@ -344,6 +344,7 @@
       <modules>
         <module>projects-to-be-tested/thorntail/microprofile</module>
         <module>projects-to-be-tested/vertx/simplest</module>
+        <module>projects-to-be-tested/openliberty/rest</module>
       </modules>
       <activation>
         <file>
@@ -361,6 +362,7 @@
               <includes>
                 <include>**/integrationtests/thorntail/**/*ITCase.java</include>
                 <include>**/integrationtests/vertx/**/*ITCase.java</include>
+                <include>**/integrationtests/openliberty/**/*ITCase.java</include>
               </includes>
             </configuration>
           </plugin>
