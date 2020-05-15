@@ -143,7 +143,12 @@ class OpenLibertyK8sITCase extends OpenLiberty {
     // Then
     assertThat(invocationResult.getExitCode(), equalTo(0));
     assertThat(baos.toString(StandardCharsets.UTF_8),
-      stringContainsInOrder("Web Module openliberty-rest has been bound to default_host","The defaultServer server started"));
+      stringContainsInOrder(
+        "The defaultServer server started",
+        "Monitoring dropins for applications",
+        "Web application available (default_host)",
+        String.format("Application %s started in", getApplication())
+      ));
   }
 
 
