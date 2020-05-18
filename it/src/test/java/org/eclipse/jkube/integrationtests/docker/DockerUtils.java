@@ -16,7 +16,9 @@ package org.eclipse.jkube.integrationtests.docker;
 import org.eclipse.jkube.integrationtests.cli.CliUtils;
 import org.eclipse.jkube.integrationtests.cli.CliUtils.CliResult;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -41,6 +43,15 @@ public class DockerUtils {
             new DockerImage(parsedImageLine[0], parsedImageLine[1], parsedImageLine[2],
                 parsedImageLine[3]))
         .collect(Collectors.toList());
+  }
+
+  public static List<String> listImageFiles(String imageName, String baseDir) throws IOException, InterruptedException {
+    final CliResult result = CliUtils.runCommand(String.format(
+      "docker run --rm -t --entrypoint \"/bin/sh\" %s -c 'find %s -print'",
+      imageName,
+      Optional.ofNullable(baseDir).orElse("/")
+    ));
+    return Arrays.asList(result.getOutput().replace("\r", "").split("\n"));
   }
 
   public static final class DockerImage {

@@ -40,11 +40,13 @@ import static org.eclipse.jkube.integrationtests.assertions.DeploymentAssertion.
 import static org.eclipse.jkube.integrationtests.assertions.DeploymentAssertion.awaitDeployment;
 import static org.eclipse.jkube.integrationtests.assertions.DockerAssertion.assertImageWasRecentlyBuilt;
 import static org.eclipse.jkube.integrationtests.assertions.YamlAssertion.yaml;
+import static org.eclipse.jkube.integrationtests.docker.DockerUtils.listImageFiles;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.anEmptyMap;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.hasSize;
@@ -99,14 +101,6 @@ class CompleteDockerITCase extends Complete {
       String.format("../%s/target/docker/integration-tests/docker-spring-boot-complete", PROJECT_COMPLETE));
     assertThat(dockerDirectory.exists(), equalTo(true));
     assertThat(new File(dockerDirectory, "tmp/docker-build.tar.gz").exists(), equalTo(true));
-    assertThat(new File(dockerDirectory, "build/maven/assembly-test/inlined-file.txt").exists(), equalTo(true));
-    assertThat(new File(dockerDirectory, "build/maven/assembly-test/not-considered.txt").exists(), equalTo(false));
-    assertThat(new File(dockerDirectory, "build/maven/static/ignored-file.txt").exists(), equalTo(false));
-    assertThat(new File(dockerDirectory, "build/maven/static/static-file.txt").exists(), equalTo(true));
-    assertThat(new File(dockerDirectory,
-      "latest/build/maven/jkube-includes/will-be-included-if-no-assemblies-defined.txt").exists(), equalTo(false));
-    assertThat(new File(dockerDirectory, "build/maven/spring-boot-complete-0.0.0-SNAPSHOT.jar").exists(), equalTo(true));
-    assertThat(new File(dockerDirectory, "build/Dockerfile").exists(), equalTo(true));
     final String dockerFileContent = String.join("\n",
       Files.readAllLines(new File(dockerDirectory, "build/Dockerfile").toPath()));
     assertThat(dockerFileContent, containsString("FROM adoptopenjdk/openjdk11:alpine-slim"));
@@ -116,6 +110,15 @@ class CompleteDockerITCase extends Complete {
     assertThat(dockerFileContent, containsString("COPY maven /deployments/"));
     assertThat(dockerFileContent, containsString("ENTRYPOINT [\"java\",\"-jar\",\"/deployments/spring-boot-complete-0.0.0-SNAPSHOT.jar\"]"));
     assertThat(dockerFileContent, containsString("USER 1000"));
+    final List<String> imageFiles = listImageFiles(String.format("%s/%s", "integration-tests", getApplication()),
+      "/deployments");
+    assertThat(imageFiles, hasItem("/deployments/assembly-test/inlined-file.txt"));
+    assertThat(imageFiles, not(hasItem("/deployments/assembly-test/not-considered.txt")));
+    assertThat(imageFiles, not(hasItem("/deployments/static/ignored-file.txt")));
+    assertThat(imageFiles, hasItem("/deployments/static/static-file.txt"));
+    assertThat(imageFiles, not(hasItem("/deployments/jkube-includes/will-be-included-if-no-assemblies-defined.txt")));
+    assertThat(imageFiles, hasItem("/deployments/spring-boot-complete-0.0.0-SNAPSHOT.jar"));
+    assertThat(new File(dockerDirectory, "build/Dockerfile").exists(), equalTo(true));
   }
 
   @Test
