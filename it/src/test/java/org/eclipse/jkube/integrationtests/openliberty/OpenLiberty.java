@@ -20,8 +20,10 @@ import org.eclipse.jkube.integrationtests.maven.BaseMavenCase;
 import static org.eclipse.jkube.integrationtests.assertions.PodAssertion.assertPod;
 import static org.eclipse.jkube.integrationtests.assertions.PodAssertion.awaitPod;
 import static org.eclipse.jkube.integrationtests.assertions.ServiceAssertion.awaitService;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.stringContainsInOrder;
 
 abstract class OpenLiberty extends BaseMavenCase implements JKubeCase {
 
@@ -51,5 +53,15 @@ abstract class OpenLiberty extends BaseMavenCase implements JKubeCase {
       .assertPort("glrpc", 9080, true)
       .assertNodePortResponse("glrpc", equalTo("Hello, World."));
     return pod;
+  }
+
+  final void assertLog(String log) {
+    assertThat(log,
+      stringContainsInOrder(
+        "The defaultServer server started",
+        "Monitoring dropins for applications",
+        "Web application available (default_host)",
+        String.format("Application %s started in", getApplication())
+      ));
   }
 }
