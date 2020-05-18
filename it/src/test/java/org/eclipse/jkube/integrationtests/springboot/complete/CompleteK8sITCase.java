@@ -38,11 +38,13 @@ import static org.eclipse.jkube.integrationtests.assertions.DeploymentAssertion.
 import static org.eclipse.jkube.integrationtests.assertions.DeploymentAssertion.awaitDeployment;
 import static org.eclipse.jkube.integrationtests.assertions.DockerAssertion.assertImageWasRecentlyBuilt;
 import static org.eclipse.jkube.integrationtests.assertions.YamlAssertion.yaml;
+import static org.eclipse.jkube.integrationtests.docker.DockerUtils.listImageFiles;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.anEmptyMap;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.hasSize;
@@ -87,11 +89,12 @@ class CompleteK8sITCase extends Complete {
     assertImageWasRecentlyBuilt("integration-tests", "spring-boot-complete");
     final File dockerDirectory = new File(
       String.format("../%s/target/docker/integration-tests/spring-boot-complete/", PROJECT_COMPLETE));
-    assertThat(new File(dockerDirectory, "latest/build/maven/assembly-test").exists(), equalTo(false));
-    assertThat(new File(dockerDirectory, "latest/build/maven/static").exists(), equalTo(false));
-    assertThat(new File(dockerDirectory, "latest/build/maven/static").exists(), equalTo(false));
-    assertThat(new File(dockerDirectory,
-      "latest/build/maven/jkube-includes/will-be-included-if-no-assemblies-defined.txt").exists(), equalTo(true));
+    final List<String> imageFiles = listImageFiles(String.format("%s/%s", "integration-tests", getApplication()),
+      "/deployments");
+    assertThat(imageFiles, not(hasItem("/deployments/assembly-test")));
+    assertThat(imageFiles, not(hasItem("/deployments/static")));
+    assertThat(imageFiles, hasItem("/deployments/jkube-includes/will-be-included-if-no-assemblies-defined.txt"));
+    assertThat(imageFiles, hasItem("/deployments/spring-boot-complete-0.0.0-SNAPSHOT.jar"));
   }
 
   @Test
