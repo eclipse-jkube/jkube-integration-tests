@@ -50,7 +50,6 @@ import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.stringContainsInOrder;
 import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 
 @Tag(KUBERNETES)
@@ -142,13 +141,7 @@ class OpenLibertyK8sITCase extends OpenLiberty {
     final InvocationResult invocationResult = maven("k8s:log", properties, irc);
     // Then
     assertThat(invocationResult.getExitCode(), equalTo(0));
-    assertThat(baos.toString(StandardCharsets.UTF_8),
-      stringContainsInOrder(
-        "The defaultServer server started",
-        "Monitoring dropins for applications",
-        "Web application available (default_host)",
-        String.format("Application %s started in", getApplication())
-      ));
+    assertLog(baos.toString(StandardCharsets.UTF_8));
   }
 
 

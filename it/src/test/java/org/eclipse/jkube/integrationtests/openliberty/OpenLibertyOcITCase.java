@@ -46,7 +46,6 @@ import static org.hamcrest.Matchers.anEmptyMap;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.stringContainsInOrder;
 import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 
 @Tag(OPEN_SHIFT)
@@ -129,8 +128,7 @@ class OpenLibertyOcITCase extends OpenLiberty {
     final InvocationResult invocationResult = maven("oc:log", properties, irc);
     // Then
     assertThat(invocationResult.getExitCode(), equalTo(0));
-    assertThat(baos.toString(StandardCharsets.UTF_8),
-      stringContainsInOrder("Web Module openliberty-rest has been bound to default_host","The defaultServer server started"));
+    assertLog(baos.toString(StandardCharsets.UTF_8));
   }
 
   @Test
