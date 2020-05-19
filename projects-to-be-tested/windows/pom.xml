@@ -50,10 +50,6 @@
         <groupId>org.eclipse.jkube</groupId>
         <artifactId>kubernetes-maven-plugin</artifactId>
       </plugin>
-      <plugin>
-        <groupId>org.eclipse.jkube</groupId>
-        <artifactId>openshift-maven-plugin</artifactId>
-      </plugin>
     </plugins>
   </build>
 </project>

@@ -34,6 +34,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Collections;
 import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static org.eclipse.jkube.integrationtests.Tags.WINDOWS;
 import static org.eclipse.jkube.integrationtests.assertions.DockerAssertion.assertImageWasRecentlyBuilt;
@@ -72,12 +74,16 @@ public class WindowsITCase extends BaseMavenCase {
       String.format("..\\%s\\target\\docker\\integration-tests\\windows\\latest", getProject()));
     assertThat(dockerDirectory.exists(), equalTo(true));
     assertThat(new File(dockerDirectory, "tmp\\docker-build.tar").exists(), equalTo(true));
-    assertThat(new File(dockerDirectory, "build\\maven\\windows-0.0.0-SNAPSHOT.jar").exists(), equalTo(true));
     assertThat(new File(dockerDirectory, "build\\Dockerfile").exists(), equalTo(true));
     final String dockerFileContent = String.join("\n",
       Files.readAllLines(new File(dockerDirectory, "build\\Dockerfile").toPath()));
     assertThat(dockerFileContent, containsString("FROM mcr.microsoft.com/windows/nanoserver:1809-amd64"));
+    final Matcher deploymentDirMatcher = Pattern.compile("COPY ([^\\s]*)", Pattern.MULTILINE).matcher(dockerFileContent);
+    assertThat(deploymentDirMatcher.find(), equalTo(true));
+    assertThat(new File(dockerDirectory,
+        String.format("build\\%s\\windows-0.0.0-SNAPSHOT.jar", deploymentDirMatcher.group(1))).exists(), equalTo(true));
   }
+
   @Test
   @Order(2)
   @DisplayName("k8s:push, should push image to remote registry")
