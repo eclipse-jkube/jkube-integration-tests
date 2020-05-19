@@ -46,14 +46,15 @@ import static org.hamcrest.Matchers.anEmptyMap;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.stringContainsInOrder;
 import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 
 
 @Tag(OPEN_SHIFT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class WildFlySwarmOcITCase extends  WildFlySwarm{
+
   private OpenShiftClient oc;
+
   @BeforeEach
   void setUp() {
       oc = new DefaultKubernetesClient().adapt(OpenShiftClient.class);
@@ -64,6 +65,7 @@ class WildFlySwarmOcITCase extends  WildFlySwarm{
     oc.close();
     oc = null;
   }
+
   @Override
   public KubernetesClient getKubernetesClient() {
     return oc;
@@ -78,7 +80,7 @@ class WildFlySwarmOcITCase extends  WildFlySwarm{
     final InvocationResult invocationResult = maven("oc:build");
     // Then
     assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
-    final ImageStream is = oc.imageStreams().withName("wildflyswarm-rest").get();
+    final ImageStream is = oc.imageStreams().withName(getApplication()).get();
     assertThat(is, notNullValue());
     assertThat(is.getStatus().getTags().iterator().next().getTag(), equalTo("latest"));
   }
@@ -99,6 +101,7 @@ class WildFlySwarmOcITCase extends  WildFlySwarm{
     assertThat(new File(metaInfDirectory, "jkube/openshift/wildflyswarm-rest-route.yml"), yaml(not(anEmptyMap())));
     assertThat(new File(metaInfDirectory, "jkube/openshift/wildflyswarm-rest-service.yml"), yaml(not(anEmptyMap())));
   }
+
   @Test
   @Order(3)
   @ResourceLock(value = CLUSTER_RESOURCE_INTENSIVE, mode = READ_WRITE)
@@ -114,7 +117,7 @@ class WildFlySwarmOcITCase extends  WildFlySwarm{
   @Test
   @Order(4)
   @DisplayName("oc:log, should retrieve log")
-  void k8sLog() throws Exception {
+  void ocLog() throws Exception {
     // Given
     final Properties properties = new Properties();
     properties.setProperty("jkube.log.follow", "false");
@@ -126,8 +129,7 @@ class WildFlySwarmOcITCase extends  WildFlySwarm{
     final InvocationResult invocationResult = maven("oc:log", properties, irc);
     // Then
     assertThat(invocationResult.getExitCode(), equalTo(0));
-    assertThat(baos.toString(StandardCharsets.UTF_8),
-      stringContainsInOrder("Deployed","WildFly","started in "));
+    assertLog(baos.toString(StandardCharsets.UTF_8));
   }
 
   @Test

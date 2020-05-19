@@ -27,6 +27,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.Properties;
 
 import static org.eclipse.jkube.integrationtests.Locks.CLUSTER_RESOURCE_INTENSIVE;
@@ -67,10 +68,16 @@ class WildFlySwarmK8sITCase extends WildFlySwarm{
   @DisplayName("k8s:build, should create image")
   void k8sBuild() throws Exception {
     // When
-    final InvocationResult invocationResult = maven("k8s:build ");
+    final InvocationResult invocationResult = maven("k8s:build");
     // Then
     assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
-    assertImageWasRecentlyBuilt("integration-tests", "wildflyswarm-rest");
+    assertImageWasRecentlyBuilt("integration-tests", getApplication());
+    final File dockerDirectory = new File(
+      String.format("../%s/target/docker/integration-tests/%s/latest", getProject(), getApplication()));
+    assertThat(dockerDirectory.exists(), equalTo(true));
+    final String dockerFileContent = String.join("\n",
+      Files.readAllLines(new File(dockerDirectory, "build/Dockerfile").toPath()));
+    assertThat(dockerFileContent, containsString("ENV AB_PROMETHEUS_OFF=true"));
   }
 
   @Test
@@ -78,7 +85,7 @@ class WildFlySwarmK8sITCase extends WildFlySwarm{
   @DisplayName("k8s:resource, should create manifests")
   void k8sResource() throws Exception {
     // When
-    final InvocationResult invocationResult = maven("k8s:resource ");
+    final InvocationResult invocationResult = maven("k8s:resource");
     // Then
     assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
     final File metaInfDirectory = new File(
@@ -96,7 +103,7 @@ class WildFlySwarmK8sITCase extends WildFlySwarm{
   @SuppressWarnings("unchecked")
   void k8sApply() throws Exception {
     // When
-    final InvocationResult invocationResult = maven("k8s:apply ");
+    final InvocationResult invocationResult = maven("k8s:apply");
     // Then
     assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
     final Pod pod = assertThatShouldApplyResources();
@@ -105,8 +112,8 @@ class WildFlySwarmK8sITCase extends WildFlySwarm{
       .assertContainers(hasSize(1))
       .assertContainers(hasItems(allOf(
         hasProperty("image", equalTo("integration-tests/wildflyswarm-rest:latest")),
-        hasProperty("name", equalTo("webapp")),
-        hasProperty("ports", hasSize(1)),
+        hasProperty("name", equalTo("wildfly-swarm")),
+        hasProperty("ports", hasSize(3)),
         hasProperty("ports", hasItems(allOf(
           hasProperty("name", equalTo("http")),
           hasProperty("containerPort", equalTo(8080))
@@ -126,20 +133,19 @@ class WildFlySwarmK8sITCase extends WildFlySwarm{
       invocationRequest.setOutputHandler(new PrintStreamHandler(new PrintStream(baos), true));
     };
     // When
-    final InvocationResult invocationResult = maven("k8s:log ", properties, irc);
+    final InvocationResult invocationResult = maven("k8s:log", properties, irc);
     // Then
     assertThat(invocationResult.getExitCode(), equalTo(0));
-    assertThat(baos.toString(StandardCharsets.UTF_8),
-      stringContainsInOrder("Deployed","WildFly","started in "));
+    assertLog(baos.toString(StandardCharsets.UTF_8));
   }
 
 
   @Test
-  @Order(4)
+  @Order(5)
   @DisplayName("k8s:undeploy, should delete all applied resources")
   void k8sUndeploy() throws Exception {
     // When
-    final InvocationResult invocationResult = maven("k8s:undeploy ");
+    final InvocationResult invocationResult = maven("k8s:undeploy");
     // Then
     assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
     assertThatShouldDeleteAllAppliedResources(this);

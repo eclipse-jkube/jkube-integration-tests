@@ -13,16 +13,9 @@
  */
 package org.swarm.wildfly;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.ApplicationPath;
+import javax.ws.rs.core.Application;
 
-@Path("/")
-public class HelloWildfly {
-
-    @GET
-    @Produces("text/plain")
-    public String helloJKube() {
-        return "Hello from JKube!";
-    }
+@ApplicationPath("/")
+public class WildflyApplication  extends Application {
 }
