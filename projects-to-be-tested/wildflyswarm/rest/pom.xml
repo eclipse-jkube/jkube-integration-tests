@@ -79,25 +79,10 @@
       <plugin>
         <groupId>org.eclipse.jkube</groupId>
         <artifactId>kubernetes-maven-plugin</artifactId>
-        <configuration>
-          <resources>
-            <env>
-              <AB_OFF>true</AB_OFF>
-              <JAVA_OPTIONS>-Djava.net.preferIPv4Stack=true</JAVA_OPTIONS>
-            </env>
-          </resources>
-        </configuration>
       </plugin>
       <plugin>
         <groupId>org.eclipse.jkube</groupId>
         <artifactId>openshift-maven-plugin</artifactId>
-        <configuration>
-          <resources>
-            <env>
-              <JAVA_ARGS>-Djava.net.preferIPv4Stack=true</JAVA_ARGS>
-            </env>
-          </resources>
-        </configuration>
       </plugin>
     </plugins>
   </build>
