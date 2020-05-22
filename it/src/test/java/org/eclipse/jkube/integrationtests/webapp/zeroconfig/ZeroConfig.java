@@ -14,6 +14,7 @@
 package org.eclipse.jkube.integrationtests.webapp.zeroconfig;
 
 import io.fabric8.kubernetes.api.model.Pod;
+import io.fabric8.kubernetes.api.model.Service;
 import org.eclipse.jkube.integrationtests.JKubeCase;
 import org.eclipse.jkube.integrationtests.maven.BaseMavenCase;
 
@@ -22,7 +23,9 @@ import java.io.IOException;
 import static org.eclipse.jkube.integrationtests.assertions.PodAssertion.assertPod;
 import static org.eclipse.jkube.integrationtests.assertions.PodAssertion.awaitPod;
 import static org.eclipse.jkube.integrationtests.assertions.ServiceAssertion.awaitService;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.stringContainsInOrder;
 
 abstract class ZeroConfig extends BaseMavenCase implements JKubeCase {
 
@@ -48,4 +51,19 @@ abstract class ZeroConfig extends BaseMavenCase implements JKubeCase {
     return pod;
   }
 
+  final Service serviceSpecTypeToNodePort() throws InterruptedException, IOException {
+    final Pod pod = awaitPod(this).getKubernetesResource();
+    return getKubernetesClient().services()
+      .inNamespace(pod.getMetadata().getNamespace())
+      .withName(getApplication())
+      .edit().editSpec().withType("NodePort").endSpec().done();
+  }
+
+  final void assertLog(String log) {
+    assertThat(log,
+      stringContainsInOrder(
+        "Deploying web application archive [/usr/local/tomcat/webapps/ROOT.war]",
+        "Deployment of web application archive [/usr/local/tomcat/webapps/ROOT.war] has finished",
+        "org.apache.catalina.startup.Catalina.start Server startup in", "seconds"));
+  }
 }
