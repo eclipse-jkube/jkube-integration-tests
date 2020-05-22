@@ -67,6 +67,11 @@ public class ServiceAssertion extends KubernetesClientAssertion<Service> {
     return this;
   }
 
+  public ServiceAssertion assertIsClusterIp() {
+    assertThat(getKubernetesResource().getSpec().getType(), equalTo("ClusterIP"));
+    return this;
+  }
+
   public ServiceAssertion assertIsNodePort() {
     assertThat(getKubernetesResource().getSpec().getType(), equalTo("NodePort"));
     return this;

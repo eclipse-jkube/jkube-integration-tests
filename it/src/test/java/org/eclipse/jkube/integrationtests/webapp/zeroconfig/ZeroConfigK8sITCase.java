@@ -14,9 +14,12 @@
 package org.eclipse.jkube.integrationtests.webapp.zeroconfig;
 
 import io.fabric8.kubernetes.api.model.Pod;
+import io.fabric8.kubernetes.api.model.Service;
 import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import org.apache.maven.shared.invoker.InvocationResult;
+import org.apache.maven.shared.invoker.PrintStreamHandler;
+import org.eclipse.jkube.integrationtests.maven.MavenUtils;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,18 +31,27 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.parallel.ResourceLock;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.Properties;
 
 import static org.eclipse.jkube.integrationtests.Locks.CLUSTER_RESOURCE_INTENSIVE;
 import static org.eclipse.jkube.integrationtests.Tags.KUBERNETES;
 import static org.eclipse.jkube.integrationtests.assertions.DeploymentAssertion.assertDeploymentExists;
 import static org.eclipse.jkube.integrationtests.assertions.DeploymentAssertion.awaitDeployment;
 import static org.eclipse.jkube.integrationtests.assertions.DockerAssertion.assertImageWasRecentlyBuilt;
+import static org.eclipse.jkube.integrationtests.assertions.ServiceAssertion.awaitService;
 import static org.eclipse.jkube.integrationtests.assertions.YamlAssertion.yaml;
+import static org.eclipse.jkube.integrationtests.docker.DockerUtils.listImageFiles;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.anEmptyMap;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.hasSize;
@@ -76,7 +88,10 @@ class ZeroConfigK8sITCase extends ZeroConfig {
     final InvocationResult invocationResult = maven("k8s:build");
     // Then
     assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
-    assertImageWasRecentlyBuilt("integration-tests", "webapp-zero-config");
+    assertImageWasRecentlyBuilt("integration-tests", getApplication());
+    final List<String> imageFiles = listImageFiles(String.format("%s/%s", "integration-tests", getApplication()),
+      "/deployments");
+    assertThat(imageFiles, hasItem("/deployments/ROOT.war"));
   }
 
   @Test
@@ -112,16 +127,47 @@ class ZeroConfigK8sITCase extends ZeroConfig {
       .assertContainers(hasItems(allOf(
         hasProperty("image", equalTo("integration-tests/webapp-zero-config:latest")),
         hasProperty("name", equalTo("webapp")),
-        hasProperty("ports", hasSize(2)),
+        hasProperty("ports", hasSize(1)),
         hasProperty("ports", hasItems(allOf(
           hasProperty("name", equalTo("http")),
           hasProperty("containerPort", equalTo(8080))
         )))
       )));
+    awaitService(this, pod.getMetadata().getNamespace())
+      .assertIsClusterIp();
   }
 
   @Test
   @Order(4)
+  @DisplayName("Service as NodePort response should return String")
+  void testNodePortResponse() throws Exception {
+    // Given
+    final Service service = serviceSpecTypeToNodePort();
+    // Then
+    awaitService(this, service.getMetadata().getNamespace())
+      .assertNodePortResponse("http", containsString("Eclipse JKube rocks!!"));
+  }
+
+  @Test
+  @Order(5)
+  @DisplayName("k8s:log, should retrieve log")
+  void k8sLog() throws Exception {
+    // Given
+    final Properties properties = new Properties();
+    properties.setProperty("jkube.log.follow", "false");
+    final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    final MavenUtils.InvocationRequestCustomizer irc = invocationRequest -> {
+      invocationRequest.setOutputHandler(new PrintStreamHandler(new PrintStream(baos), true));
+    };
+    // When
+    final InvocationResult invocationResult = maven("k8s:log", properties, irc);
+    // Then
+    assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
+    assertLog(baos.toString(StandardCharsets.UTF_8));
+  }
+
+  @Test
+  @Order(6)
   @DisplayName("k8s:undeploy, should delete all applied resources")
   void k8sUndeploy() throws Exception {
     // When

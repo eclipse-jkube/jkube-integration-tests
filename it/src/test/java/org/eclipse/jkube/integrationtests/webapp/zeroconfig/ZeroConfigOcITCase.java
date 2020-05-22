@@ -13,10 +13,15 @@
  */
 package org.eclipse.jkube.integrationtests.webapp.zeroconfig;
 
+import io.fabric8.kubernetes.api.model.Pod;
+import io.fabric8.kubernetes.api.model.Service;
 import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClient;
+import io.fabric8.openshift.api.model.ImageStream;
 import io.fabric8.openshift.client.OpenShiftClient;
 import org.apache.maven.shared.invoker.InvocationResult;
+import org.apache.maven.shared.invoker.PrintStreamHandler;
+import org.eclipse.jkube.integrationtests.maven.MavenUtils;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,19 +33,23 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.parallel.ResourceLock;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 
-import static org.eclipse.jkube.integrationtests.Hacks.hackToPreventNullPointerInRegistryServiceCreateAuthConfig;
 import static org.eclipse.jkube.integrationtests.Locks.CLUSTER_RESOURCE_INTENSIVE;
 import static org.eclipse.jkube.integrationtests.OpenShift.cleanUpCluster;
 import static org.eclipse.jkube.integrationtests.Tags.OPEN_SHIFT;
-import static org.eclipse.jkube.integrationtests.assertions.DockerAssertion.assertImageWasRecentlyBuilt;
+import static org.eclipse.jkube.integrationtests.assertions.ServiceAssertion.awaitService;
 import static org.eclipse.jkube.integrationtests.assertions.YamlAssertion.yaml;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.anEmptyMap;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 
 @Tag(OPEN_SHIFT)
@@ -67,28 +76,23 @@ class ZeroConfigOcITCase extends ZeroConfig {
 
   @Test
   @Order(1)
-  @DisplayName("oc:build, in docker mode, should create image")
+  @DisplayName("oc:build, should create image")
   void ocBuild() throws Exception {
-    // Given
-    hackToPreventNullPointerInRegistryServiceCreateAuthConfig("fabric8/tomcat-9:1.2.1");
-    final Properties properties = new Properties();
-    properties.setProperty("jkube.mode", "kubernetes"); // S2I doesn't support webapp yet
     // When
-    final InvocationResult invocationResult = maven("oc:build", properties);
+    final InvocationResult invocationResult = maven("oc:build");
     // Then
     assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
-    assertImageWasRecentlyBuilt("integration-tests", "webapp-zero-config");
+    final ImageStream is = oc.imageStreams().withName(getApplication()).get();
+    assertThat(is, notNullValue());
+    assertThat(is.getStatus().getTags().iterator().next().getTag(), equalTo("latest"));
   }
 
   @Test
   @Order(2)
   @DisplayName("oc:resource, should create manifests")
   void ocResource() throws Exception {
-    // Given
-    final Properties properties = new Properties();
-    properties.setProperty("jkube.mode", "kubernetes"); // S2I doesn't support webapp yet
     // When
-    final InvocationResult invocationResult = maven("oc:resource", properties);
+    final InvocationResult invocationResult = maven("oc:resource");
     // Then
     assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
     final File metaInfDirectory = new File(
@@ -109,11 +113,42 @@ class ZeroConfigOcITCase extends ZeroConfig {
     final InvocationResult invocationResult = maven("oc:apply");
     // Then
     assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
-    assertThatShouldApplyResources();
+    final Pod pod = assertThatShouldApplyResources();
+    awaitService(this, pod.getMetadata().getNamespace())
+      .assertIsClusterIp();
   }
 
   @Test
   @Order(4)
+  @DisplayName("Service as NodePort response should return String")
+  void testNodePortResponse() throws Exception {
+    // Given
+    final Service service = serviceSpecTypeToNodePort();
+    // Then
+    awaitService(this, service.getMetadata().getNamespace())
+      .assertNodePortResponse("http", containsString("Eclipse JKube rocks!!"));
+  }
+
+  @Test
+  @Order(5)
+  @DisplayName("oc:log, should retrieve log")
+  void ocLog() throws Exception {
+    // Given
+    final Properties properties = new Properties();
+    properties.setProperty("jkube.log.follow", "false");
+    final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    final MavenUtils.InvocationRequestCustomizer irc = invocationRequest -> {
+      invocationRequest.setOutputHandler(new PrintStreamHandler(new PrintStream(baos), true));
+    };
+    // When
+    final InvocationResult invocationResult = maven("oc:log", properties, irc);
+    // Then
+    assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
+    assertLog(baos.toString(StandardCharsets.UTF_8));
+  }
+
+  @Test
+  @Order(6)
   @DisplayName("oc:undeploy, should delete all applied resources")
   void ocUndeploy() throws Exception {
     // When
