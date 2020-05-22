@@ -19,6 +19,7 @@ import org.eclipse.jkube.integrationtests.JKubeCase;
 import org.eclipse.jkube.integrationtests.maven.BaseMavenCase;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 import static org.eclipse.jkube.integrationtests.assertions.PodAssertion.assertPod;
 import static org.eclipse.jkube.integrationtests.assertions.PodAssertion.awaitPod;
@@ -51,12 +52,18 @@ abstract class ZeroConfig extends BaseMavenCase implements JKubeCase {
     return pod;
   }
 
+  @SuppressWarnings("squid:S2925")
   final Service serviceSpecTypeToNodePort() throws InterruptedException, IOException {
     final Pod pod = awaitPod(this).getKubernetesResource();
-    return getKubernetesClient().services()
+    final Service updatedService = getKubernetesClient().services()
       .inNamespace(pod.getMetadata().getNamespace())
       .withName(getApplication())
       .edit().editSpec().withType("NodePort").endSpec().done();
+    getKubernetesClient().resource(updatedService)
+      .waitUntilCondition(s -> s.getSpec().getType().equals("NodePort"), 10, TimeUnit.SECONDS);
+    final long throttleMilliseconds = 300L;
+    Thread.sleep(throttleMilliseconds);
+    return updatedService;
   }
 
   final void assertLog(String log) {
