@@ -316,6 +316,7 @@
     <profile>
       <id>webapp</id>
       <modules>
+        <module>projects-to-be-tested/webapp/jetty</module>
         <module>projects-to-be-tested/webapp/zero-config</module>
       </modules>
       <activation>
