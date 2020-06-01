@@ -93,7 +93,7 @@ class CompleteK8sITCase extends Complete {
       "/deployments");
     assertThat(imageFiles, not(hasItem("/deployments/assembly-test")));
     assertThat(imageFiles, not(hasItem("/deployments/static")));
-    assertThat(imageFiles, hasItem("/deployments/jkube-includes/will-be-included-if-no-assemblies-defined.txt"));
+    assertThat(imageFiles, hasItem("/deployments/will-be-included-if-no-assemblies-defined.txt"));
     assertThat(imageFiles, hasItem("/deployments/spring-boot-complete-0.0.0-SNAPSHOT.jar"));
   }
 
