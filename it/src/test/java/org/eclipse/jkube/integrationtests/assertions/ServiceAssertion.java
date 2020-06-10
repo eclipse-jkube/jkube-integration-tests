@@ -15,6 +15,7 @@ package org.eclipse.jkube.integrationtests.assertions;
 
 import io.fabric8.kubernetes.api.model.Service;
 import io.fabric8.kubernetes.api.model.ServicePort;
+import io.fabric8.openshift.api.model.Route;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.eclipse.jkube.integrationtests.JKubeCase;
@@ -99,12 +100,27 @@ public class ServiceAssertion extends KubernetesClientAssertion<Service> {
       .filter(sp -> sp.getNodePort() != null)
       .findAny().orElse(null);
     assertThat(port, notNullValue());
+    final String host;
+    if (isOpenShiftClient()) {
+      host = openShiftRouteHost();
+    } else {
+      host = String.format("%s:%s", getClusterHost(), port.getNodePort());
+    }
     final Response response = httpClient().newCall(new Request.Builder()
       .get()
-      .url(String.format("http://%s:%s/%s", getClusterHost(), port.getNodePort(), String.join("/", path))).build())
+      .url(String.format("http://%s/%s", host, String.join("/", path))).build())
       .execute();
     assertThat(response.body(), notNullValue());
     assertThat(response.body().string(), responseBodyMatcher);
     return this;
+  }
+
+  private String openShiftRouteHost() throws Exception {
+    final Route route = getOpenShiftClient().routes()
+      .inNamespace(getKubernetesResource().getMetadata().getNamespace())
+      .withName(getKubernetesResource().getMetadata().getName())
+      .waitUntilCondition(Objects::nonNull, DEFAULT_AWAIT_TIME_SECONDS, TimeUnit.SECONDS);
+    assertThat(route, notNullValue());
+    return route.getSpec().getHost();
   }
 }

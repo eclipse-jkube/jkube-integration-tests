@@ -88,7 +88,7 @@ class ZeroConfigOcITCase extends ZeroConfig {
   }
 
   @Test
-  @Order(2)
+  @Order(1)
   @DisplayName("oc:resource, should create manifests")
   void ocResource() throws Exception {
     // When
@@ -105,7 +105,7 @@ class ZeroConfigOcITCase extends ZeroConfig {
   }
 
   @Test
-  @Order(3)
+  @Order(2)
   @ResourceLock(value = CLUSTER_RESOURCE_INTENSIVE, mode = READ_WRITE)
   @DisplayName("oc:apply, should deploy pod and service")
   void ocApply() throws Exception {
@@ -119,7 +119,7 @@ class ZeroConfigOcITCase extends ZeroConfig {
   }
 
   @Test
-  @Order(4)
+  @Order(3)
   @DisplayName("Service as NodePort response should return String")
   void testNodePortResponse() throws Exception {
     // Given
@@ -130,7 +130,7 @@ class ZeroConfigOcITCase extends ZeroConfig {
   }
 
   @Test
-  @Order(5)
+  @Order(3)
   @DisplayName("oc:log, should retrieve log")
   void ocLog() throws Exception {
     // Given
@@ -148,7 +148,7 @@ class ZeroConfigOcITCase extends ZeroConfig {
   }
 
   @Test
-  @Order(6)
+  @Order(4)
   @DisplayName("oc:undeploy, should delete all applied resources")
   void ocUndeploy() throws Exception {
     // When

@@ -75,7 +75,7 @@ class WildFlyK8sITCase extends WildFly {
   }
 
   @Test
-  @Order(2)
+  @Order(1)
   @DisplayName("k8s:resource, should create manifests")
   void k8sResource() throws Exception {
     // When
@@ -91,7 +91,7 @@ class WildFlyK8sITCase extends WildFly {
   }
 
   @Test
-  @Order(3)
+  @Order(2)
   @ResourceLock(value = CLUSTER_RESOURCE_INTENSIVE, mode = READ_WRITE)
   @DisplayName("k8s:apply, should deploy pod and service")
   @SuppressWarnings("unchecked")
@@ -116,7 +116,7 @@ class WildFlyK8sITCase extends WildFly {
   }
 
   @Test
-  @Order(4)
+  @Order(3)
   @DisplayName("k8s:log, should retrieve log")
   void k8sLog() throws Exception {
     // Given
@@ -134,9 +134,8 @@ class WildFlyK8sITCase extends WildFly {
       stringContainsInOrder("Deployed","WildFly","started in "));
   }
 
-
   @Test
-  @Order(4)
+  @Order(3)
   @DisplayName("k8s:undeploy, should delete all applied resources")
   void k8sUndeploy() throws Exception {
     // When

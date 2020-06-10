@@ -34,6 +34,7 @@
   </description>
   <properties>
     <failOnMissingWebXml>false</failOnMissingWebXml>
+    <jkube.enricher.jkube-service.type>NodePort</jkube.enricher.jkube-service.type>
   </properties>
 
   <dependencies>
@@ -69,15 +70,6 @@
           <plugin>
             <groupId>org.eclipse.jkube</groupId>
             <artifactId>kubernetes-maven-plugin</artifactId>
-            <configuration>
-              <enricher>
-                <config>
-                  <jkube-service>
-                    <type>NodePort</type>
-                  </jkube-service>
-                </config>
-              </enricher>
-            </configuration>
           </plugin>
         </plugins>
       </build>
@@ -92,15 +84,6 @@
           <plugin>
             <groupId>org.eclipse.jkube</groupId>
             <artifactId>openshift-maven-plugin</artifactId>
-            <configuration>
-              <enricher>
-                <config>
-                  <jkube-service>
-                    <type>NodePort</type>
-                  </jkube-service>
-                </config>
-              </enricher>
-            </configuration>
           </plugin>
         </plugins>
       </build>

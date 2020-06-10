@@ -32,7 +32,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        kubernetes: [v1.12.0,v1.18.2]
+        kubernetes: [v1.12.0,v1.18.3]
         suite: ['quarkus','quarkus-native','springboot','webapp','other']
     steps:
       - name: Checkout
@@ -118,7 +118,7 @@ jobs:
           cd $JKUBE_DIR \
           && JKUBE_VERSION=$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec) \
           && cd .. \
-          && ./mvnw -B -POpenShift,${{ matrix.suite }} clean verify -Djkube.version="$JKUBE_VERSION" -Djunit.jupiter.execution.parallel.config.fixed.parallelism=1
+          && ./mvnw -B -POpenShift,${{ matrix.suite }} clean verify -Djkube.version="$JKUBE_VERSION" -Djunit.jupiter.execution.parallel.config.fixed.parallelism=4
       - name: Save reports as artifact
         if: always()
         uses: actions/upload-artifact@master

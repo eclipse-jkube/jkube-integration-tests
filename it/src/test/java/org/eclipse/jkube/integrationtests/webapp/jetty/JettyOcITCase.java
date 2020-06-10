@@ -86,7 +86,7 @@ class JettyOcITCase extends Jetty {
   }
 
   @Test
-  @Order(2)
+  @Order(1)
   @DisplayName("oc:resource, should create manifests")
   void ocResource() throws Exception {
     // When
@@ -103,7 +103,7 @@ class JettyOcITCase extends Jetty {
   }
 
   @Test
-  @Order(3)
+  @Order(2)
   @ResourceLock(value = CLUSTER_RESOURCE_INTENSIVE, mode = READ_WRITE)
   @DisplayName("oc:apply, should deploy pod and service")
   void ocApply() throws Exception {
@@ -115,7 +115,7 @@ class JettyOcITCase extends Jetty {
   }
 
   @Test
-  @Order(4)
+  @Order(3)
   @DisplayName("oc:log, should retrieve log")
   void ocLog() throws Exception {
     // Given
@@ -133,7 +133,7 @@ class JettyOcITCase extends Jetty {
   }
 
   @Test
-  @Order(5)
+  @Order(4)
   @DisplayName("oc:undeploy, should delete all applied resources")
   void ocUndeploy() throws Exception {
     // When

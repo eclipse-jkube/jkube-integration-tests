@@ -68,20 +68,19 @@ class WildFlyOcITCase extends WildFly {
 
   @Test
   @Order(1)
-  @ResourceLock(value = CLUSTER_RESOURCE_INTENSIVE, mode = READ_WRITE)
   @DisplayName("oc:build, should create image")
   void ocBuild() throws Exception{
     //When
     final InvocationResult invocationResult = maven("oc:build");
     //Then
     assertThat(invocationResult.getExitCode(), equalTo(0));
-    final ImageStream is = oc.imageStreams().withName("webapp-wildfly").get();
+    final ImageStream is = oc.imageStreams().withName(getApplication()).get();
     assertThat(is, notNullValue());
     assertThat(is.getStatus().getTags().iterator().next().getTag(), equalTo("latest"));
   }
 
   @Test
-  @Order(2)
+  @Order(1)
   @DisplayName("oc:resource, should create manifests")
   void ocResource() throws Exception {
     //When
@@ -97,7 +96,7 @@ class WildFlyOcITCase extends WildFly {
   }
 
   @Test
-  @Order(3)
+  @Order(2)
   @ResourceLock(value = CLUSTER_RESOURCE_INTENSIVE,mode = READ_WRITE)
   @DisplayName("oc:apply, should deploy pod and service")
   void ocApply() throws Exception {
@@ -109,12 +108,12 @@ class WildFlyOcITCase extends WildFly {
   }
 
   @Test
-  @Order(4)
+  @Order(3)
   @DisplayName("oc:log, should retrieve logs")
   void ocLog() throws Exception {
     //Given
     final Properties properties = new Properties();
-    properties.setProperty("jkube.log.follow","false");
+    properties.setProperty("jkube.log.follow", "false");
     final ByteArrayOutputStream baos = new ByteArrayOutputStream();
     final MavenUtils.InvocationRequestCustomizer irc = invocationRequest -> {
       invocationRequest.setOutputHandler(new PrintStreamHandler(new PrintStream(baos), true));
@@ -123,12 +122,13 @@ class WildFlyOcITCase extends WildFly {
     final InvocationResult invocationResult = maven("oc:log", properties,irc);
     //Then
     assertThat(invocationResult.getExitCode(), equalTo(0));
-    assertThat(baos.toString(StandardCharsets.UTF_8),
-      stringContainsInOrder("Deployed"));
+    assertThat(baos.toString(StandardCharsets.UTF_8), stringContainsInOrder(
+      "Running wildfly/wildfly-centos7 image", "JBoss Bootstrap Environment", "Deployed \"ROOT.war\"")
+    );
   }
 
   @Test
-  @Order(5)
+  @Order(4)
   @DisplayName("oc:undeploy, should delete all applied resources")
   void ocUndeploy() throws Exception {
     //When
