@@ -21,8 +21,11 @@ import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.HttpServerRequest;
 
+import java.util.logging.Logger;
+
 public class SimplestEmbedded extends AbstractVerticle {
 
+  private static final Logger LOG = Logger.getLogger(SimplestEmbedded.class.getName());
   @Override
   public void start(Future<Void> startFuture) {
     Vertx.vertx().createHttpServer()
@@ -34,6 +37,7 @@ public class SimplestEmbedded extends AbstractVerticle {
     return asyncResult -> {
       if (asyncResult.succeeded()) {
         verticleStart.complete();
+        LOG.info("Vert.x test application is ready");
       } else {
         verticleStart.fail(asyncResult.cause());
       }

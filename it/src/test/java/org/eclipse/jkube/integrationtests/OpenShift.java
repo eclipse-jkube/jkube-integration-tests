@@ -24,10 +24,10 @@ public class OpenShift {
 
   public static void cleanUpCluster(OpenShiftClient oc, JKubeCase jKubeCase) {
     oc.imageStreams().withName(jKubeCase.getApplication()).delete();
-    oc.builds().withLabel("buildconfig", jKubeCase.getApplication()+S2I_BUILD_SUFFIX).delete();
-    oc.buildConfigs().withName(jKubeCase.getApplication()+S2I_BUILD_SUFFIX).delete();
+    oc.builds().withLabel("buildconfig", jKubeCase.getApplication() + S2I_BUILD_SUFFIX).delete();
+    oc.buildConfigs().withName(jKubeCase.getApplication() + S2I_BUILD_SUFFIX).delete();
     oc.pods().withLabel(OPENSHIFT_BUILD_LABEL).list().getItems().stream()
-      .filter(p -> p.getMetadata().getLabels().get(OPENSHIFT_BUILD_LABEL).startsWith(jKubeCase.getApplication()+S2I_BUILD_SUFFIX))
+      .filter(p -> p.getMetadata().getLabels().get(OPENSHIFT_BUILD_LABEL).startsWith(jKubeCase.getApplication() + S2I_BUILD_SUFFIX))
       .forEach(p -> oc.resource(p).delete());
   }
 }

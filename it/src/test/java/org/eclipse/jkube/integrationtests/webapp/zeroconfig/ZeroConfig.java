@@ -44,7 +44,7 @@ abstract class ZeroConfig extends BaseMavenCase implements JKubeCase {
 
   final Pod assertThatShouldApplyResources() throws InterruptedException, IOException {
     final Pod pod = awaitPod(this).getKubernetesResource();
-    assertPod(pod).apply(this).logContains("Catalina.start Server startup", 10);
+    assertPod(pod).apply(this).logContains("Catalina.start Server startup", 60);
     awaitService(this, pod.getMetadata().getNamespace())
       .assertExposed()
       .assertPorts(hasSize(1))
@@ -55,13 +55,15 @@ abstract class ZeroConfig extends BaseMavenCase implements JKubeCase {
   @SuppressWarnings("squid:S2925")
   final Service serviceSpecTypeToNodePort() throws InterruptedException, IOException {
     final Pod pod = awaitPod(this).getKubernetesResource();
-    final Service updatedService = getKubernetesClient().services()
+    final Service serviceToUpdate = getKubernetesClient().services()
       .inNamespace(pod.getMetadata().getNamespace())
       .withName(getApplication())
       .edit().editSpec().withType("NodePort").endSpec().done();
-    getKubernetesClient().resource(updatedService)
+    final Service updatedService = getKubernetesClient().services()
+      .inNamespace(serviceToUpdate.getMetadata().getNamespace())
+      .withName(serviceToUpdate.getMetadata().getName())
       .waitUntilCondition(s -> s.getSpec().getType().equals("NodePort"), 10, TimeUnit.SECONDS);
-    final long throttleMilliseconds = 300L;
+    final long throttleMilliseconds = 500L;
     Thread.sleep(throttleMilliseconds);
     return updatedService;
   }

@@ -95,7 +95,7 @@ class ZeroConfigK8sITCase extends ZeroConfig {
   }
 
   @Test
-  @Order(2)
+  @Order(1)
   @DisplayName("k8s:resource, should create manifests")
   void k8sResource() throws Exception {
     // When
@@ -111,7 +111,7 @@ class ZeroConfigK8sITCase extends ZeroConfig {
   }
 
   @Test
-  @Order(3)
+  @Order(2)
   @ResourceLock(value = CLUSTER_RESOURCE_INTENSIVE, mode = READ_WRITE)
   @DisplayName("k8s:apply, should deploy pod and service")
   @SuppressWarnings("unchecked")
@@ -138,7 +138,7 @@ class ZeroConfigK8sITCase extends ZeroConfig {
   }
 
   @Test
-  @Order(4)
+  @Order(3)
   @DisplayName("Service as NodePort response should return String")
   void testNodePortResponse() throws Exception {
     // Given
@@ -149,7 +149,7 @@ class ZeroConfigK8sITCase extends ZeroConfig {
   }
 
   @Test
-  @Order(5)
+  @Order(3)
   @DisplayName("k8s:log, should retrieve log")
   void k8sLog() throws Exception {
     // Given
@@ -167,7 +167,7 @@ class ZeroConfigK8sITCase extends ZeroConfig {
   }
 
   @Test
-  @Order(6)
+  @Order(4)
   @DisplayName("k8s:undeploy, should delete all applied resources")
   void k8sUndeploy() throws Exception {
     // When
