@@ -22,18 +22,25 @@ import org.eclipse.jkube.integrationtests.JKubeCase;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 
 import static org.eclipse.jkube.integrationtests.cli.CliUtils.runCommand;
 
 public class KubernetesClientAssertion<T extends KubernetesResource> {
 
   static final long DEFAULT_AWAIT_TIME_SECONDS = 45L;
+  static final Duration CONNECT_TIMEOUT = Duration.of(20L, ChronoUnit.SECONDS);
+  static final Duration READ_TIMEOUT = Duration.of(30L, ChronoUnit.SECONDS);
 
   private static OkHttpClient okHttpClient;
 
   synchronized static OkHttpClient httpClient() {
     if (okHttpClient == null) {
-      okHttpClient = new OkHttpClient.Builder().build();
+      okHttpClient = new OkHttpClient.Builder()
+        .connectTimeout(CONNECT_TIMEOUT)
+        .readTimeout(READ_TIMEOUT)
+        .build();
     }
     return okHttpClient;
   }
@@ -56,6 +63,14 @@ public class KubernetesClientAssertion<T extends KubernetesResource> {
 
   public KubernetesClient getKubernetesClient() {
     return jKubeCase.getKubernetesClient();
+  }
+
+  public OpenShiftClient getOpenShiftClient() {
+    return getKubernetesClient().adapt(OpenShiftClient.class);
+  }
+
+  public boolean isOpenShiftClient() {
+    return getKubernetesClient().isAdaptable(OpenShiftClient.class);
   }
 
   public String getApplication() {

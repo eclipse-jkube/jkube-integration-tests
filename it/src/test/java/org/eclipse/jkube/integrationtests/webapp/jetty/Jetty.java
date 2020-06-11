@@ -41,7 +41,7 @@ abstract class Jetty extends BaseMavenCase implements JKubeCase {
 
   final Pod assertThatShouldApplyResources() throws Exception {
     final Pod pod = awaitPod(this).getKubernetesResource();
-    assertPod(pod).apply(this).logContains("Server:main: Started", 10);
+    assertPod(pod).apply(this).logContains("Server:main: Started", 60);
     awaitService(this, pod.getMetadata().getNamespace())
       .assertExposed()
       .assertPorts(hasSize(1))

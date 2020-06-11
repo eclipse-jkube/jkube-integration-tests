@@ -44,10 +44,11 @@ import java.util.Properties;
 
 import static org.eclipse.jkube.integrationtests.Locks.CLUSTER_RESOURCE_INTENSIVE;
 import static org.eclipse.jkube.integrationtests.OpenShift.cleanUpCluster;
-import static org.eclipse.jkube.integrationtests.assertions.DockerAssertion.assertImageWasRecentlyBuilt;
 import static org.eclipse.jkube.integrationtests.assertions.YamlAssertion.yaml;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.anEmptyMap;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
@@ -84,21 +85,20 @@ class WildFlyOcDockerModeITCase extends WildFly  {
 
   @Test
   @Order(1)
-  @ResourceLock( value = CLUSTER_RESOURCE_INTENSIVE, mode = READ_WRITE)
   @DisplayName("oc:build, should create image using docker")
   void ocBuild() throws Exception{
    //When
    final InvocationResult invocationResult = maven("oc:build");
    //Then
     assertThat(invocationResult.getExitCode(),equalTo(0));
-    final ImageStream is = oc.imageStreams().withName("webapp-wildfly-docker-mode").get();
+    final ImageStream is = oc.imageStreams().withName(getApplication()).get();
     assertThat(is, notNullValue());
     assertThat(is.getStatus().getTags().iterator().next().getTag(),equalTo("latest"));
   }
 
   @Test
-  @Order(2)
-  @DisplayName("k8s:resource, should create manifersts")
+  @Order(1)
+  @DisplayName("k8s:resource, should create manifests")
   void ocResource() throws Exception{
     //When
     final InvocationResult invocationResult = maven("oc:resource");
@@ -107,31 +107,31 @@ class WildFlyOcDockerModeITCase extends WildFly  {
     final File metaInfDirectory = new File(
       String.format("../%s/target/classes/META-INF", PROJECT_WILDFLY));
     assertThat(metaInfDirectory.exists(),equalTo(true));
-    assertListResource(new File(metaInfDirectory,"/jkube/openshift.yml"));
-    assertThat(new File(metaInfDirectory, "jkube/openshift/webapp-wildfly-docker-mode-deploymentconfig.yml"),yaml(not(anEmptyMap())));
-    assertThat(new File(metaInfDirectory, "jkube/openshift/webapp-wildfly-docker-mode-service.yml"),yaml(not(anEmptyMap())));
-    assertThat(new File(metaInfDirectory, "jkube/openshift/webapp-wildfly-docker-mode-route.yml"),yaml(not(anEmptyMap())));
+    assertListResource(new File(metaInfDirectory,"/jkube-docker-mode/openshift.yml"));
+    assertThat(new File(metaInfDirectory, "jkube-docker-mode/openshift/webapp-wildfly-docker-mode-deploymentconfig.yml"),yaml(not(anEmptyMap())));
+    assertThat(new File(metaInfDirectory, "jkube-docker-mode/openshift/webapp-wildfly-docker-mode-service.yml"),yaml(not(anEmptyMap())));
+    assertThat(new File(metaInfDirectory, "jkube-docker-mode/openshift/webapp-wildfly-docker-mode-route.yml"),yaml(not(anEmptyMap())));
   }
 
   @Test
-  @Order(3)
+  @Order(2)
   @ResourceLock(value = CLUSTER_RESOURCE_INTENSIVE,mode = READ_WRITE)
   @DisplayName("oc:apply, should deploy pod and service")
   void ocApply() throws Exception{
     //when
     final InvocationResult invocationResult = maven("oc:apply");
     //Then
-    assertThat(invocationResult.getExitCode(),equalTo(0));
+    assertThat(invocationResult.getExitCode(), equalTo(0));
     assertThatShouldApplyResources();
   }
 
   @Test
-  @Order(4)
+  @Order(3)
   @DisplayName("oc:log, should retrieve logs")
   void ocLog() throws Exception {
     //Given
     final Properties properties = new Properties();
-    properties.setProperty("jkube.log.follow","false");
+    properties.setProperty("jkube.log.follow", "false");
     final ByteArrayOutputStream baos = new ByteArrayOutputStream();
     final MavenUtils.InvocationRequestCustomizer irc = invocationRequest -> {
       invocationRequest.setOutputHandler(new PrintStreamHandler(new PrintStream(baos), true));
@@ -140,12 +140,14 @@ class WildFlyOcDockerModeITCase extends WildFly  {
     final InvocationResult invocationResult = maven("oc:log", properties,irc);
     //Then
     assertThat(invocationResult.getExitCode(), equalTo(0));
-    assertThat(baos.toString(StandardCharsets.UTF_8),
-      stringContainsInOrder("Deployed"));
+    assertThat(baos.toString(StandardCharsets.UTF_8), allOf(
+      not(containsString("Running wildfly/wildfly-centos7 image")),
+      stringContainsInOrder("JBoss Bootstrap Environment", "Deployed \"ROOT.war\"")
+    ));
   }
 
   @Test
-  @Order(5)
+  @Order(4)
   @DisplayName("oc:undeploy, should delete all applied resources")
   void ocUndeploy() throws Exception {
     //When

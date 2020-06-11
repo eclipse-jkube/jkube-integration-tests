@@ -86,11 +86,11 @@ class VertxOcITCase extends Vertx {
   }
 
   @Test
-  @Order(2)
+  @Order(1)
   @DisplayName("oc:resource, should create manifests")
   void ocResource() throws Exception {
     // When
-    final InvocationResult invocationResult = maven("clean oc:resource"); //Clean to free up DiskSpace
+    final InvocationResult invocationResult = maven("oc:resource");
     // Then
     assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
     final File metaInfDirectory = new File(
@@ -103,7 +103,7 @@ class VertxOcITCase extends Vertx {
   }
 
   @Test
-  @Order(3)
+  @Order(2)
   @ResourceLock(value = CLUSTER_RESOURCE_INTENSIVE, mode = READ_WRITE)
   @DisplayName("oc:apply, should deploy pod and service")
   void ocApply() throws Exception {
@@ -115,7 +115,7 @@ class VertxOcITCase extends Vertx {
   }
 
   @Test
-  @Order(4)
+  @Order(3)
   @DisplayName("oc:log, should retrieve log")
   void k8sLog() throws Exception {
     // Given
@@ -129,12 +129,14 @@ class VertxOcITCase extends Vertx {
     final InvocationResult invocationResult = maven("oc:log", properties, irc);
     // Then
     assertThat(invocationResult.getExitCode(), equalTo(0));
-    assertThat(baos.toString(StandardCharsets.UTF_8),
-      stringContainsInOrder("Succeeded in deploying verticle"));
+    assertThat(baos.toString(StandardCharsets.UTF_8), stringContainsInOrder(
+      "Vert.x test application is ready",
+      "Succeeded in deploying verticle"
+    ));
   }
 
   @Test
-  @Order(5)
+  @Order(4)
   @DisplayName("oc:undeploy, should delete all applied resources")
   void ocUndeploy() throws Exception {
     // When

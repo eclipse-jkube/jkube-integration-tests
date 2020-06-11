@@ -142,8 +142,10 @@ class VertxK8sITCase extends Vertx {
     final InvocationResult invocationResult = maven("k8s:log", properties, irc);
     // Then
     assertThat(invocationResult.getExitCode(), equalTo(0));
-    assertThat(baos.toString(StandardCharsets.UTF_8),
-      stringContainsInOrder("Succeeded in deploying verticle"));
+    assertThat(baos.toString(StandardCharsets.UTF_8), stringContainsInOrder(
+      "Vert.x test application is ready",
+      "Succeeded in deploying verticle"
+    ));
   }
 
 

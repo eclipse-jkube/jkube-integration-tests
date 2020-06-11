@@ -81,6 +81,8 @@
       <properties>
         <artifact-suffix>-docker-mode</artifact-suffix>
         <jkube.build.strategy>docker</jkube.build.strategy>
+        <jkube.targetDir>${project.build.outputDirectory}/META-INF/jkube-docker-mode</jkube.targetDir>
+        <jkube.openshiftManifest>${project.basedir}/target/classes/META-INF/jkube-docker-mode/openshift.yml</jkube.openshiftManifest>
       </properties>
     </profile>
   </profiles>
