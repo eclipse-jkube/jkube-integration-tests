@@ -285,6 +285,32 @@
       </build>
     </profile>
     <profile>
+      <id>dockerfile</id>
+      <modules>
+        <module>projects-to-be-tested/dockerfile/simple-dockerfile</module>
+      </modules>
+      <activation>
+        <file>
+          <exists>
+            projects-to-be-tested/dockerfile/simple-dockerfile/target
+          </exists>
+        </file>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <configuration>
+              <includes>
+                <include>**/integrationtests/dockerfile/**/*ITCase.java</include>
+              </includes>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
       <id>springboot</id>
       <modules>
         <module>projects-to-be-tested/spring-boot/complete</module>

@@ -33,7 +33,7 @@ jobs:
       fail-fast: false
       matrix:
         kubernetes: [v1.12.0,v1.18.3]
-        suite: ['quarkus','quarkus-native','springboot','webapp','other']
+        suite: ['quarkus','quarkus-native','springboot','webapp','other', 'dockerfile']
     steps:
       - name: Checkout
         uses: actions/checkout@v2.0.0
