@@ -13,17 +13,23 @@
  */
 package org.eclipse.jkube.integrationtests.dockerfile.simpledockerfile;
 
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * Hello world!
- */
-@RestController
-public class App {
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
-  @RequestMapping(value = "/")
+@RestController
+public class Resource {
+
+  @GetMapping(value = "/")
   public String index() {
     return "Hello world!";
+  }
+
+  @GetMapping(path = "/static-file")
+  public String staticFile() throws IOException {
+    return Files.readString(Path.of("/","deployments", "my-file.txt"));
   }
 }

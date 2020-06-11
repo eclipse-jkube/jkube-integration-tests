@@ -35,7 +35,7 @@ public class DockerAssertion {
     final List<DockerUtils.DockerImage> dockerImages = DockerUtils.dockerImages();
     assertThat(dockerImages, hasSize(greaterThanOrEqualTo(1)));
     final DockerUtils.DockerImage mostRecentImage = dockerImages.stream()
-      .filter(di -> di.getRepository().contains("/" + name))
+      .filter(di -> di.getRepository().endsWith("/" + name))
       .filter(di -> di.getTag().equals(tag))
       .findFirst().orElse(null);
     assertThat(mostRecentImage, notNullValue());

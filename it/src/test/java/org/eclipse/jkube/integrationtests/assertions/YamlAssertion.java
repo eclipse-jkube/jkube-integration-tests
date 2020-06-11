@@ -29,14 +29,14 @@ public class YamlAssertion {
   private static final ObjectMapper YAML_MAPPER = new ObjectMapper(new YAMLFactory());
 
   public static <V> Matcher<File> yaml(Matcher<Map<? extends String, ? extends V>> matcher) {
-    return new YamlFileMatcher<>(matcher);
+    return new YamlMapFileMatcher<>(matcher);
   }
 
-  private static class YamlFileMatcher<V> extends TypeSafeMatcher<File> {
+  private static class YamlFileMatcher<M> extends TypeSafeMatcher<File> {
 
-    private final Matcher<? super Map<String,V>> matcher;
+    private final Matcher<? super M> matcher;
 
-    private YamlFileMatcher(Matcher<? super Map<String, V>> matcher) {
+    private YamlFileMatcher(Matcher<? super M> matcher) {
       super(File.class);
       this.matcher = matcher;
     }
@@ -65,11 +65,15 @@ public class YamlAssertion {
       }
     }
 
-    private Map<String, V> readFile(File yamlFile) throws IOException {
+    private M readFile(File yamlFile) throws IOException {
       return YAML_MAPPER.readValue(yamlFile, new TypeReference<>() { });
     }
   }
 
+  private static class YamlMapFileMatcher<V> extends YamlFileMatcher<Map<String, V>> {
 
-
+    private YamlMapFileMatcher(Matcher<? super Map<String, V>> matcher) {
+      super(matcher);
+    }
+  }
 }

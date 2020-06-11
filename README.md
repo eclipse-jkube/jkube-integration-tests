@@ -10,7 +10,8 @@ way.
 
 ### Tags
 
-There are two tags which match with a maven profile (`Kubernetes` & `OpenShift`).
+There are three [tags](src/test/java/org/eclipse/jkube/integrationtests/Tags.java) which match with a maven profile
+(`Kubernetes`, `OpenShift` & `Windows`).
 
 Each of these tags should be applied to a specific test case suite in order to execute
 the given tests only when that profile is specified.
@@ -21,7 +22,7 @@ e.g. when running with a standard k8s cluster `mvn verify -PKubernetes`
 
 Tests are divided into several groups in order to run only a set of tests.
 
-As of now, test groups are: `quarkus`, `springboot`, `other`
+As of now, test groups are: `dockerfile`, `other`, `quarkus`, `quarkus-native`, `springboot`, `webapp`
 
 Following the same principle as with tags, in order to activate a given set of tests,
 a profile matching the group name defined above must be specified-
