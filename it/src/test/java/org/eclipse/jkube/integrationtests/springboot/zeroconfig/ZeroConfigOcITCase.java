@@ -124,6 +124,8 @@ class ZeroConfigOcITCase extends ZeroConfig {
   @ResourceLock(value = CLUSTER_RESOURCE_INTENSIVE, mode = READ_WRITE)
   @DisplayName("oc:apply, should deploy pod and service")
   void ocApply() throws Exception {
+    // Given
+    assertThat(oc.imageStreams().withName(getApplication()).get(), notNullValue());
     // When
     final InvocationResult invocationResult = maven("oc:apply");
     // Then

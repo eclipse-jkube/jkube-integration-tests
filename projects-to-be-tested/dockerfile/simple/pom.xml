@@ -26,32 +26,20 @@
     <relativePath>../../../pom.xml</relativePath>
   </parent>
 
-  <artifactId>simple-dockerfile</artifactId>
-  <name>${global.name} :: Dockerfile :: Simple Dockerfile</name>
+  <artifactId>dockerfile-simple</artifactId>
+  <name>${global.name} :: Dockerfile :: Simple</name>
   <description>
     Simple Dockerfile project
   </description>
 
   <properties>
-    <!-- Configuration for Service Enricher -->
+    <java.version>11</java.version>
     <!-- TODO: Remove port related property once https://github.com/eclipse/jkube/issues/240 gets fixed -->
     <jkube.enricher.jkube-service.port>8080</jkube.enricher.jkube-service.port>
     <jkube.enricher.jkube-service.type>NodePort</jkube.enricher.jkube-service.type>
   </properties>
 
   <dependencies>
-    <!-- Dependencies only for debugging purposes -->
-    <dependency>
-      <groupId>org.eclipse.jkube</groupId>
-      <artifactId>kubernetes-maven-plugin</artifactId>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.jkube</groupId>
-      <artifactId>openshift-maven-plugin</artifactId>
-      <scope>compile</scope>
-    </dependency>
-    <!-- ***************************************  -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter</artifactId>
@@ -79,10 +67,6 @@
       <plugin>
         <groupId>org.eclipse.jkube</groupId>
         <artifactId>kubernetes-maven-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.eclipse.jkube</groupId>
-        <artifactId>openshift-maven-plugin</artifactId>
       </plugin>
     </plugins>
   </build>

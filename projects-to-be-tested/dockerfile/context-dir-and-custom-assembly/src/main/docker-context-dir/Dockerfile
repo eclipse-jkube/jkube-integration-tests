@@ -12,7 +12,7 @@
 #   Red Hat, Inc. - initial API and implementation
 #
 
-FROM openjdk:latest
-COPY maven/target/simple-dockerfile-0.0.0-SNAPSHOT.jar /tmp/simple-dockerfile-0.0.0-SNAPSHOT.jar
-COPY maven/static-dir-in-project-root/my-file.txt /tmp/my-file.txt
-CMD ["java", "-jar", "/tmp/simple-dockerfile-0.0.0-SNAPSHOT.jar"]
+FROM openjdk:11-jre-slim
+ADD input-files/subdirectory-in-context /deployments/subdirectory
+COPY input-files/file-in-context.txt /deployments/file-in-context.txt
+ENTRYPOINT [ "echo READY PLAYER 1 && sleep 3600" ]

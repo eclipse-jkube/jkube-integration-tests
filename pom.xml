@@ -233,6 +233,68 @@
   </build>
   <profiles>
     <profile>
+      <id>dockerfile</id>
+      <modules>
+        <module>projects-to-be-tested/dockerfile/context-dir</module>
+        <module>projects-to-be-tested/dockerfile/context-dir-and-custom-assembly</module>
+        <module>projects-to-be-tested/dockerfile/context-dir-and-docker-file</module>
+        <module>projects-to-be-tested/dockerfile/docker-file</module>
+        <module>projects-to-be-tested/dockerfile/simple</module>
+      </modules>
+      <activation>
+        <file>
+          <exists>
+            projects-to-be-tested/dockerfile/simple/target
+          </exists>
+        </file>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <configuration>
+              <includes>
+                <include>**/integrationtests/dockerfile/**/*ITCase.java</include>
+              </includes>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>other</id>
+      <modules>
+        <module>projects-to-be-tested/openliberty/rest</module>
+        <module>projects-to-be-tested/thorntail/microprofile</module>
+        <module>projects-to-be-tested/vertx/simplest</module>
+        <module>projects-to-be-tested/wildflyswarm/rest</module>
+      </modules>
+      <activation>
+        <file>
+          <exists>
+            projects-to-be-tested/thorntail/microprofile/target
+          </exists>
+        </file>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <configuration>
+              <includes>
+                <include>**/integrationtests/openliberty/**/*ITCase.java</include>
+                <include>**/integrationtests/thorntail/**/*ITCase.java</include>
+                <include>**/integrationtests/vertx/**/*ITCase.java</include>
+                <include>**/integrationtests/wildflyswarm/**/*ITCase.java</include>
+              </includes>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
       <id>quarkus</id>
       <modules>
         <module>projects-to-be-tested/quarkus/rest</module>
@@ -285,32 +347,6 @@
       </build>
     </profile>
     <profile>
-      <id>dockerfile</id>
-      <modules>
-        <module>projects-to-be-tested/dockerfile/simple-dockerfile</module>
-      </modules>
-      <activation>
-        <file>
-          <exists>
-            projects-to-be-tested/dockerfile/simple-dockerfile/target
-          </exists>
-        </file>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-failsafe-plugin</artifactId>
-            <configuration>
-              <includes>
-                <include>**/integrationtests/dockerfile/**/*ITCase.java</include>
-              </includes>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    <profile>
       <id>springboot</id>
       <modules>
         <module>projects-to-be-tested/spring-boot/complete</module>
@@ -342,8 +378,8 @@
     <profile>
       <id>webapp</id>
       <modules>
-        <module>projects-to-be-tested/webapp/wildfly</module>
         <module>projects-to-be-tested/webapp/jetty</module>
+        <module>projects-to-be-tested/webapp/wildfly</module>
         <module>projects-to-be-tested/webapp/zero-config</module>
       </modules>
       <activation>
@@ -361,38 +397,6 @@
             <configuration>
               <includes>
                 <include>**/integrationtests/webapp/**/*ITCase.java</include>
-              </includes>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    <profile>
-      <id>other</id>
-      <modules>
-        <module>projects-to-be-tested/thorntail/microprofile</module>
-        <module>projects-to-be-tested/vertx/simplest</module>
-        <module>projects-to-be-tested/wildflyswarm/rest</module>
-        <module>projects-to-be-tested/openliberty/rest</module>
-      </modules>
-      <activation>
-        <file>
-          <exists>
-            projects-to-be-tested/thorntail/microprofile/target
-          </exists>
-        </file>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-failsafe-plugin</artifactId>
-            <configuration>
-              <includes>
-                <include>**/integrationtests/thorntail/**/*ITCase.java</include>
-                <include>**/integrationtests/vertx/**/*ITCase.java</include>
-                <include>**/integrationtests/wildflyswarm/**/*ITCase.java</include>
-                <include>**/integrationtests/openliberty/**/*ITCase.java</include>
               </includes>
             </configuration>
           </plugin>

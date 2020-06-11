@@ -76,24 +76,26 @@ jobs:
         suite: ['quarkus','springboot','webapp','other']
     steps:
       - name: Free up Space
+#            'linux-headers.*'                       \ # Takes > 2 minutes
+#            'google-cloud.*'                        \
         run: |
           sudo apt list --installed
-          sudo apt-get autoremove -y 'aspnetcore.*'
-          sudo apt-get autoremove -y 'cabal-install.*'
-          sudo apt-get autoremove -y 'clang.*'
-          sudo apt-get autoremove -y 'dotnet.*'
-          sudo apt-get autoremove -y 'firefox.*'
-          sudo apt-get autoremove -y 'ghc.*'
-          sudo apt-get autoremove -y 'google-chrome.*'
-          sudo apt-get autoremove -y 'google-cloud.*'
-          sudo apt-get autoremove -y 'heroku.*'
-          sudo apt-get autoremove -y 'libmagic.*'
-          sudo apt-get autoremove -y 'libmono.*'
-          sudo apt-get autoremove -y 'linux-headers.*'
-          sudo apt-get autoremove -y 'mono-.*'
-          sudo apt-get autoremove -y 'mysql.*'
-          sudo apt-get autoremove -y 'php.*'
-          sudo apt-get autoremove -y 'ruby.*'
+          sudo apt-get purge -y                     \
+            'aspnetcore.*'                          \
+            'cabal-install.*'                       \
+            'clang.*'                               \
+            'dotnet.*'                              \
+            'firefox.*'                             \
+            'ghc.*'                                 \
+            'google-chrome.*'                       \
+            'heroku.*'                              \
+            'libmagic.*'                            \
+            'libmono.*'                             \
+            'mono-.*'                               \
+            'mysql.*'                               \
+            'php.*'                                 \
+            'ruby.*'
+          sudo apt-get autoremove
           df -h
       - name: Checkout
         uses: actions/checkout@v2.0.0
