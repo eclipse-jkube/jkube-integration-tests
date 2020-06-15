@@ -21,8 +21,11 @@ import okhttp3.Response;
 import org.eclipse.jkube.integrationtests.JKubeCase;
 import org.hamcrest.Matcher;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
@@ -38,6 +41,7 @@ import static org.hamcrest.Matchers.nullValue;
 
 public class ServiceAssertion extends KubernetesClientAssertion<Service> {
 
+  private static final String OC_ROUTE_ANNOTATION_TIMEOUT = "haproxy.router.openshift.io/timeout";
   private ServiceAssertion(JKubeCase jKubeCase, Service service) {
     super(jKubeCase, service);
   }
@@ -100,11 +104,12 @@ public class ServiceAssertion extends KubernetesClientAssertion<Service> {
       .filter(sp -> sp.getNodePort() != null)
       .findAny().orElse(null);
     assertThat(port, notNullValue());
+    final String clusterHost = getClusterHost();
     final String host;
-    if (isOpenShiftClient()) {
+    if (isOpenShiftClient() && isNotLocal(clusterHost)) {
       host = openShiftRouteHost();
     } else {
-      host = String.format("%s:%s", getClusterHost(), port.getNodePort());
+      host = String.format("%s:%s", clusterHost, port.getNodePort());
     }
     final Response response = httpClient().newCall(new Request.Builder()
       .get()
@@ -116,11 +121,30 @@ public class ServiceAssertion extends KubernetesClientAssertion<Service> {
   }
 
   private String openShiftRouteHost() throws Exception {
+    openShiftRouteIncreaseTimeout();
     final Route route = getOpenShiftClient().routes()
       .inNamespace(getKubernetesResource().getMetadata().getNamespace())
       .withName(getKubernetesResource().getMetadata().getName())
-      .waitUntilCondition(Objects::nonNull, DEFAULT_AWAIT_TIME_SECONDS, TimeUnit.SECONDS);
+      .waitUntilCondition(r -> Optional.ofNullable(r)
+          .filter(fr -> fr.getMetadata().getAnnotations().containsKey(OC_ROUTE_ANNOTATION_TIMEOUT))
+          .isPresent(),
+        DEFAULT_AWAIT_TIME_SECONDS, TimeUnit.SECONDS);
     assertThat(route, notNullValue());
     return route.getSpec().getHost();
   }
+
+  private void openShiftRouteIncreaseTimeout() {
+    getOpenShiftClient().routes()
+      .inNamespace(getKubernetesResource().getMetadata().getNamespace())
+      .withName(getKubernetesResource().getMetadata().getName())
+      .edit().editMetadata()
+      .addToAnnotations(OC_ROUTE_ANNOTATION_TIMEOUT, "15s")
+      .endMetadata()
+      .done();
+  }
+
+  private static boolean isNotLocal(String host) throws UnknownHostException {
+    return !InetAddress.getByName(host).isLoopbackAddress();
+  }
 }
+
