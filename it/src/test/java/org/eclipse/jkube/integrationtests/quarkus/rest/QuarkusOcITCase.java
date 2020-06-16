@@ -74,12 +74,12 @@ class QuarkusOcITCase extends Quarkus {
     // Given
     hackToPreventNullPointerInRegistryServiceCreateAuthConfig("openjdk:11");
     final Properties properties = new Properties();
-    properties.setProperty("jkube.mode", "kubernetes"); // S2I doesn't support quarkus yet
+    properties.setProperty("jkube.build.strategy", "docker"); // S2I doesn't support quarkus yet
     // When
     final InvocationResult invocationResult = maven("oc:build", properties);
     // Then
     assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
-    assertImageWasRecentlyBuilt("integration-tests", "quarkus-rest");
+    assertImageWasRecentlyBuilt("172.30.1.1:5000/myproject", "quarkus-rest");
   }
 
   @Test
@@ -88,7 +88,7 @@ class QuarkusOcITCase extends Quarkus {
   void ocResource() throws Exception {
     // Given
     final Properties properties = new Properties();
-    properties.setProperty("jkube.mode", "kubernetes"); // S2I doesn't support quarkus yet
+    properties.setProperty("jkube.build.strategy", "docker"); // S2I doesn't support quarkus yet
     // When
     final InvocationResult invocationResult = maven("oc:resource", properties);
     // Then
