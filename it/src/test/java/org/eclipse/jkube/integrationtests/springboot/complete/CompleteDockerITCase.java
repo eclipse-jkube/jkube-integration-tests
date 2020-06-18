@@ -108,7 +108,7 @@ class CompleteDockerITCase extends Complete {
     assertThat(dockerFileContent, containsString("ENV JAVA_APP_DIR=/deployments"));
     assertThat(dockerFileContent, containsString("LABEL some.label=\"The value\""));
     assertThat(dockerFileContent, containsString("EXPOSE 8082 8778 9779"));
-    assertThat(dockerFileContent, matchesPattern("COPY [^\\s]*? /deployments/\n"));
+    assertThat(dockerFileContent, matchesPattern("COPY [^\\s]*? /deployments/"));
     assertThat(dockerFileContent, containsString("ENTRYPOINT [\"java\",\"-jar\",\"/deployments/spring-boot-complete-0.0.0-SNAPSHOT.jar\"]"));
     assertThat(dockerFileContent, containsString("USER 1000"));
     final List<String> imageFiles = listImageFiles(String.format("%s/%s", "integration-tests", getApplication()),
