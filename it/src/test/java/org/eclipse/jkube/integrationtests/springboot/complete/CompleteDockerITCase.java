@@ -32,6 +32,7 @@ import java.nio.file.Files;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
+import java.util.regex.Pattern;
 
 import static org.eclipse.jkube.integrationtests.Locks.CLUSTER_RESOURCE_INTENSIVE;
 import static org.eclipse.jkube.integrationtests.Locks.SPRINGBOOT_COMPLETE_K8s;
@@ -108,7 +109,8 @@ class CompleteDockerITCase extends Complete {
     assertThat(dockerFileContent, containsString("ENV JAVA_APP_DIR=/deployments"));
     assertThat(dockerFileContent, containsString("LABEL some.label=\"The value\""));
     assertThat(dockerFileContent, containsString("EXPOSE 8082 8778 9779"));
-    assertThat(dockerFileContent, matchesPattern(".*\nCOPY [^\\s]*? /deployments/\n.*"));
+    assertThat(dockerFileContent, matchesPattern(Pattern.compile("[\\s\\S]*COPY [^\\s]*? /deployments/\n" +
+      "[\\s\\S]*")));
     assertThat(dockerFileContent, containsString("ENTRYPOINT [\"java\",\"-jar\",\"/deployments/spring-boot-complete-0.0.0-SNAPSHOT.jar\"]"));
     assertThat(dockerFileContent, containsString("USER 1000"));
     final List<String> imageFiles = listImageFiles(String.format("%s/%s", "integration-tests", getApplication()),
