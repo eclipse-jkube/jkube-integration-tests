@@ -50,6 +50,7 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.matchesPattern;
 import static org.hamcrest.Matchers.not;
 import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 
@@ -107,7 +108,7 @@ class CompleteDockerITCase extends Complete {
     assertThat(dockerFileContent, containsString("ENV JAVA_APP_DIR=/deployments"));
     assertThat(dockerFileContent, containsString("LABEL some.label=\"The value\""));
     assertThat(dockerFileContent, containsString("EXPOSE 8082 8778 9779"));
-    assertThat(dockerFileContent, containsString("COPY maven /deployments/"));
+    assertThat(dockerFileContent, matchesPattern("COPY [^\\s]*? /deployments/\n"));
     assertThat(dockerFileContent, containsString("ENTRYPOINT [\"java\",\"-jar\",\"/deployments/spring-boot-complete-0.0.0-SNAPSHOT.jar\"]"));
     assertThat(dockerFileContent, containsString("USER 1000"));
     final List<String> imageFiles = listImageFiles(String.format("%s/%s", "integration-tests", getApplication()),
