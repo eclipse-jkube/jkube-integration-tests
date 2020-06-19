@@ -45,8 +45,7 @@
               <build>
                 <contextDir>${project.basedir}/src/main/docker-context-dir</contextDir>
                 <assembly>
-<!--                  <name>customized-assembly</name>-->
-                  <name>input-files</name> <!-- TODO: targetDir should be considered instead of name, uncomment previous line and remove this one when JKube FIX is ready -->
+                  <name>customized-assembly</name>
                   <targetDir>/input-files</targetDir>
                 </assembly>
               </build>
