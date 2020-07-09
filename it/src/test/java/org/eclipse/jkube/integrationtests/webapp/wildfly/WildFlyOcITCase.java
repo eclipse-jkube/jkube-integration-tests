@@ -123,7 +123,8 @@ class WildFlyOcITCase extends WildFly {
     //Then
     assertThat(invocationResult.getExitCode(), equalTo(0));
     assertThat(baos.toString(StandardCharsets.UTF_8), stringContainsInOrder(
-      "Running wildfly/wildfly-centos7 image", "JBoss Bootstrap Environment", "Deployed \"ROOT.war\"")
+      "JBoss Bootstrap Environment", "Deployed \"ROOT.war\"", "Http management interface listening on"
+      , "Admin console listening on")
     );
   }
 
