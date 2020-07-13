@@ -303,6 +303,7 @@
         <module>projects-to-be-tested/vertx/simplest</module>
         <module>projects-to-be-tested/wildflyswarm/rest</module>
         <module>projects-to-be-tested/wildfly-jar/microprofile</module>
+        <module>projects-to-be-tested/karaf/camel-log</module>
       </modules>
       <activation>
         <file>
@@ -323,6 +324,7 @@
                 <include>**/integrationtests/vertx/**/*ITCase.java</include>
                 <include>**/integrationtests/wildflyswarm/**/*ITCase.java</include>
                 <include>**/integrationtests/wildfly/jar/**/*ITCase.java</include>
+                <include>**/integrationtests/karaf/**/*ITCase.java</include>
               </includes>
             </configuration>
           </plugin>
