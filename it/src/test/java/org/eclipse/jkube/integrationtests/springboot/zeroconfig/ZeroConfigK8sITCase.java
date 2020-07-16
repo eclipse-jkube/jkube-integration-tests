@@ -100,6 +100,7 @@ class ZeroConfigK8sITCase extends ZeroConfig {
     // Given
     final Properties properties = new Properties();
     properties.setProperty("docker.push.registry", "localhost:5000");
+    properties.setProperty("jkube.docker.push.registry", "localhost:5000");
     // When
     final InvocationResult invocationResult = maven("k8s:push", properties);
     // Then
