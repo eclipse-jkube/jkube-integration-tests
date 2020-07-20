@@ -1,0 +1,24 @@
+#
+# Copyright (c) 2019 Red Hat, Inc.
+# This program and the accompanying materials are made
+# available under the terms of the Eclipse Public License 2.0
+# which is available at:
+#
+#     https://www.eclipse.org/legal/epl-2.0/
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+# Contributors:
+#   Red Hat, Inc. - initial API and implementation
+#
+
+spec:
+  template:
+    spec:
+      containers:
+        - env:
+            - name: JAVA_OPTIONS
+              value: "-Djava.net.preferIPv4Stack=true"
+              #Required (reason not identifed for the tests to pass on some K8s platform).
+            - name: JAVA_ARGS
+              value: "-Djboss.bind.address=0.0.0.0"
