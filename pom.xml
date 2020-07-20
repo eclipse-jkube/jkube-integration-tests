@@ -45,6 +45,8 @@
     <thorntail.version>2.5.0.Final</thorntail.version>
     <vertx.version>3.8.5</vertx.version>
     <vertx.plugin.version>1.0.22</vertx.plugin.version>
+    <wildfly.jar.plugin.version>2.0.0.Alpha6</wildfly.jar.plugin.version>
+    <version.org.jboss.spec.javax.ws.jboss-jaxrs-api_2.1_spec>2.0.1.Final</version.org.jboss.spec.javax.ws.jboss-jaxrs-api_2.1_spec>
   </properties>
 
   <repositories>
@@ -120,6 +122,11 @@
         <version>${thorntail.version}</version>
       </dependency>
       <dependency>
+          <groupId>org.jboss.spec.javax.ws.rs</groupId>
+          <artifactId>jboss-jaxrs-api_2.1_spec</artifactId>
+          <version>${version.org.jboss.spec.javax.ws.jboss-jaxrs-api_2.1_spec}</version>
+      </dependency>
+      <dependency>
         <groupId>io.vertx</groupId>
         <artifactId>vertx-core</artifactId>
         <version>${vertx.version}</version>
@@ -171,6 +178,11 @@
           <groupId>io.thorntail</groupId>
           <artifactId>thorntail-maven-plugin</artifactId>
           <version>${thorntail.version}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.wildfly.plugins</groupId>
+          <artifactId>wildfly-jar-maven-plugin</artifactId>
+          <version>${wildfly.jar.plugin.version}</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -269,6 +281,7 @@
         <module>projects-to-be-tested/thorntail/microprofile</module>
         <module>projects-to-be-tested/vertx/simplest</module>
         <module>projects-to-be-tested/wildflyswarm/rest</module>
+        <module>projects-to-be-tested/wildfly-jar/microprofile</module>
       </modules>
       <activation>
         <file>
@@ -288,6 +301,7 @@
                 <include>**/integrationtests/thorntail/**/*ITCase.java</include>
                 <include>**/integrationtests/vertx/**/*ITCase.java</include>
                 <include>**/integrationtests/wildflyswarm/**/*ITCase.java</include>
+                <include>**/integrationtests/wildfly/jar/**/*ITCase.java</include>
               </includes>
             </configuration>
           </plugin>
