@@ -30,8 +30,8 @@ import static org.eclipse.jkube.integrationtests.cli.CliUtils.runCommand;
 public class KubernetesClientAssertion<T extends KubernetesResource> {
 
   static final long DEFAULT_AWAIT_TIME_SECONDS = 45L;
-  static final Duration CONNECT_TIMEOUT = Duration.of(20L, ChronoUnit.SECONDS);
-  static final Duration READ_TIMEOUT = Duration.of(30L, ChronoUnit.SECONDS);
+  static final Duration CONNECT_TIMEOUT = Duration.of(30L, ChronoUnit.SECONDS);
+  static final Duration READ_TIMEOUT = Duration.of(90L, ChronoUnit.SECONDS);
 
   private static OkHttpClient okHttpClient;
 
