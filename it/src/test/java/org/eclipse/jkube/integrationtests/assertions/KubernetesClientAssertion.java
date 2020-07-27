@@ -17,6 +17,8 @@ import io.fabric8.kubernetes.api.model.KubernetesResource;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.openshift.client.OpenShiftClient;
 import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 import org.eclipse.jkube.integrationtests.JKubeCase;
 
 import java.io.IOException;
@@ -32,17 +34,32 @@ public class KubernetesClientAssertion<T extends KubernetesResource> {
   static final long DEFAULT_AWAIT_TIME_SECONDS = 45L;
   static final Duration CONNECT_TIMEOUT = Duration.of(30L, ChronoUnit.SECONDS);
   static final Duration READ_TIMEOUT = Duration.of(90L, ChronoUnit.SECONDS);
+  private static final int MAX_RETIRES = 5;
 
   private static OkHttpClient okHttpClient;
 
   synchronized static OkHttpClient httpClient() {
     if (okHttpClient == null) {
       okHttpClient = new OkHttpClient.Builder()
+        .retryOnConnectionFailure(true)
         .connectTimeout(CONNECT_TIMEOUT)
         .readTimeout(READ_TIMEOUT)
         .build();
     }
     return okHttpClient;
+  }
+
+  static Response getWithRetry(String url) throws IOException {
+    IOException exception = null;
+    int attempt = 0;
+    while (attempt++ < MAX_RETIRES) {
+      try {
+        return httpClient().newCall(new Request.Builder().get().url(url).build()).execute();
+      } catch (IOException e) {
+        exception = e;
+      }
+    }
+    throw exception;
   }
 
   private final JKubeCase jKubeCase;
