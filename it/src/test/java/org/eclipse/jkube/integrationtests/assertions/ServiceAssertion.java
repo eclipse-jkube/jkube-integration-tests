@@ -16,7 +16,6 @@ package org.eclipse.jkube.integrationtests.assertions;
 import io.fabric8.kubernetes.api.model.Service;
 import io.fabric8.kubernetes.api.model.ServicePort;
 import io.fabric8.openshift.api.model.Route;
-import okhttp3.Request;
 import okhttp3.Response;
 import org.eclipse.jkube.integrationtests.JKubeCase;
 import org.hamcrest.Matcher;
@@ -111,10 +110,7 @@ public class ServiceAssertion extends KubernetesClientAssertion<Service> {
     } else {
       host = String.format("%s:%s", clusterHost, port.getNodePort());
     }
-    final Response response = httpClient().newCall(new Request.Builder()
-      .get()
-      .url(String.format("http://%s/%s", host, String.join("/", path))).build())
-      .execute();
+    final Response response = getWithRetry(String.format("http://%s/%s", host, String.join("/", path)));
     assertThat(response.body(), notNullValue());
     assertThat(response.body().string(), responseBodyMatcher);
     return this;
@@ -138,7 +134,7 @@ public class ServiceAssertion extends KubernetesClientAssertion<Service> {
       .inNamespace(getKubernetesResource().getMetadata().getNamespace())
       .withName(getKubernetesResource().getMetadata().getName())
       .edit().editMetadata()
-      .addToAnnotations(OC_ROUTE_ANNOTATION_TIMEOUT, "15s")
+      .addToAnnotations(OC_ROUTE_ANNOTATION_TIMEOUT, "30s")
       .endMetadata()
       .done();
   }
