@@ -18,6 +18,7 @@ import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import org.apache.maven.shared.invoker.InvocationResult;
 import org.apache.maven.shared.invoker.PrintStreamHandler;
+import org.eclipse.jkube.integrationtests.maven.MavenInvocationResult;
 import org.eclipse.jkube.integrationtests.maven.MavenUtils;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.*;
@@ -81,7 +82,7 @@ class WildFlySwarmK8sITCase extends WildFlySwarm{
   }
 
   @Test
-  @Order(2)
+  @Order(1)
   @DisplayName("k8s:resource, should create manifests")
   void k8sResource() throws Exception {
     // When
@@ -97,7 +98,7 @@ class WildFlySwarmK8sITCase extends WildFlySwarm{
   }
 
   @Test
-  @Order(3)
+  @Order(2)
   @ResourceLock(value = CLUSTER_RESOURCE_INTENSIVE, mode = READ_WRITE)
   @DisplayName("k8s:apply, should deploy pod and service")
   @SuppressWarnings("unchecked")
@@ -122,26 +123,18 @@ class WildFlySwarmK8sITCase extends WildFlySwarm{
   }
 
   @Test
-  @Order(4)
+  @Order(3)
   @DisplayName("k8s:log, should retrieve log")
   void k8sLog() throws Exception {
-    // Given
-    final Properties properties = new Properties();
-    properties.setProperty("jkube.log.follow", "false");
-    final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    final MavenUtils.InvocationRequestCustomizer irc = invocationRequest -> {
-      invocationRequest.setOutputHandler(new PrintStreamHandler(new PrintStream(baos), true));
-    };
     // When
-    final InvocationResult invocationResult = maven("k8s:log", properties, irc);
+    final MavenInvocationResult invocationResult = maven("k8s:log", properties("jkube.log.follow", "false"));
     // Then
     assertThat(invocationResult.getExitCode(), equalTo(0));
-    assertLog(baos.toString(StandardCharsets.UTF_8));
+    assertLog(invocationResult.getStdOut());
   }
 
-
   @Test
-  @Order(5)
+  @Order(4)
   @DisplayName("k8s:undeploy, should delete all applied resources")
   void k8sUndeploy() throws Exception {
     // When

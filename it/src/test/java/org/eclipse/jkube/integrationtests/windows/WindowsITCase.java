@@ -20,6 +20,7 @@ import org.apache.maven.shared.invoker.InvocationResult;
 import org.apache.maven.shared.invoker.MavenInvocationException;
 import org.eclipse.jkube.integrationtests.docker.RegistryExtension;
 import org.eclipse.jkube.integrationtests.maven.BaseMavenCase;
+import org.eclipse.jkube.integrationtests.maven.MavenInvocationResult;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
@@ -89,8 +90,7 @@ public class WindowsITCase extends BaseMavenCase {
   @DisplayName("k8s:push, should push image to remote registry")
   void k8sPush() throws Exception {
     // Given
-    final Properties properties = new Properties();
-    properties.setProperty("jkube.docker.push.registry", "localhost:5000");
+    final Properties properties = properties("jkube.docker.push.registry", "localhost:5000");
     // When
     final InvocationResult invocationResult = maven("k8s:push", properties);
     // Then
@@ -169,7 +169,7 @@ public class WindowsITCase extends BaseMavenCase {
   }
 
   @Override
-  protected InvocationResult maven(String goal, Properties properties)
+  protected MavenInvocationResult maven(String goal, Properties properties)
     throws IOException, InterruptedException, MavenInvocationException {
     return super.maven(goal, properties, ir -> ir.setProfiles(Collections.singletonList("Windows")));
   }

@@ -20,9 +20,8 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.apache.maven.shared.invoker.InvocationResult;
-import org.apache.maven.shared.invoker.PrintStreamHandler;
 import org.eclipse.jkube.integrationtests.docker.RegistryExtension;
-import org.eclipse.jkube.integrationtests.maven.MavenUtils;
+import org.eclipse.jkube.integrationtests.maven.MavenInvocationResult;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,10 +34,7 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.parallel.ResourceLock;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.PrintStream;
-import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 
 import static org.eclipse.jkube.integrationtests.Locks.CLUSTER_RESOURCE_INTENSIVE;
@@ -98,8 +94,7 @@ class ZeroConfigK8sITCase extends ZeroConfig {
   @DisplayName("k8s:push, should push image to remote registry")
   void k8sPush() throws Exception {
     // Given
-    final Properties properties = new Properties();
-    properties.setProperty("jkube.docker.push.registry", "localhost:5000");
+    final Properties properties = properties("jkube.docker.push.registry", "localhost:5000");
     // When
     final InvocationResult invocationResult = maven("k8s:push", properties);
     // Then
@@ -172,18 +167,11 @@ class ZeroConfigK8sITCase extends ZeroConfig {
   @Order(6)
   @DisplayName("k8s:log, should retrieve log")
   void k8sLog() throws Exception {
-    // Given
-    final Properties properties = new Properties();
-    properties.setProperty("jkube.log.follow", "false");
-    final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    final MavenUtils.InvocationRequestCustomizer irc = invocationRequest -> {
-      invocationRequest.setOutputHandler(new PrintStreamHandler(new PrintStream(baos), true));
-    };
     // When
-    final InvocationResult invocationResult = maven("k8s:log", properties, irc);
+    final MavenInvocationResult invocationResult = maven("k8s:log", properties("jkube.log.follow", "false"));
     // Then
-    assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
-    assertThat(baos.toString(StandardCharsets.UTF_8),
+    assertThat(invocationResult.getExitCode(), equalTo(0));
+    assertThat(invocationResult.getStdOut(),
       stringContainsInOrder("Tomcat started on port(s): 8080", "Started ZeroConfigApplication in", "seconds"));
   }
 

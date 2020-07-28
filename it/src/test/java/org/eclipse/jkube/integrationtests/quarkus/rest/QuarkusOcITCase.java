@@ -73,8 +73,7 @@ class QuarkusOcITCase extends Quarkus {
     oc.imageStreams().delete();
     // Given
     hackToPreventNullPointerInRegistryServiceCreateAuthConfig("openjdk:11");
-    final Properties properties = new Properties();
-    properties.setProperty("jkube.build.strategy", "docker"); // S2I doesn't support quarkus yet
+    final Properties properties = properties("jkube.build.strategy", "docker"); // S2I doesn't support quarkus yet
     // When
     final InvocationResult invocationResult = maven("oc:build", properties);
     // Then
@@ -83,12 +82,11 @@ class QuarkusOcITCase extends Quarkus {
   }
 
   @Test
-  @Order(2)
+  @Order(1)
   @DisplayName("oc:resource, should create manifests")
   void ocResource() throws Exception {
     // Given
-    final Properties properties = new Properties();
-    properties.setProperty("jkube.build.strategy", "docker"); // S2I doesn't support quarkus yet
+    final Properties properties = properties("jkube.build.strategy", "docker"); // S2I doesn't support quarkus yet
     // When
     final InvocationResult invocationResult = maven("oc:resource", properties);
     // Then
@@ -103,7 +101,7 @@ class QuarkusOcITCase extends Quarkus {
   }
 
   @Test
-  @Order(3)
+  @Order(2)
   @DisplayName("oc:helm, should create Helm charts")
   void ocHelm() throws Exception {
     // When
@@ -118,7 +116,7 @@ class QuarkusOcITCase extends Quarkus {
   }
 
   @Test
-  @Order(4)
+  @Order(3)
   @ResourceLock(value = CLUSTER_RESOURCE_INTENSIVE, mode = READ_WRITE)
   @DisplayName("oc:apply, should deploy pod and service")
   void ocApply() throws Exception {
@@ -130,7 +128,7 @@ class QuarkusOcITCase extends Quarkus {
   }
 
   @Test
-  @Order(5)
+  @Order(4)
   @DisplayName("oc:undeploy, should delete all applied resources")
   void ocUndeploy() throws Exception {
     // When
