@@ -18,9 +18,7 @@ import io.fabric8.openshift.api.model.ImageStream;
 import io.fabric8.openshift.client.DefaultOpenShiftClient;
 import io.fabric8.openshift.client.OpenShiftClient;
 import org.apache.maven.shared.invoker.InvocationResult;
-import org.apache.maven.shared.invoker.PrintStreamHandler;
-import org.eclipse.jkube.integrationtests.maven.MavenUtils;
-
+import org.eclipse.jkube.integrationtests.maven.MavenInvocationResult;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -31,23 +29,19 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.parallel.ResourceLock;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.PrintStream;
-import java.nio.charset.StandardCharsets;
-import java.util.Properties;
 
 import static org.eclipse.jkube.integrationtests.Locks.CLUSTER_RESOURCE_INTENSIVE;
+import static org.eclipse.jkube.integrationtests.OpenShift.cleanUpCluster;
 import static org.eclipse.jkube.integrationtests.Tags.OPEN_SHIFT;
 import static org.eclipse.jkube.integrationtests.assertions.YamlAssertion.yaml;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.anEmptyMap;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.stringContainsInOrder;
 import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
-import static org.hamcrest.Matchers.not;
-import static org.eclipse.jkube.integrationtests.OpenShift.cleanUpCluster;
 
 
 @Tag(OPEN_SHIFT)
@@ -111,18 +105,11 @@ class WildFlyOcITCase extends WildFly {
   @Order(3)
   @DisplayName("oc:log, should retrieve logs")
   void ocLog() throws Exception {
-    //Given
-    final Properties properties = new Properties();
-    properties.setProperty("jkube.log.follow", "false");
-    final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    final MavenUtils.InvocationRequestCustomizer irc = invocationRequest -> {
-      invocationRequest.setOutputHandler(new PrintStreamHandler(new PrintStream(baos), true));
-    };
-    //When
-    final InvocationResult invocationResult = maven("oc:log", properties,irc);
-    //Then
+    // When
+    final MavenInvocationResult invocationResult = maven("oc:log", properties("jkube.log.follow", "false"));
+    // Then
     assertThat(invocationResult.getExitCode(), equalTo(0));
-    assertThat(baos.toString(StandardCharsets.UTF_8), stringContainsInOrder(
+    assertThat(invocationResult.getStdOut(), stringContainsInOrder(
       "Running wildfly/wildfly-centos7 image", "JBoss Bootstrap Environment", "Deployed \"ROOT.war\"")
     );
   }

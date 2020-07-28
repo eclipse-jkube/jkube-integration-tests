@@ -19,6 +19,7 @@ import io.fabric8.openshift.api.model.ImageStream;
 import io.fabric8.openshift.client.OpenShiftClient;
 import org.apache.maven.shared.invoker.InvocationResult;
 import org.apache.maven.shared.invoker.PrintStreamHandler;
+import org.eclipse.jkube.integrationtests.maven.MavenInvocationResult;
 import org.eclipse.jkube.integrationtests.maven.MavenUtils;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterEach;
@@ -118,18 +119,11 @@ class WildFlySwarmOcITCase extends  WildFlySwarm{
   @Order(3)
   @DisplayName("oc:log, should retrieve log")
   void ocLog() throws Exception {
-    // Given
-    final Properties properties = new Properties();
-    properties.setProperty("jkube.log.follow", "false");
-    final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    final MavenUtils.InvocationRequestCustomizer irc = invocationRequest -> {
-      invocationRequest.setOutputHandler(new PrintStreamHandler(new PrintStream(baos), true));
-    };
     // When
-    final InvocationResult invocationResult = maven("oc:log", properties, irc);
+    final MavenInvocationResult invocationResult = maven("oc:log", properties("jkube.log.follow", "false"));
     // Then
     assertThat(invocationResult.getExitCode(), equalTo(0));
-    assertLog(baos.toString(StandardCharsets.UTF_8));
+    assertLog(invocationResult.getStdOut());
   }
 
   @Test

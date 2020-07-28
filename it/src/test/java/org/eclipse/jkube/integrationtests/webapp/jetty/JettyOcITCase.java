@@ -13,14 +13,12 @@
  */
 package org.eclipse.jkube.integrationtests.webapp.jetty;
 
-import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.openshift.api.model.ImageStream;
 import io.fabric8.openshift.client.OpenShiftClient;
 import org.apache.maven.shared.invoker.InvocationResult;
-import org.apache.maven.shared.invoker.PrintStreamHandler;
-import org.eclipse.jkube.integrationtests.maven.MavenUtils;
+import org.eclipse.jkube.integrationtests.maven.MavenInvocationResult;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,16 +30,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.parallel.ResourceLock;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.PrintStream;
-import java.nio.charset.StandardCharsets;
-import java.util.Properties;
 
 import static org.eclipse.jkube.integrationtests.Locks.CLUSTER_RESOURCE_INTENSIVE;
 import static org.eclipse.jkube.integrationtests.OpenShift.cleanUpCluster;
 import static org.eclipse.jkube.integrationtests.Tags.OPEN_SHIFT;
-import static org.eclipse.jkube.integrationtests.assertions.ServiceAssertion.awaitService;
 import static org.eclipse.jkube.integrationtests.assertions.YamlAssertion.yaml;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.anEmptyMap;
@@ -118,18 +111,11 @@ class JettyOcITCase extends Jetty {
   @Order(3)
   @DisplayName("oc:log, should retrieve log")
   void ocLog() throws Exception {
-    // Given
-    final Properties properties = new Properties();
-    properties.setProperty("jkube.log.follow", "false");
-    final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    final MavenUtils.InvocationRequestCustomizer irc = invocationRequest -> {
-      invocationRequest.setOutputHandler(new PrintStreamHandler(new PrintStream(baos), true));
-    };
     // When
-    final InvocationResult invocationResult = maven("oc:log", properties, irc);
+    final MavenInvocationResult invocationResult = maven("oc:log", properties("jkube.log.follow", "false"));
     // Then
-    assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
-    assertLog(baos.toString(StandardCharsets.UTF_8));
+    assertThat(invocationResult.getExitCode(), equalTo(0));
+    assertLog(invocationResult.getStdOut());
   }
 
   @Test

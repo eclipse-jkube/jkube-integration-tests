@@ -87,7 +87,7 @@ class WildflyJarK8sITCase extends WildflyJar {
   }
 
   @Test
-  @Order(2)
+  @Order(1)
   @DisplayName("k8s:resource, should create manifests")
   void k8sResource() throws Exception {
     // When
@@ -103,7 +103,7 @@ class WildflyJarK8sITCase extends WildflyJar {
   }
 
   @Test
-  @Order(3)
+  @Order(2)
   @ResourceLock(value = CLUSTER_RESOURCE_INTENSIVE, mode = READ_WRITE)
   @DisplayName("k8s:apply, should deploy pod and service")
   @SuppressWarnings("unchecked")
@@ -136,7 +136,7 @@ class WildflyJarK8sITCase extends WildflyJar {
   }
 
   @Test
-  @Order(4)
+  @Order(3)
   @DisplayName("k8s:undeploy, should delete all applied resources")
   void k8sUndeploy() throws Exception {
     // When
