@@ -33,7 +33,6 @@
   </description>
   <properties>
     <java.version>11</java.version>
-    <jkube.generator.from>adoptopenjdk/openjdk11:jdk-11.0.6_10-alpine-slim</jkube.generator.from>
     <jkube.environment>default</jkube.environment>
   </properties>
 
@@ -81,6 +80,7 @@
       <id>Docker-Assembly</id>
       <properties>
         <jkube.environment>docker</jkube.environment>
+        <jkube.generator.from>adoptopenjdk/openjdk11:jdk-11.0.6_10-alpine-slim</jkube.generator.from>
       </properties>
       <build>
       <plugins>
@@ -151,6 +151,19 @@
         </plugin>
       </plugins>
     </build>
+    </profile>
+    <profile>
+      <id>JIB</id>
+      <properties>
+        <jkube.build.strategy>jib</jkube.build.strategy>
+        <jkube.targetDir>${project.build.outputDirectory}/META-INF/jkube-jib</jkube.targetDir>
+        <jkube.kubernetesManifest>${project.build.outputDirectory}/META-INF/jkube-jib/kubernetes.yml</jkube.kubernetesManifest>
+        <jkube.generator.name>localhost:5000/sb/sb-complete</jkube.generator.name>
+        <jkube.enricher.jkube-controller.name>spring-boot-complete-jib</jkube.enricher.jkube-controller.name>
+        <jkube.enricher.jkube-project-label.app>spring-boot-complete-jib</jkube.enricher.jkube-project-label.app>
+        <jkube.enricher.jkube-service.name>spring-boot-complete-jib</jkube.enricher.jkube-service.name>
+        <jkube.enricher.jkube-service.type>NodePort</jkube.enricher.jkube-service.type>
+      </properties>
     </profile>
     <profile>
       <id>Kubernetes</id>
