@@ -25,8 +25,14 @@ import java.nio.file.Path;
 @RequestMapping("/")
 public class CompleteResource {
 
+  @GetMapping(path = "jkube/hello")
+  public String jkubeHello() {
+    return "hello";
+  }
+
   @GetMapping(path = "jkube/readme")
   public String jkubeReadme() throws IOException {
+    // Retrieved from a git mounted volume defined in a k8s/deployment fragment
     return Files.readString(Path.of("/","app", "jkube", "README.md"));
   }
 

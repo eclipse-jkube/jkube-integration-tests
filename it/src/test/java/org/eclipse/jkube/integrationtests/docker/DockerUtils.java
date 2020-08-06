@@ -15,6 +15,8 @@ package org.eclipse.jkube.integrationtests.docker;
 
 import org.eclipse.jkube.integrationtests.cli.CliUtils;
 import org.eclipse.jkube.integrationtests.cli.CliUtils.CliResult;
+
+import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
@@ -52,6 +54,15 @@ public class DockerUtils {
       Optional.ofNullable(baseDir).orElse("/")
     ));
     return Arrays.asList(result.getOutput().replace("\r", "").split("\n"));
+  }
+
+  public static void loadTar(File dockerBuildTar) throws IOException, InterruptedException {
+    final CliResult result = CliUtils.runCommand(String.format(
+      "docker load -i %s", dockerBuildTar.getAbsolutePath()
+    ));
+    if (result.getExitCode() != 0) {
+      throw new IOException(String.format("Docker image was not loaded: %s", result.getOutput()));
+    }
   }
 
   public static final class DockerImage {

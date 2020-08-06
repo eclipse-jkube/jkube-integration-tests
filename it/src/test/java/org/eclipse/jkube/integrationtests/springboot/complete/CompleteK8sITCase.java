@@ -86,9 +86,9 @@ class CompleteK8sITCase extends Complete {
     final InvocationResult invocationResult = maven("k8s:build");
     // Then
     assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
-    assertImageWasRecentlyBuilt("integration-tests", "spring-boot-complete");
+    assertImageWasRecentlyBuilt("integration-tests", getApplication());
     final File dockerDirectory = new File(
-      String.format("../%s/target/docker/integration-tests/spring-boot-complete/", PROJECT_COMPLETE));
+      String.format("../%s/target/docker/integration-tests/spring-boot-complete/", getProject()));
     final List<String> imageFiles = listImageFiles(String.format("%s/%s", "integration-tests", getApplication()),
       "/deployments");
     assertThat(imageFiles, not(hasItem("/deployments/assembly-test")));
@@ -107,7 +107,7 @@ class CompleteK8sITCase extends Complete {
     // Then
     assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
     final File metaInfDirectory = new File(
-      String.format("../%s/target/classes/META-INF", PROJECT_COMPLETE));
+      String.format("../%s/target/classes/META-INF", getProject()));
     assertThat(metaInfDirectory.exists(), equalTo(true));
     assertListResource(new File(metaInfDirectory, "jkube/kubernetes.yml"));
     assertThat(new File(metaInfDirectory, "jkube/kubernetes/password-secret.yml"), yaml(not(anEmptyMap())));
