@@ -100,7 +100,7 @@ class CompleteDockerITCase extends Complete {
     assertImageWasRecentlyBuilt("integration-tests", getApplication());
     assertImageWasRecentlyBuilt("integration-tests", getApplication(), "1337");
     final File dockerDirectory = new File(
-      String.format("../%s/target/docker/integration-tests/docker-spring-boot-complete", PROJECT_COMPLETE));
+      String.format("../%s/target/docker/integration-tests/docker-spring-boot-complete", getProject()));
     assertThat(dockerDirectory.exists(), equalTo(true));
     assertThat(new File(dockerDirectory, "tmp/docker-build.tar.gz").exists(), equalTo(true));
     final String dockerFileContent = String.join("\n",
@@ -129,17 +129,14 @@ class CompleteDockerITCase extends Complete {
   @ResourceLock(value = SPRINGBOOT_COMPLETE_K8s, mode = READ_WRITE)
   @DisplayName("k8s:resource, should create manifests in specific directory")
   void k8sResource() throws Exception {
-    // Given
-    final Properties properties = new Properties();
-    properties.put("jkube.targetDir", "${project.build.outputDirectory}/META-INF/jkube-docker");
     // When
-    final InvocationResult invocationResult = maven("k8s:resource", properties);
+    final InvocationResult invocationResult = maven("k8s:resource");
     // Then
     assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
     final File metaInfDirectory = new File(
-      String.format("../%s/target/classes/META-INF", PROJECT_COMPLETE));
+      String.format("../%s/target/classes/META-INF", getProject()));
     assertThat(metaInfDirectory.exists(), equalTo(true));
-    assertListResource(new File(metaInfDirectory, "jkube/kubernetes.yml"));
+    assertListResource(new File(metaInfDirectory, "jkube-docker/kubernetes.yml"));
     assertThat(new File(metaInfDirectory, "jkube-docker/kubernetes/password-secret.yml").exists(), equalTo(false));
     assertThat(new File(metaInfDirectory, "jkube-docker/kubernetes/docker-spring-boot-complete-deployment.yml"), yaml(not(anEmptyMap())));
     assertThat(new File(metaInfDirectory, "jkube-docker/kubernetes/docker-spring-boot-complete-service.yml"), yaml(not(anEmptyMap())));
@@ -150,11 +147,8 @@ class CompleteDockerITCase extends Complete {
   @ResourceLock(value = CLUSTER_RESOURCE_INTENSIVE, mode = READ_WRITE)
   @DisplayName("k8s:apply, should deploy pod and service form manifests in specific directory")
   void k8sApply() throws Exception {
-    // Given
-    final Properties properties = new Properties();
-    properties.put("jkube.kubernetesManifest", "${basedir}/target/classes/META-INF/jkube-docker/kubernetes.yml");
     // When
-    final InvocationResult invocationResult = maven("k8s:apply", properties);
+    final InvocationResult invocationResult = maven("k8s:apply");
     // Then
     assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
     final String namespace = assertThatShouldApplyResources()

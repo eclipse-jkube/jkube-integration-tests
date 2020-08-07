@@ -80,6 +80,8 @@
       <id>Docker-Assembly</id>
       <properties>
         <jkube.environment>docker</jkube.environment>
+        <jkube.targetDir>${project.build.outputDirectory}/META-INF/jkube-docker</jkube.targetDir>
+        <jkube.kubernetesManifest>${project.build.outputDirectory}/META-INF/jkube-docker/kubernetes.yml</jkube.kubernetesManifest>
         <jkube.generator.from>adoptopenjdk/openjdk11:jdk-11.0.6_10-alpine-slim</jkube.generator.from>
       </properties>
       <build>
