@@ -52,6 +52,11 @@ public abstract class BaseMavenCase implements MavenProject {
   }
 
   protected static void assertThatShouldDeleteAllAppliedResources(JKubeCase jKubeCase) throws InterruptedException {
+    assertPodDeleted(jKubeCase);
+    assertServiceDeleted(jKubeCase);
+  }
+
+  private static void assertPodDeleted(JKubeCase jKubeCase) throws InterruptedException {
     final Optional<Pod> matchingPod = jKubeCase.getKubernetesClient().pods().list().getItems().stream()
       .filter(p -> p.getMetadata().getName().startsWith(jKubeCase.getApplication()))
       .filter(((Predicate<Pod>)(p -> p.getMetadata().getName().endsWith("-build"))).negate())
@@ -68,7 +73,13 @@ public abstract class BaseMavenCase implements MavenProject {
           "Pod %s is still running when it should have been deleted", matchingPod.get().getMetadata().getName()));
       }
     }
-    assertServiceExists(jKubeCase, equalTo(false));
+  }
+
+  private static void assertServiceDeleted(JKubeCase jKubeCase) {
+    final boolean servicesExists = jKubeCase.getKubernetesClient().services().list().getItems().stream()
+      .filter(s -> s.getMetadata().getDeletionTimestamp() == null)
+      .anyMatch(s -> s.getMetadata().getName().equals(jKubeCase.getApplication()));
+    assertThat(servicesExists, equalTo(false));
   }
 
   protected static void assertListResource(File file) {
