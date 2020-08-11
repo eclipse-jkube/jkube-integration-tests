@@ -45,6 +45,8 @@ import static org.hamcrest.Matchers.notNullValue;
 
 public abstract class BaseMavenCase implements MavenProject {
 
+  private static final int MAX_RETRIES = 10;
+
   protected List<String> getProfiles() {
     return new ArrayList<>();
   }
@@ -56,8 +58,15 @@ public abstract class BaseMavenCase implements MavenProject {
       .findAny();
     final Function<Pod, Pod> refreshPod = pod ->
       jKubeCase.getKubernetesClient().pods().withName(pod.getMetadata().getName()).fromServer().get();
-    matchingPod.map(refreshPod).ifPresent(updatedPod ->
-      assertThat(updatedPod.getMetadata().getDeletionTimestamp(), notNullValue()));
+    int current = 0;
+    while (current++ < MAX_RETRIES) {
+      final boolean podIsStillRunning = matchingPod.map(refreshPod)
+        .filter(updatedPod -> updatedPod.getMetadata().getDeletionTimestamp() != null).isPresent();
+      if (podIsStillRunning && ++current > MAX_RETRIES) {
+        throw new AssertionError(String.format(
+          "Pod %s is still running when it should have been deleted", matchingPod.get().getMetadata().getName()));
+      }
+    }
     assertServiceExists(jKubeCase, equalTo(false));
   }
 
