@@ -51,7 +51,7 @@ public abstract class BaseMavenCase implements MavenProject {
     return new ArrayList<>();
   }
 
-  protected static void assertThatShouldDeleteAllAppliedResources(JKubeCase jKubeCase) {
+  protected static void assertThatShouldDeleteAllAppliedResources(JKubeCase jKubeCase) throws InterruptedException {
     final Optional<Pod> matchingPod = jKubeCase.getKubernetesClient().pods().list().getItems().stream()
       .filter(p -> p.getMetadata().getName().startsWith(jKubeCase.getApplication()))
       .filter(((Predicate<Pod>)(p -> p.getMetadata().getName().endsWith("-build"))).negate())
@@ -60,6 +60,7 @@ public abstract class BaseMavenCase implements MavenProject {
       jKubeCase.getKubernetesClient().pods().withName(pod.getMetadata().getName()).fromServer().get();
     int current = 0;
     while (current++ < MAX_RETRIES) {
+      Thread.sleep(300L);
       final boolean podIsStillRunning = matchingPod.map(refreshPod)
         .filter(updatedPod -> updatedPod.getMetadata().getDeletionTimestamp() != null).isPresent();
       if (podIsStillRunning && ++current > MAX_RETRIES) {
