@@ -32,6 +32,7 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 import static org.eclipse.jkube.integrationtests.assertions.ServiceAssertion.assertServiceExists;
 import static org.eclipse.jkube.integrationtests.assertions.YamlAssertion.yaml;
@@ -59,27 +60,50 @@ public abstract class BaseMavenCase implements MavenProject {
   private static void assertPodDeleted(JKubeCase jKubeCase) throws InterruptedException {
     final Optional<Pod> matchingPod = jKubeCase.getKubernetesClient().pods().list().getItems().stream()
       .filter(p -> p.getMetadata().getName().startsWith(jKubeCase.getApplication()))
-      .filter(((Predicate<Pod>)(p -> p.getMetadata().getName().endsWith("-build"))).negate())
+      .filter(p -> p.getMetadata().getLabels().getOrDefault("app", "").equals(jKubeCase.getApplication()))
+      .filter(Predicate.not(p -> p.getMetadata().getName().endsWith("-build")))
       .findAny();
     final Function<Pod, Pod> refreshPod = pod ->
       jKubeCase.getKubernetesClient().pods().withName(pod.getMetadata().getName()).fromServer().get();
-    int current = 0;
-    while (current++ < MAX_RETRIES) {
-      Thread.sleep(300L);
-      final boolean podIsStillRunning = matchingPod.map(refreshPod)
-        .filter(updatedPod -> updatedPod.getMetadata().getDeletionTimestamp() != null).isPresent();
-      if (podIsStillRunning && ++current > MAX_RETRIES) {
-        throw new AssertionError(String.format(
-          "Pod %s is still running when it should have been deleted", matchingPod.get().getMetadata().getName()));
-      }
-    }
+    final boolean podIsStillRunning = retryWhileTrue(() -> matchingPod.map(refreshPod)
+      .filter(updatedPod -> updatedPod.getMetadata().getDeletionTimestamp() == null)
+      .isPresent()
+    );
+    assertThat("Pod is still running when it should have been deleted",
+      podIsStillRunning, equalTo(false));
   }
 
-  private static void assertServiceDeleted(JKubeCase jKubeCase) {
-    final boolean servicesExists = jKubeCase.getKubernetesClient().services().list().getItems().stream()
+  private static void assertServiceDeleted(JKubeCase jKubeCase) throws InterruptedException {
+    final boolean servicesExists = retryWhileTrue(() -> jKubeCase.getKubernetesClient().services()
+      .list().getItems().stream()
       .filter(s -> s.getMetadata().getDeletionTimestamp() == null)
-      .anyMatch(s -> s.getMetadata().getName().equals(jKubeCase.getApplication()));
-    assertThat(servicesExists, equalTo(false));
+      .anyMatch(s -> s.getMetadata().getName().equals(jKubeCase.getApplication()))
+    );
+    assertThat("Service is still present when it should have been deleted",
+      servicesExists, equalTo(false));
+  }
+
+  protected static void assertDeploymentDeleted(JKubeCase jKubeCase) throws InterruptedException {
+    final boolean deploymentExists = retryWhileTrue(() -> jKubeCase.getKubernetesClient().apps().deployments()
+      .list().getItems().stream()
+      .filter(s -> s.getMetadata().getDeletionTimestamp() == null)
+      .anyMatch(s -> s.getMetadata().getName().equals(jKubeCase.getApplication()))
+    );
+    assertThat("Deployment is still present when it should have been deleted",
+      deploymentExists, equalTo(false));
+  }
+
+  private static boolean retryWhileTrue(Supplier<Boolean> func) throws InterruptedException {
+    boolean ret = true;
+    int current = 0;
+    while (current++ < MAX_RETRIES) {
+      ret = func.get();
+      if (!ret) {
+        break;
+      }
+      Thread.sleep(300L);
+    }
+    return ret;
   }
 
   protected static void assertListResource(File file) {
@@ -131,6 +155,7 @@ public abstract class BaseMavenCase implements MavenProject {
         recordStdOutCustomizer.customize(i);
         Optional.ofNullable(chainedCustomizer).ifPresent(cc -> cc.customize(i));
       });
+      printStream.flush();
       baos.flush();
       return new MavenInvocationResult(mavenResult, baos.toString(StandardCharsets.UTF_8));
     }
