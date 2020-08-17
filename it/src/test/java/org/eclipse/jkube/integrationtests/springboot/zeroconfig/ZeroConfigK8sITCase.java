@@ -39,7 +39,6 @@ import java.util.Properties;
 
 import static org.eclipse.jkube.integrationtests.Locks.CLUSTER_RESOURCE_INTENSIVE;
 import static org.eclipse.jkube.integrationtests.Tags.KUBERNETES;
-import static org.eclipse.jkube.integrationtests.assertions.DeploymentAssertion.assertDeploymentExists;
 import static org.eclipse.jkube.integrationtests.assertions.DeploymentAssertion.awaitDeployment;
 import static org.eclipse.jkube.integrationtests.assertions.DockerAssertion.assertImageWasRecentlyBuilt;
 import static org.eclipse.jkube.integrationtests.assertions.YamlAssertion.yaml;
@@ -184,6 +183,6 @@ class ZeroConfigK8sITCase extends ZeroConfig {
     // Then
     assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
     assertThatShouldDeleteAllAppliedResources(this);
-    assertDeploymentExists(this, equalTo(false));
+    assertDeploymentDeleted(this);
   }
 }
