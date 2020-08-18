@@ -31,7 +31,7 @@
     <global.name>JKube :: Integration Tests</global.name>
     <apache.maven.maven-compiler-plugin.version>3.8.1</apache.maven.maven-compiler-plugin.version>
     <apache.maven.maven-war-plugin.version>2.6</apache.maven.maven-war-plugin.version>
-    <apache.maven-failsafe-plugin.version>3.0.0-M3</apache.maven-failsafe-plugin.version>
+    <apache.maven-failsafe-plugin.version>3.0.0-M4</apache.maven-failsafe-plugin.version>
     <apache.maven.maven-invoker.version>3.0.1</apache.maven.maven-invoker.version>
     <fabric8.kubernetes-client.version>4.10.3</fabric8.kubernetes-client.version>
     <jkube.version>1.0.0-SNAPSHOT</jkube.version>
@@ -41,7 +41,7 @@
     <license-maven-plugin.version>3.0</license-maven-plugin.version>
     <hamcrest.version>2.0.0.0</hamcrest.version>
     <quarkus.version>1.7.0.Final</quarkus.version>
-    <spring-boot.version>2.2.0.RELEASE</spring-boot.version>
+    <spring-boot.version>2.3.1.RELEASE</spring-boot.version>
     <thorntail.version>2.5.0.Final</thorntail.version>
     <vertx.version>3.9.1</vertx.version>
     <vertx.plugin.version>1.0.22</vertx.plugin.version>
