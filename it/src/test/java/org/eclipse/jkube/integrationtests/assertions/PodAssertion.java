@@ -22,7 +22,12 @@ import org.eclipse.jkube.integrationtests.JKubeCase;
 import org.eclipse.jkube.integrationtests.PodReadyWatcher;
 
 import java.io.IOException;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
 import static org.eclipse.jkube.integrationtests.assertions.LabelAssertion.assertLabels;
@@ -55,15 +60,24 @@ public class PodAssertion extends KubernetesClientAssertion<Pod> {
   }
 
   public PodAssertion logContains(CharSequence sequence, long timeoutSeconds) throws InterruptedException {
-    podResource().waitUntilCondition(conditionPod -> {
-        try {
-          return podResource().getLog().contains(sequence);
-        } catch (Exception ex) {
-          // Ignore error and iterate again
-        }
-        return false;
-      },
-      timeoutSeconds, TimeUnit.SECONDS);
+    final CountDownLatch latch = new CountDownLatch(1);
+    final AtomicReference<String> lastLog = new AtomicReference<>("");
+    final ScheduledExecutorService es = Executors.newSingleThreadScheduledExecutor();
+    final Runnable waitCondition = () -> {
+      lastLog.set(podResource().getLog());
+      if (lastLog.get().contains(sequence)) {
+        latch.countDown();
+      }
+    };
+    @SuppressWarnings("rawtypes")
+    final Future task = es.scheduleAtFixedRate(waitCondition, 0L, 500L, TimeUnit.MILLISECONDS);
+    final boolean logContainsSequence = latch.await(timeoutSeconds, TimeUnit.SECONDS);
+    task.cancel(true);
+    es.shutdown();
+    if (!logContainsSequence) {
+      throw new AssertionError(String.format("Error awaiting for log to contain:%n %s%nBut was:%n%s",
+        sequence, lastLog.get()));
+    }
     return this;
   }
 

@@ -52,7 +52,7 @@ import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 
 @Tag(OPEN_SHIFT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class WildFlySwarmOcITCase extends  WildFlySwarm{
+class WildFlySwarmOcITCase extends WildFlySwarm {
 
   private OpenShiftClient oc;
 
@@ -95,7 +95,7 @@ class WildFlySwarmOcITCase extends  WildFlySwarm{
     // Then
     assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
     final File metaInfDirectory = new File(
-      String.format("../%s/target/classes/META-INF", PROJECT_WILDFLYSWARM));
+      String.format("../%s/target/classes/META-INF", getProject()));
     assertThat(metaInfDirectory.exists(), equalTo(true));
     assertListResource(new File(metaInfDirectory, "jkube/openshift.yml"));
     assertThat(new File(metaInfDirectory, "jkube/openshift/wildflyswarm-rest-deploymentconfig.yml"), yaml(not(anEmptyMap())));

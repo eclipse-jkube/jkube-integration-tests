@@ -34,7 +34,6 @@
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <wildfly.version>2018.5.0</wildfly.version>
     <jkube.enricher.jkube-service.type>NodePort</jkube.enricher.jkube-service.type>
   </properties>
 
@@ -48,7 +47,7 @@
     <dependency>
       <groupId>org.wildfly.swarm</groupId>
       <artifactId>jaxrs</artifactId>
-      <version>${wildfly.version}</version>
+      <version>${wildfly.swarm.version}</version>
     </dependency>
 
   </dependencies>
@@ -67,7 +66,7 @@
       <plugin>
         <groupId>org.wildfly.swarm</groupId>
         <artifactId>wildfly-swarm-plugin</artifactId>
-        <version>${wildfly.version}</version>
+        <version>${wildfly.swarm.version}</version>
         <executions>
           <execution>
             <goals>

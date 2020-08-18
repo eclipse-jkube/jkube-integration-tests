@@ -27,7 +27,7 @@ import static org.hamcrest.Matchers.stringContainsInOrder;
 
 abstract class WildFlySwarm extends BaseMavenCase implements JKubeCase {
 
-  static final String PROJECT_WILDFLYSWARM="projects-to-be-tested/wildflyswarm/rest";
+  private static final String PROJECT_WILDFLYSWARM = "projects-to-be-tested/wildflyswarm/rest";
 
   @Override
   public String getProject() {
