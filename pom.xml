@@ -33,19 +33,20 @@
     <apache.maven.maven-war-plugin.version>2.6</apache.maven.maven-war-plugin.version>
     <apache.maven-failsafe-plugin.version>3.0.0-M3</apache.maven-failsafe-plugin.version>
     <apache.maven.maven-invoker.version>3.0.1</apache.maven.maven-invoker.version>
-    <fabric8.kubernetes-client.version>4.9.2</fabric8.kubernetes-client.version>
+    <fabric8.kubernetes-client.version>4.10.3</fabric8.kubernetes-client.version>
     <jkube.version>1.0.0-SNAPSHOT</jkube.version>
-    <com.fasterxml.jackson.core.version>2.10.0</com.fasterxml.jackson.core.version>
-    <com.fasterxml.jackson.dataformat.yaml.version>2.10.0</com.fasterxml.jackson.dataformat.yaml.version>
-    <junit.version>5.5.1</junit.version>
+    <com.fasterxml.jackson.core.version>2.11.0</com.fasterxml.jackson.core.version>
+    <com.fasterxml.jackson.dataformat.yaml.version>2.11.0</com.fasterxml.jackson.dataformat.yaml.version>
+    <junit.version>5.6.2</junit.version>
     <license-maven-plugin.version>3.0</license-maven-plugin.version>
     <hamcrest.version>2.0.0.0</hamcrest.version>
-    <quarkus.version>1.2.1.Final</quarkus.version>
+    <quarkus.version>1.7.0.Final</quarkus.version>
     <spring-boot.version>2.2.0.RELEASE</spring-boot.version>
     <thorntail.version>2.5.0.Final</thorntail.version>
-    <vertx.version>3.8.5</vertx.version>
+    <vertx.version>3.9.1</vertx.version>
     <vertx.plugin.version>1.0.22</vertx.plugin.version>
     <wildfly.jar.plugin.version>2.0.0.Alpha6</wildfly.jar.plugin.version>
+    <wildfly.swarm.version>2018.5.0</wildfly.swarm.version>
     <version.org.jboss.spec.javax.ws.jboss-jaxrs-api_2.1_spec>2.0.1.Final</version.org.jboss.spec.javax.ws.jboss-jaxrs-api_2.1_spec>
   </properties>
 
@@ -74,11 +75,31 @@
         <groupId>org.eclipse.jkube</groupId>
         <artifactId>kubernetes-maven-plugin</artifactId>
         <version>${jkube.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>io.fabric8</groupId>
+            <artifactId>kubernetes-client</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>io.fabric8</groupId>
+            <artifactId>openshift-client</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.eclipse.jkube</groupId>
         <artifactId>openshift-maven-plugin</artifactId>
         <version>${jkube.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>io.fabric8</groupId>
+            <artifactId>kubernetes-client</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>io.fabric8</groupId>
+            <artifactId>openshift-client</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <!-- ***************************************  -->
       <dependency>

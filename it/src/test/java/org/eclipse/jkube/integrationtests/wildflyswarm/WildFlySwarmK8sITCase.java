@@ -96,7 +96,7 @@ class WildFlySwarmK8sITCase extends WildFlySwarm{
     // Then
     assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
     final File metaInfDirectory = new File(
-      String.format("../%s/target/classes/META-INF", PROJECT_WILDFLYSWARM));
+      String.format("../%s/target/classes/META-INF", getProject()));
     assertThat(metaInfDirectory.exists(), equalTo(true));
     assertListResource(new File(metaInfDirectory, "jkube/kubernetes.yml"));
     assertThat(new File(metaInfDirectory, "jkube/kubernetes/wildflyswarm-rest-deployment.yml"), yaml(not(anEmptyMap())));
