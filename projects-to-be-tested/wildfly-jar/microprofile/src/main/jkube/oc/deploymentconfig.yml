@@ -14,12 +14,6 @@
 
 spec:
   replicas: 1
-  template:
-    spec:
-      containers:
-        - env:
-            - name: JAVA_OPTIONS
-              value: "-Djava.net.preferIPv4Stack=true"
   triggers:
   - imageChangeParams:
       automatic: true

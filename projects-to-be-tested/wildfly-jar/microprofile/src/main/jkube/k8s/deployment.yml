@@ -17,8 +17,6 @@ spec:
     spec:
       containers:
         - env:
-            - name: JAVA_OPTIONS
-              value: "-Djava.net.preferIPv4Stack=true"
               #Required (reason not identifed for the tests to pass on some K8s platform).
             - name: JAVA_ARGS
               value: "-Djboss.bind.address=0.0.0.0"
