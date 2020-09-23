@@ -35,7 +35,7 @@
   <properties>
     <failOnMissingWebXml>false</failOnMissingWebXml>
     <jkube.enricher.jkube-service.type>NodePort</jkube.enricher.jkube-service.type>
-    <version.wildfly>20.0.0.Final</version.wildfly>
+    <version.wildfly>21.0.0.Beta1</version.wildfly>
   </properties>
 
   <dependencies>
@@ -55,6 +55,14 @@
             <layers>
                 <layer>cloud-server</layer>
             </layers>
+            <plugin-options>
+                <!-- Build a slim server for faster server startup -->
+                <jboss-maven-dist/>
+                <!-- A Maven repository containing the server
+                 artifacts is generated in the this directory. 
+                JKube generator installs it in the generated image. -->
+                <jboss-maven-repo>target/bootable-jar-maven-repo</jboss-maven-repo>
+            </plugin-options>
             <cloud/>
         </configuration>
         <executions>
