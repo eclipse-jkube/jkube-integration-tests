@@ -124,10 +124,6 @@ class WildflyJarK8sITCase extends WildflyJar {
           hasProperty("containerPort", equalTo(8080))
         ))),
         hasProperty("env", hasItems(allOf(
-          hasProperty("name", equalTo("JAVA_OPTIONS")),
-          hasProperty("value", equalTo("-Djava.net.preferIPv4Stack=true"))
-        ))),
-        hasProperty("env", hasItems(allOf(
           hasProperty("name", equalTo("JAVA_ARGS")),
           hasProperty("value", equalTo("-Djboss.bind.address=0.0.0.0"))
         )))
