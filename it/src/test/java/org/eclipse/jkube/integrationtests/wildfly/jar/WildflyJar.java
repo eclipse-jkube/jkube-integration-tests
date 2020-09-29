@@ -42,7 +42,7 @@ abstract class WildflyJar extends BaseMavenCase implements JKubeCase {
   final Pod assertThatShouldApplyResources() throws Exception {
     final Pod pod = awaitPod(this).getKubernetesResource();
     assertPod(pod).apply(this)
-      .logContains("wildfly-jar-microprofile-0.0.0-SNAPSHOT-wildfly.jar", 15)
+      .logContains("wildfly-jar-microprofile-0.0.0-SNAPSHOT-bootable.jar", 15)
       .logContains("Deployed \"wildfly-jar-microprofile-0.0.0-SNAPSHOT.war\"", 60)
       .logContains("WFLYSRV0025", 15);
     awaitService(this, pod.getMetadata().getNamespace())
