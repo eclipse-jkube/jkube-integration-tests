@@ -17,7 +17,7 @@ name: JKube E2E Tests
 on:
   push:
     branches:
-      - master
+      - main
   pull_request:
 
 env:

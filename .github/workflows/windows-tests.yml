@@ -17,7 +17,7 @@ name: JKube Windows Specific Tests
 on:
   push:
     branches:
-      - master
+      - main
   pull_request:
 
 env:
