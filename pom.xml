@@ -46,7 +46,7 @@
     <thorntail.version>2.5.0.Final</thorntail.version>
     <vertx.version>3.9.1</vertx.version>
     <vertx.plugin.version>1.0.22</vertx.plugin.version>
-    <wildfly.jar.plugin.version>2.0.0.Beta7</wildfly.jar.plugin.version>
+    <wildfly.jar.plugin.version>2.0.0.Final</wildfly.jar.plugin.version>
     <wildfly.swarm.version>2018.5.0</wildfly.swarm.version>
     <version.org.jboss.spec.javax.ws.jboss-jaxrs-api_2.1_spec>2.0.1.Final</version.org.jboss.spec.javax.ws.jboss-jaxrs-api_2.1_spec>
   </properties>
@@ -59,6 +59,20 @@
         <enabled>false</enabled>
       </snapshots>
     </repository>
+    <repository>
+      <id>jboss-public-repository-group</id>
+      <name>JBoss Public Repository Group</name>
+      <url>https://repository.jboss.org/nexus/content/groups/public/</url>
+      <layout>default</layout>
+      <releases>
+        <enabled>true</enabled>
+        <updatePolicy>never</updatePolicy>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+        <updatePolicy>never</updatePolicy>
+      </snapshots>
+    </repository>
   </repositories>
   <pluginRepositories>
     <pluginRepository>
@@ -66,6 +80,17 @@
       <url>https://repo1.maven.org/maven2</url>
       <snapshots>
         <enabled>false</enabled>
+      </snapshots>
+    </pluginRepository>
+    <pluginRepository>
+      <id>jboss-public-repository-group</id>
+      <name>JBoss Public Repository Group</name>
+      <url>https://repository.jboss.org/nexus/content/groups/public/</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
       </snapshots>
     </pluginRepository>
   </pluginRepositories>
