@@ -31,9 +31,6 @@ import org.junit.jupiter.api.parallel.ResourceLock;
 import java.io.File;
 import java.util.Collections;
 import java.util.List;
-import java.util.Properties;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static org.eclipse.jkube.integrationtests.Locks.CLUSTER_RESOURCE_INTENSIVE;
 import static org.eclipse.jkube.integrationtests.Tags.KUBERNETES;
@@ -81,9 +78,7 @@ class WildflyJarK8sITCase extends WildflyJar {
   @Test
   @Order(1)
   @DisplayName("k8s:build, should create image")
-  void k8sBuild() throws Exception {
-    // Given
-    workAroundForLocalMavenRepoIssue();
+    void k8sBuild() throws Exception {
     // When
     final InvocationResult invocationResult = maven("k8s:build");
     // Then

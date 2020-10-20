@@ -75,9 +75,7 @@ class WildflyJarOcITCase extends WildflyJar {
   @Order(1)
   @ResourceLock(value = CLUSTER_RESOURCE_INTENSIVE, mode = READ_WRITE)
   @DisplayName("oc:build, should create image")
-  void ocBuild() throws Exception {
-    // Given
-    workAroundForLocalMavenRepoIssue();
+    void ocBuild() throws Exception {
     // When
     final InvocationResult invocationResult = maven("oc:build");
     // Then
