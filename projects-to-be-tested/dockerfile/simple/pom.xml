@@ -35,7 +35,6 @@
   <properties>
     <java.version>11</java.version>
     <!-- TODO: Remove port related property once https://github.com/eclipse/jkube/issues/240 gets fixed -->
-    <jkube.enricher.jkube-service.port>8080</jkube.enricher.jkube-service.port>
     <jkube.enricher.jkube-service.type>NodePort</jkube.enricher.jkube-service.type>
   </properties>
 
