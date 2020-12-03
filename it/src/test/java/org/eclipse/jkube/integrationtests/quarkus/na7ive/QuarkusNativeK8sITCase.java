@@ -44,7 +44,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.anEmptyMap;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.hasSize;
@@ -53,7 +52,7 @@ import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 
 @Tag(KUBERNETES)
 @TestMethodOrder(OrderAnnotation.class)
-public class QuarkusNativeK8sITCase extends BaseMavenCase implements JKubeCase {
+class QuarkusNativeK8sITCase extends BaseMavenCase implements JKubeCase {
 
   static final String PROJECT_QUARKUS_NATIVE = "projects-to-be-tested/quarkus/native";
 
