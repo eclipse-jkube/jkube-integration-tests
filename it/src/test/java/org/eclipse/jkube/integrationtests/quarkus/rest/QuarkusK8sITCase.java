@@ -75,7 +75,7 @@ class QuarkusK8sITCase extends Quarkus {
     final InvocationResult invocationResult = maven("k8s:build");
     // Then
     assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
-    assertImageWasRecentlyBuilt("integration-tests", "quarkus-rest");
+    assertImageWasRecentlyBuilt("integration-tests", getApplication());
   }
 
   @Test
@@ -125,11 +125,21 @@ class QuarkusK8sITCase extends Quarkus {
       .assertContainers(hasItems(allOf(
         hasProperty("image", equalTo("integration-tests/quarkus-rest:latest")),
         hasProperty("name", equalTo("quarkus")),
-        hasProperty("ports", hasSize(1)),
-        hasProperty("ports", hasItems(allOf(
-          hasProperty("name", equalTo("http")),
-          hasProperty("containerPort", equalTo(8080))
-        )))
+        hasProperty("ports", hasSize(3)),
+        hasProperty("ports", hasItems(
+          allOf(
+            hasProperty("name", equalTo("http")),
+            hasProperty("containerPort", equalTo(8080))
+          ),
+          allOf(
+            hasProperty("name", equalTo("prometheus")),
+            hasProperty("containerPort", equalTo(9779))
+          ),
+          allOf(
+            hasProperty("name", equalTo("jolokia")),
+            hasProperty("containerPort", equalTo(8778))
+          )
+        ))
       )));
   }
 

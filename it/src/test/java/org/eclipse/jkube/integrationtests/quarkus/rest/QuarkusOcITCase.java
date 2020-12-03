@@ -15,6 +15,7 @@ package org.eclipse.jkube.integrationtests.quarkus.rest;
 
 import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClient;
+import io.fabric8.openshift.api.model.ImageStream;
 import io.fabric8.openshift.client.OpenShiftClient;
 import org.apache.maven.shared.invoker.InvocationResult;
 import org.hamcrest.Matchers;
@@ -29,18 +30,16 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.parallel.ResourceLock;
 
 import java.io.File;
-import java.util.Properties;
 
-import static org.eclipse.jkube.integrationtests.Hacks.hackToPreventNullPointerInRegistryServiceCreateAuthConfig;
 import static org.eclipse.jkube.integrationtests.Locks.CLUSTER_RESOURCE_INTENSIVE;
 import static org.eclipse.jkube.integrationtests.OpenShift.cleanUpCluster;
 import static org.eclipse.jkube.integrationtests.Tags.OPEN_SHIFT;
-import static org.eclipse.jkube.integrationtests.assertions.DockerAssertion.assertImageWasRecentlyBuilt;
 import static org.eclipse.jkube.integrationtests.assertions.YamlAssertion.yaml;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.anEmptyMap;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 
 @Tag(OPEN_SHIFT)
@@ -68,27 +67,24 @@ class QuarkusOcITCase extends Quarkus {
   @Test
   @Order(1)
   @ResourceLock(value = CLUSTER_RESOURCE_INTENSIVE, mode = READ_WRITE)
-  @DisplayName("oc:build, in docker mode, should create image")
+  @DisplayName("oc:build, should create image")
   void ocBuild() throws Exception {
     oc.imageStreams().delete();
-    // Given
-    hackToPreventNullPointerInRegistryServiceCreateAuthConfig("openjdk:11");
-    final Properties properties = properties("jkube.build.strategy", "docker"); // S2I doesn't support quarkus yet
     // When
-    final InvocationResult invocationResult = maven("oc:build", properties);
+    final InvocationResult invocationResult = maven("oc:build");
     // Then
     assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
-    assertImageWasRecentlyBuilt("172.30.1.1:5000/myproject", "quarkus-rest");
+    final ImageStream is = oc.imageStreams().withName(getApplication()).get();
+    assertThat(is, notNullValue());
+    assertThat(is.getStatus().getTags().iterator().next().getTag(), equalTo("latest"));
   }
 
   @Test
   @Order(1)
   @DisplayName("oc:resource, should create manifests")
   void ocResource() throws Exception {
-    // Given
-    final Properties properties = properties("jkube.build.strategy", "docker"); // S2I doesn't support quarkus yet
     // When
-    final InvocationResult invocationResult = maven("oc:resource", properties);
+    final InvocationResult invocationResult = maven("oc:resource");
     // Then
     assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
     final File metaInfDirectory = new File(
