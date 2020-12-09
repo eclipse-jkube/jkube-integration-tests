@@ -29,6 +29,7 @@ jobs:
   build-jKube:
     name: Build JKube
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Checkout
         uses: actions/checkout@v2.0.0
@@ -56,6 +57,7 @@ jobs:
     name: K8S
     needs: build-jKube
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
@@ -102,6 +104,7 @@ jobs:
     name: OpenShift
     needs: build-jKube
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
