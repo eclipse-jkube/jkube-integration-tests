@@ -34,7 +34,7 @@
     <apache.maven-failsafe-plugin.version>3.0.0-M4</apache.maven-failsafe-plugin.version>
     <apache.maven.maven-invoker.version>3.0.1</apache.maven.maven-invoker.version>
     <apache.commons-codec.version>1.15</apache.commons-codec.version>
-    <fabric8.kubernetes-client.version>4.10.3</fabric8.kubernetes-client.version>
+    <fabric8.kubernetes-client.version>4.13.0</fabric8.kubernetes-client.version>
     <jkube.version>1.1.0-SNAPSHOT</jkube.version>
     <com.fasterxml.jackson.core.version>2.11.0</com.fasterxml.jackson.core.version>
     <com.fasterxml.jackson.dataformat.yaml.version>2.11.0</com.fasterxml.jackson.dataformat.yaml.version>
