@@ -15,6 +15,7 @@ package org.eclipse.jkube.integrationtests.webapp.zeroconfig;
 
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.Service;
+import io.fabric8.kubernetes.api.model.ServiceBuilder;
 import org.eclipse.jkube.integrationtests.JKubeCase;
 import org.eclipse.jkube.integrationtests.maven.BaseMavenCase;
 
@@ -58,7 +59,7 @@ abstract class ZeroConfig extends BaseMavenCase implements JKubeCase {
     final Service serviceToUpdate = getKubernetesClient().services()
       .inNamespace(pod.getMetadata().getNamespace())
       .withName(getApplication())
-      .edit().editSpec().withType("NodePort").endSpec().done();
+      .edit(s -> new ServiceBuilder(s).editSpec().withType("NodePort").endSpec().build());
     final Service updatedService = getKubernetesClient().services()
       .inNamespace(serviceToUpdate.getMetadata().getNamespace())
       .withName(serviceToUpdate.getMetadata().getName())
