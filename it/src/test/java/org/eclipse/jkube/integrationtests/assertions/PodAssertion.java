@@ -13,10 +13,10 @@
  */
 package org.eclipse.jkube.integrationtests.assertions;
 
-import io.fabric8.kubernetes.api.model.DoneablePod;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.dsl.PodResource;
+import io.fabric8.openshift.api.model.DeploymentConfigBuilder;
 import io.fabric8.openshift.client.OpenShiftClient;
 import org.eclipse.jkube.integrationtests.JKubeCase;
 import org.eclipse.jkube.integrationtests.PodReadyWatcher;
@@ -81,7 +81,7 @@ public class PodAssertion extends KubernetesClientAssertion<Pod> {
     return this;
   }
 
-  private PodResource<Pod, DoneablePod> podResource() {
+  private PodResource<Pod> podResource() {
     return getKubernetesClient().pods()
       .inNamespace(getKubernetesResource().getMetadata().getNamespace())
       .withName(getKubernetesResource().getMetadata().getName());
@@ -104,9 +104,10 @@ public class PodAssertion extends KubernetesClientAssertion<Pod> {
         });
       final OpenShiftClient oc = jKubeCase.getKubernetesClient().adapt(OpenShiftClient.class);
       System.err.println("\n\n===========================\nRedeploying!");
-      oc.deploymentConfigs().withName(jKubeCase.getApplication()).edit().editSpec().editStrategy()
-        .withType("Recreate")
-        .endStrategy().endSpec().done();
+      oc.deploymentConfigs().withName(jKubeCase.getApplication()).edit(dc ->
+        new DeploymentConfigBuilder(dc).editSpec().editStrategy()
+          .withType("Recreate")
+          .endStrategy().endSpec().build());
       oc.deploymentConfigs().withName(jKubeCase.getApplication()).deployLatest();
       final Pod retriedPod = awaitPod(jKubeCase.getKubernetesClient(), jKubeCase.getApplication());
       printDiagnosis(jKubeCase);

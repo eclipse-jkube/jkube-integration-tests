@@ -16,6 +16,7 @@ package org.eclipse.jkube.integrationtests.assertions;
 import io.fabric8.kubernetes.api.model.Service;
 import io.fabric8.kubernetes.api.model.ServicePort;
 import io.fabric8.openshift.api.model.Route;
+import io.fabric8.openshift.api.model.RouteBuilder;
 import okhttp3.Response;
 import org.eclipse.jkube.integrationtests.JKubeCase;
 import org.hamcrest.Matcher;
@@ -133,10 +134,10 @@ public class ServiceAssertion extends KubernetesClientAssertion<Service> {
     getOpenShiftClient().routes()
       .inNamespace(getKubernetesResource().getMetadata().getNamespace())
       .withName(getKubernetesResource().getMetadata().getName())
-      .edit().editMetadata()
-      .addToAnnotations(OC_ROUTE_ANNOTATION_TIMEOUT, "30s")
-      .endMetadata()
-      .done();
+      .edit(r -> new RouteBuilder(r).editMetadata()
+        .addToAnnotations(OC_ROUTE_ANNOTATION_TIMEOUT, "30s")
+        .endMetadata()
+        .build());
   }
 
   private static boolean isNotLocal(String host) throws UnknownHostException {

@@ -14,8 +14,8 @@
 package org.eclipse.jkube.integrationtests;
 
 import io.fabric8.kubernetes.api.model.Pod;
-import io.fabric8.kubernetes.client.KubernetesClientException;
 import io.fabric8.kubernetes.client.Watcher;
+import io.fabric8.kubernetes.client.WatcherException;
 import io.fabric8.kubernetes.client.internal.readiness.Readiness;
 
 import java.util.Optional;
@@ -39,7 +39,7 @@ public class PodReadyWatcher implements Watcher<Pod> {
   }
 
   @Override
-  public void onClose(KubernetesClientException e) {
+  public void onClose(WatcherException e) {
 
   }
 
