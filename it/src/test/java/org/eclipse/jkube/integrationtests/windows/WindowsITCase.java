@@ -177,7 +177,8 @@ public class WindowsITCase extends BaseMavenCase {
   private static void assertHelm(File helmDirectory) {
     assertThat(helmDirectory.exists(), equalTo(true));
     assertThat(new File(helmDirectory, "Chart.yaml"), yaml(allOf(
-      aMapWithSize(3),
+      aMapWithSize(4),
+      hasEntry("apiVersion", "v1"),
       hasEntry("name", "windows"),
       hasEntry("description", "Windows Image Build")
     )));
