@@ -85,7 +85,8 @@ public class HelmConfigITCase extends BaseMavenCase {
     final File helmDirectory = new File(
       String.format("../%s/target/jkube/helm/This is the chart name/kubernetes", getProject()));
     assertThat(new File(helmDirectory, "Chart.yaml"), yaml(allOf(
-      aMapWithSize(8),
+      aMapWithSize(9),
+      hasEntry("apiVersion", "v1"),
       hasEntry("name", "This is the chart name"),
       hasEntry("version", "1.0-KUBERNETES"),
       hasEntry("description", "Description different to that in the pom.xml"),
@@ -121,7 +122,8 @@ public class HelmConfigITCase extends BaseMavenCase {
     final File helmDirectory = new File(
       String.format("../%s/target/jkube/helm/different-name-for-oc/openshift", getProject()));
     assertThat(new File(helmDirectory, "Chart.yaml"), yaml(allOf(
-      aMapWithSize(7),
+      aMapWithSize(8),
+      hasEntry("apiVersion", "v1"),
       hasEntry("name", "different-name-for-oc"),
       hasEntry("version", "0.1-OC"),
       hasEntry("description", "Spring Boot with Helm Config project"),
