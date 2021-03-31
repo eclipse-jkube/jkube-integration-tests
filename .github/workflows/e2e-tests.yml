@@ -19,14 +19,15 @@ on:
     branches:
       - main
   pull_request:
+  schedule:
+    - cron: '0 1 * * *' # Everyday at 1
 
 env:
   JKUBE_REPOSITORY: https://github.com/eclipse/jkube.git
   JKUBE_REVISION: master
-  JKUBE_DIR: jkube
 
 jobs:
-  build-jKube:
+  build-jkube:
     name: Build JKube
     runs-on: ubuntu-latest
     steps:
@@ -36,25 +37,26 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: '11'
-      - name: Cache .m2 registry
-        uses: actions/cache@v1
+      - name: Cache configuration
+        uses: actions/cache@v2
         with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}-${{ github.sha }}
-          restore-keys: ${{ runner.os }}-m2
+          path: |
+            ~/.m2/repository
+            ./jkube
+          key: cache-it-${{ github.run_id }}
       - name: Checkout JKube Repository
         run: |
-          git clone "$JKUBE_REPOSITORY" \
-          && cd $JKUBE_DIR \
-          && git checkout "$JKUBE_REVISION"
+          git clone "$JKUBE_REPOSITORY" --branch "$JKUBE_REVISION" jkube
       - name: Install JKube
-        run: cd $JKUBE_DIR && mvn -f pom.xml -B -DskipTests clean install && rm -rf $JKUBE_DIR
+        run: |
+          mvn -B -f "jkube/pom.xml" -DskipTests clean install
       - name: Install Integration Tests (Downloads dependencies)
-        run: ./mvnw -B -DskipTests clean install
+        run: |
+          ./mvnw -B -DskipTests clean install
 
   minikube:
     name: K8S
-    needs: build-jKube
+    needs: build-jkube
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -68,29 +70,23 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: '11'
-      - name: Restore cache for .m2 registry
-        uses: actions/cache@v1
+      - name: Cache configuration
+        uses: actions/cache@v2
         with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}-${{ github.sha }}
-          restore-keys: ${{ runner.os }}-m2
+          path: |
+            ~/.m2/repository
+            ./jkube
+          key: cache-it-${{ github.run_id }}
       - name: Setup Minikube-Kubernetes
-        uses: manusa/actions-setup-minikube@v2.0.1
+        uses: manusa/actions-setup-minikube@v2.3.1
         with:
           minikube version: v1.18.0
           kubernetes version: ${{ matrix.kubernetes }}
           github token: ${{ secrets.GITHUB_TOKEN }}
           start args: --force
-      - name: Checkout JKube Repository
-        run: |
-          git clone "$JKUBE_REPOSITORY" \
-          && cd $JKUBE_DIR \
-          && git checkout "$JKUBE_REVISION"
       - name: Install and Run Integration Tests
         run: |
-          cd $JKUBE_DIR \
-          && JKUBE_VERSION=$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec) \
-          && cd .. \
+          JKUBE_VERSION=$(./mvnw -q -f 'jkube/pom.xml' -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec) \
           && ./mvnw -B -PKubernetes,${{ matrix.suite }} clean verify -Djkube.version="$JKUBE_VERSION"
       - name: Save reports as artifact
         if: always()
@@ -98,10 +94,11 @@ jobs:
         with:
           name: Test reports (Minikube ${{ matrix.kubernetes }}-${{ matrix.suite }})
           path: ./it/target/jkube-test-report.txt
+
   openshift:
     name: OpenShift
-    needs: build-jKube
-    runs-on: ubuntu-latest
+    needs: build-jkube
+    runs-on: ubuntu-18.04
     strategy:
       fail-fast: false
       matrix:
@@ -136,27 +133,21 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: '11'
-      - name: Restore cache for .m2 registry
-        uses: actions/cache@v1
+      - name: Cache configuration
+        uses: actions/cache@v2
         with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}-${{ github.sha }}
-          restore-keys: ${{ runner.os }}-m2
+          path: |
+            ~/.m2/repository
+            ./jkube
+          key: cache-it-${{ github.run_id }}
       - name: Setup OpenShift
         uses: manusa/actions-setup-openshift@v1.1.2
         with:
           oc version: ${{ matrix.openshift }}
           github token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Checkout JKube Repository
-        run: |
-          git clone "$JKUBE_REPOSITORY" \
-          && cd $JKUBE_DIR \
-          && git checkout "$JKUBE_REVISION"
       - name: Install and Run Integration Tests
         run: |
-          cd $JKUBE_DIR \
-          && JKUBE_VERSION=$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec) \
-          && cd .. \
+          JKUBE_VERSION=$(./mvnw -q -f 'jkube/pom.xml' -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec) \
           && ./mvnw -B -POpenShift,${{ matrix.suite }} verify -Djkube.version="$JKUBE_VERSION" -Djunit.jupiter.execution.parallel.config.fixed.parallelism=4
       - name: Save reports as artifact
         if: always()
