@@ -19,6 +19,8 @@ on:
     branches:
       - main
   pull_request:
+  schedule:
+    - cron: '0 1 * * *' # Everyday at 1
 
 env:
   JKUBE_REPOSITORY: https://github.com/eclipse/jkube.git
