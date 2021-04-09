@@ -53,7 +53,8 @@ jobs:
           mvn -B -f "jkube/pom.xml" -DskipTests clean install
       - name: Install Integration Tests (Downloads dependencies)
         run: |
-          ./mvnw -B -DskipTests clean install
+          ./mvnw -B -DskipTests clean install \
+          && ./mvnw -B -DskipTests clean  -P'quarkus','quarkus-native','springboot','webapp','other','dockerfile'
 
   minikube:
     name: K8S
