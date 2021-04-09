@@ -46,7 +46,8 @@ jobs:
           key: cache-it-${{ github.run_id }}
       - name: Checkout JKube Repository
         run: |
-          git clone "$JKUBE_REPOSITORY" --branch "$JKUBE_REVISION" jkube
+          rm -rf jkube \
+          && git clone "$JKUBE_REPOSITORY" --branch "$JKUBE_REVISION" jkube
       - name: Install JKube
         run: |
           mvn -B -f "jkube/pom.xml" -DskipTests clean install
@@ -62,7 +63,7 @@ jobs:
       fail-fast: false
       matrix:
         kubernetes: [v1.12.0,v1.20.1]
-        suite: ['quarkus','quarkus-native','springboot','webapp','other', 'dockerfile']
+        suite: ['quarkus','quarkus-native','springboot','webapp','other','dockerfile']
     steps:
       - name: Checkout
         uses: actions/checkout@v2.0.0
