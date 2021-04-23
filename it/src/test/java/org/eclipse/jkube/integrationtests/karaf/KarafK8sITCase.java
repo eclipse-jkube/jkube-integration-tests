@@ -110,18 +110,24 @@ class KarafK8sITCase extends Karaf {
       .assertContainers(hasItems(allOf(
         hasProperty("image", equalTo("integration-tests/karaf-camel-log:latest")),
         hasProperty("name", equalTo("karaf")),
-        hasProperty("ports", hasSize(1)),
-        hasProperty("ports", hasItems(allOf(
-          hasProperty("name", equalTo("intermapper")),
-          hasProperty("containerPort", equalTo(8181))
-        )))
+        hasProperty("ports", hasSize(2)),
+        hasProperty("ports", hasItems(
+          allOf(
+            hasProperty("name", equalTo("intermapper")),
+            hasProperty("containerPort", equalTo(8181))
+          ),
+          allOf(
+            hasProperty("name", equalTo("jolokia")),
+            hasProperty("containerPort", equalTo(8778))
+          )
+        ))
       )));
   }
 
   @Test
   @Order(3)
   @DisplayName("k8s:log")
-  void k8sLog() throws  Exception{
+  void k8sLog() throws  Exception {
     //When
     final MavenInvocationResult invocationResult = maven("k8s:log", properties("jkube.log.follow", "false"));
     //Then
