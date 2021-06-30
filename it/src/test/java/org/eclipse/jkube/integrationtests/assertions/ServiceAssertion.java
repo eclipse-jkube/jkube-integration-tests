@@ -60,7 +60,7 @@ public class ServiceAssertion extends KubernetesClientAssertion<Service> {
     final Service service = jKubeCase.getKubernetesClient().services()
       .inNamespace(namespace)
       .withName(jKubeCase.getApplication())
-      .waitUntilCondition(Objects::nonNull, DEFAULT_AWAIT_TIME_SECONDS, TimeUnit.SECONDS);
+      .waitUntilReady(DEFAULT_AWAIT_TIME_SECONDS, TimeUnit.SECONDS);
     assertThat(service, notNullValue());
     assertLabels(jKubeCase).assertStandardLabels(service.getMetadata()::getLabels);
     assertLabels(jKubeCase).assertStandardLabels(service.getSpec()::getSelector);
