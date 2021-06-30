@@ -41,7 +41,7 @@
     <junit.version>5.6.2</junit.version>
     <license-maven-plugin.version>3.0</license-maven-plugin.version>
     <hamcrest.version>2.0.0.0</hamcrest.version>
-    <quarkus.version>1.8.3.Final</quarkus.version>
+    <quarkus.version>2.0.0.Final</quarkus.version>
     <spring-boot.version>2.3.1.RELEASE</spring-boot.version>
     <thorntail.version>2.5.0.Final</thorntail.version>
     <vertx.version>3.9.1</vertx.version>
