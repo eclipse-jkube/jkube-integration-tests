@@ -35,9 +35,10 @@ public class LabelAssertion {
     return new LabelAssertion(jKubeCase);
   }
 
-  public void assertStandardLabels(Supplier<Map<String, String>> labelSupplier) {
+  public LabelAssertion assertStandardLabels(Supplier<Map<String, String>> labelSupplier) {
     assertGlobalLabels(labelSupplier);
     assertLabels(labelSupplier, hasEntry("app", jKubeCase.getApplication()));
+    return this;
   }
 
   public static void assertGlobalLabels(Supplier<Map<String, String>> labelSupplier) {
