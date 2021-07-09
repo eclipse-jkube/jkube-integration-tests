@@ -26,40 +26,41 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ForkJoinPool;
 
 import static org.eclipse.jkube.integrationtests.cli.CliUtils.runCommand;
 
 public class KubernetesClientAssertion<T extends KubernetesResource> {
 
   static final long DEFAULT_AWAIT_TIME_SECONDS = 45L;
-  static final Duration CONNECT_TIMEOUT = Duration.of(30L, ChronoUnit.SECONDS);
-  static final Duration READ_TIMEOUT = Duration.of(90L, ChronoUnit.SECONDS);
-  private static final int MAX_RETIRES = 5;
+  static final Duration CONNECT_TIMEOUT = Duration.of(10L, ChronoUnit.SECONDS);
+  static final Duration READ_TIMEOUT = Duration.of(30L, ChronoUnit.SECONDS);
 
-  private static OkHttpClient okHttpClient;
-
-  synchronized static OkHttpClient httpClient() {
-    if (okHttpClient == null) {
-      okHttpClient = new OkHttpClient.Builder()
-        .retryOnConnectionFailure(true)
-        .connectTimeout(CONNECT_TIMEOUT)
-        .readTimeout(READ_TIMEOUT)
-        .build();
-    }
-    return okHttpClient;
+  private static class OkHttpClientHolder {
+    private static final OkHttpClient INSTANCE = new OkHttpClient.Builder()
+      .retryOnConnectionFailure(true)
+      .connectTimeout(CONNECT_TIMEOUT)
+      .readTimeout(READ_TIMEOUT)
+      .build();
+  }
+  private static OkHttpClient httpClient() {
+    return OkHttpClientHolder.INSTANCE;
   }
 
-  static Response getWithRetry(String url) throws IOException {
-    IOException exception = null;
-    int attempt = 0;
-    while (attempt++ < MAX_RETIRES) {
-      try {
-        return httpClient().newCall(new Request.Builder().get().url(url).build()).execute();
-      } catch (IOException e) {
-        exception = e;
+  static CompletableFuture<Response> getWithRetry(String url) {
+    final var response = new CompletableFuture<Response>();
+    ForkJoinPool.commonPool().execute(() -> {
+      while (true) {
+        try {
+          response.complete(httpClient().newCall(new Request.Builder().get().url(url).build()).execute());
+          break;
+        } catch (IOException e) {
+          // IGNORE
+        }
       }
-    }
-    throw exception;
+    });
+    return response;
   }
 
   private final JKubeCase jKubeCase;

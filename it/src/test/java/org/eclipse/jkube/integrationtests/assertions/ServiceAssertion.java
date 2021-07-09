@@ -62,8 +62,9 @@ public class ServiceAssertion extends KubernetesClientAssertion<Service> {
       .withName(jKubeCase.getApplication())
       .waitUntilReady(DEFAULT_AWAIT_TIME_SECONDS, TimeUnit.SECONDS);
     assertThat(service, notNullValue());
-    assertLabels(jKubeCase).assertStandardLabels(service.getMetadata()::getLabels);
-    assertLabels(jKubeCase).assertStandardLabels(service.getSpec()::getSelector);
+    assertLabels(jKubeCase)
+      .assertStandardLabels(service.getMetadata()::getLabels)
+      .assertStandardLabels(service.getSpec()::getSelector);
     return assertService(service).apply(jKubeCase);
   }
 
@@ -111,13 +112,14 @@ public class ServiceAssertion extends KubernetesClientAssertion<Service> {
     } else {
       host = String.format("%s:%s", clusterHost, port.getNodePort());
     }
-    final Response response = getWithRetry(String.format("http://%s/%s", host, String.join("/", path)));
+    final Response response = getWithRetry(String.format("http://%s/%s", host, String.join("/", path)))
+      .get(KubernetesClientAssertion.DEFAULT_AWAIT_TIME_SECONDS, TimeUnit.SECONDS);
     assertThat(response.body(), notNullValue());
     assertThat(response.body().string(), responseBodyMatcher);
     return this;
   }
 
-  private String openShiftRouteHost() throws Exception {
+  private String openShiftRouteHost() {
     openShiftRouteIncreaseTimeout();
     final Route route = getOpenShiftClient().routes()
       .inNamespace(getKubernetesResource().getMetadata().getNamespace())

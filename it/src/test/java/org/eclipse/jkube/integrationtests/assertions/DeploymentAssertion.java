@@ -49,9 +49,10 @@ public class DeploymentAssertion extends KubernetesClientAssertion<Deployment> {
       .withName(jKubeCase.getApplication())
       .waitUntilCondition(Objects::nonNull, DEFAULT_AWAIT_TIME_SECONDS, TimeUnit.SECONDS);
     assertThat(deployment, notNullValue());
-    assertLabels(jKubeCase).assertStandardLabels(deployment.getMetadata()::getLabels);
-    assertLabels(jKubeCase).assertStandardLabels(deployment.getSpec().getSelector()::getMatchLabels);
-    assertLabels(jKubeCase).assertStandardLabels(deployment.getSpec().getTemplate().getMetadata()::getLabels);
+    assertLabels(jKubeCase)
+      .assertStandardLabels(deployment.getMetadata()::getLabels)
+      .assertStandardLabels(deployment.getSpec().getSelector()::getMatchLabels)
+      .assertStandardLabels(deployment.getSpec().getTemplate().getMetadata()::getLabels);
     return assertDeployment(deployment).apply(jKubeCase);
   }
 

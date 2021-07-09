@@ -16,6 +16,7 @@ package org.eclipse.jkube.integrationtests.webapp.zeroconfig;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.Service;
 import io.fabric8.kubernetes.api.model.ServiceBuilder;
+import io.fabric8.kubernetes.client.dsl.ServiceResource;
 import org.eclipse.jkube.integrationtests.JKubeCase;
 import org.eclipse.jkube.integrationtests.maven.BaseMavenCase;
 
@@ -56,17 +57,19 @@ abstract class ZeroConfig extends BaseMavenCase implements JKubeCase {
   @SuppressWarnings("squid:S2925")
   final Service serviceSpecTypeToNodePort() throws InterruptedException, IOException {
     final Pod pod = awaitPod(this).getKubernetesResource();
-    final Service serviceToUpdate = getKubernetesClient().services()
-      .inNamespace(pod.getMetadata().getNamespace())
-      .withName(getApplication())
+    final Service serviceToUpdate = service(pod.getMetadata().getNamespace())
       .edit(s -> new ServiceBuilder(s).editSpec().withType("NodePort").endSpec().build());
-    final Service updatedService = getKubernetesClient().services()
-      .inNamespace(serviceToUpdate.getMetadata().getNamespace())
-      .withName(serviceToUpdate.getMetadata().getName())
+    service(serviceToUpdate.getMetadata().getNamespace())
+      .waitUntilReady(10, TimeUnit.SECONDS);
+    final Service updatedService = service(serviceToUpdate.getMetadata().getNamespace())
       .waitUntilCondition(s -> s.getSpec().getType().equals("NodePort"), 10, TimeUnit.SECONDS);
     final long throttleMilliseconds = 500L;
     Thread.sleep(throttleMilliseconds);
     return updatedService;
+  }
+
+  private ServiceResource<Service> service(String namespace) {
+    return getKubernetesClient().services().inNamespace(namespace).withName(getApplication());
   }
 
   final void assertLog(String log) {
