@@ -21,7 +21,6 @@ import okhttp3.Response;
 import org.apache.maven.shared.invoker.InvocationResult;
 import org.eclipse.jkube.integrationtests.docker.RegistryExtension;
 import org.eclipse.jkube.integrationtests.maven.MavenInvocationResult;
-import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -39,6 +38,7 @@ import java.util.List;
 
 import static org.eclipse.jkube.integrationtests.Locks.CLUSTER_RESOURCE_INTENSIVE;
 import static org.eclipse.jkube.integrationtests.Tags.KUBERNETES;
+import static org.eclipse.jkube.integrationtests.assertions.InvocationResultAssertion.assertInvocation;
 import static org.eclipse.jkube.integrationtests.assertions.YamlAssertion.yaml;
 import static org.eclipse.jkube.integrationtests.docker.DockerUtils.loadTar;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -89,7 +89,7 @@ public class CompleteK8sJibITCase extends Complete {
     // When
     final InvocationResult invocationResult = maven("k8s:resource");
     // Then
-    assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
+    assertInvocation(invocationResult);
     final File metaInfDirectory = new File(
       String.format("../%s/target/classes/META-INF", getProject()));
     assertThat(metaInfDirectory.exists(), equalTo(true));
@@ -105,7 +105,7 @@ public class CompleteK8sJibITCase extends Complete {
     // When
     final MavenInvocationResult invocationResult = maven("k8s:build");
     // Then
-    assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
+    assertInvocation(invocationResult);
     assertThat(invocationResult.getStdOut(), stringContainsInOrder(
       "JIB image build started",
       "JIB> [==============================] 100.0% complete",
@@ -120,7 +120,7 @@ public class CompleteK8sJibITCase extends Complete {
     // When
     final MavenInvocationResult invocationResult = maven("k8s:push");
     // Then
-    assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
+    assertInvocation(invocationResult);
     assertThat(invocationResult.getStdOut(), containsString("JIB> [==============================] 100.0% complete"));
     final Response response = new OkHttpClient.Builder().build().newCall(new Request.Builder()
       .get().url("http://localhost:5000/v2/sb/sb-complete/tags/list").build())
@@ -141,7 +141,7 @@ public class CompleteK8sJibITCase extends Complete {
     // When
     final InvocationResult invocationResult = maven("k8s:apply");
     // Then
-    assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
+    assertInvocation(invocationResult);
     assertThatShouldApplyResources()
       .assertNodePortResponse("us-cli", containsString("hello"), "jkube", "hello");
   }
@@ -153,7 +153,7 @@ public class CompleteK8sJibITCase extends Complete {
     // When
     final InvocationResult invocationResult = maven("k8s:undeploy");
     // Then
-    assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
+    assertInvocation(invocationResult);
     assertThatShouldDeleteAllAppliedResources(this);
     assertDeploymentDeleted(this);
   }

@@ -18,7 +18,6 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.apache.maven.shared.invoker.InvocationResult;
 import org.apache.maven.shared.invoker.MavenInvocationException;
 import org.eclipse.jkube.integrationtests.maven.BaseMavenCase;
-import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
@@ -35,6 +34,7 @@ import java.util.stream.Stream;
 
 import static org.eclipse.jkube.integrationtests.Tags.KUBERNETES;
 import static org.eclipse.jkube.integrationtests.Tags.OPEN_SHIFT;
+import static org.eclipse.jkube.integrationtests.assertions.InvocationResultAssertion.assertInvocation;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasEntry;
@@ -64,7 +64,7 @@ class MultiProfileITCase extends BaseMavenCase {
     // When
     final InvocationResult invocationResult = maven("k8s:resource");
     // Then
-    assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
+    assertInvocation(invocationResult);
     assertPort("jkube/kubernetes.yml", 8081);
   }
 
@@ -75,7 +75,7 @@ class MultiProfileITCase extends BaseMavenCase {
     // When
     final InvocationResult invocationResult = maven("oc:resource");
     // Then
-    assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
+    assertInvocation(invocationResult);
     assertPort("jkube/openshift.yml", 8081);
   }
 
@@ -86,7 +86,7 @@ class MultiProfileITCase extends BaseMavenCase {
     // When
     final InvocationResult invocationResult = maven("k8s:resource", "Production");
     // Then
-    assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
+    assertInvocation(invocationResult);
     assertPort("jkube/kubernetes.yml", 8080);
   }
 
@@ -97,7 +97,7 @@ class MultiProfileITCase extends BaseMavenCase {
     // When
     final InvocationResult invocationResult = maven("oc:resource", "Production");
     // Then
-    assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
+    assertInvocation(invocationResult);
     assertPort("jkube/openshift.yml", 8080);
   }
 

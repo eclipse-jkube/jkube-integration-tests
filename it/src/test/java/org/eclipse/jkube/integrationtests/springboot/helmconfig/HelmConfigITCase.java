@@ -15,7 +15,6 @@ package org.eclipse.jkube.integrationtests.springboot.helmconfig;
 
 import org.apache.maven.shared.invoker.InvocationResult;
 import org.eclipse.jkube.integrationtests.maven.BaseMavenCase;
-import org.hamcrest.Matchers;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -27,6 +26,7 @@ import java.io.File;
 
 import static org.eclipse.jkube.integrationtests.Tags.KUBERNETES;
 import static org.eclipse.jkube.integrationtests.Tags.OPEN_SHIFT;
+import static org.eclipse.jkube.integrationtests.assertions.InvocationResultAssertion.assertInvocation;
 import static org.eclipse.jkube.integrationtests.assertions.YamlAssertion.yaml;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.aMapWithSize;
@@ -57,7 +57,7 @@ public class HelmConfigITCase extends BaseMavenCase {
     // When
     final InvocationResult invocationResult = maven("k8s:resource");
     // Then
-    assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
+    assertInvocation(invocationResult);
   }
 
   @Test
@@ -68,7 +68,7 @@ public class HelmConfigITCase extends BaseMavenCase {
     // When
     final InvocationResult invocationResult = maven("oc:resource");
     // Then
-    assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
+    assertInvocation(invocationResult);
   }
 
   @Test
@@ -79,7 +79,7 @@ public class HelmConfigITCase extends BaseMavenCase {
     // When
     final InvocationResult invocationResult = maven("k8s:helm");
     // Then
-    assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
+    assertInvocation(invocationResult);
     assertThat(new File(String.format("../%s/target/This is the chart name-1.0-KUBERNETES-helm.tar", getProject()))
       .exists(), equalTo(true));
     final File helmDirectory = new File(
@@ -116,7 +116,7 @@ public class HelmConfigITCase extends BaseMavenCase {
     // When
     final InvocationResult invocationResult = maven("oc:helm");
     // Then
-    assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
+    assertInvocation(invocationResult);
     assertThat(new File(String.format("../%s/target/different-name-for-oc-0.1-OC-helmshift.zip", getProject()))
       .exists(), equalTo(true));
     final File helmDirectory = new File(

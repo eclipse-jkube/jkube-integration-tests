@@ -24,8 +24,9 @@ import org.hamcrest.Matcher;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
@@ -112,8 +113,10 @@ public class ServiceAssertion extends KubernetesClientAssertion<Service> {
     } else {
       host = String.format("%s:%s", clusterHost, port.getNodePort());
     }
-    final Response response = getWithRetry(String.format("http://%s/%s", host, String.join("/", path)))
+    final ExecutorService executor = Executors.newSingleThreadExecutor();
+    final Response response = getWithRetry(executor, String.format("http://%s/%s", host, String.join("/", path)))
       .get(KubernetesClientAssertion.DEFAULT_AWAIT_TIME_SECONDS, TimeUnit.SECONDS);
+    executor.shutdownNow();
     assertThat(response.body(), notNullValue());
     assertThat(response.body().string(), responseBodyMatcher);
     return this;
