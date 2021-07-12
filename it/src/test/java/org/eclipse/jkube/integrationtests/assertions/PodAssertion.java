@@ -15,6 +15,7 @@ package org.eclipse.jkube.integrationtests.assertions;
 
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.client.KubernetesClient;
+import io.fabric8.kubernetes.client.Watch;
 import io.fabric8.kubernetes.client.dsl.PodResource;
 import io.fabric8.openshift.api.model.DeploymentConfigBuilder;
 import io.fabric8.openshift.client.OpenShiftClient;
@@ -46,8 +47,6 @@ public class PodAssertion extends KubernetesClientAssertion<Pod> {
   }
 
   public static PodAssertion awaitPod(JKubeCase jKubeCase) throws InterruptedException, IOException {
-    final PodReadyWatcher podWatcher = new PodReadyWatcher();
-    jKubeCase.getKubernetesClient().pods().withLabel("app", jKubeCase.getApplication()).watch(podWatcher);
     Pod pod = awaitPod(jKubeCase.getKubernetesClient(), jKubeCase.getApplication());
     if (pod == null) {
       printDiagnosis(jKubeCase);
@@ -89,8 +88,9 @@ public class PodAssertion extends KubernetesClientAssertion<Pod> {
 
   private static Pod awaitPod(KubernetesClient kc,String appId) throws InterruptedException {
     final PodReadyWatcher podWatcher = new PodReadyWatcher();
-    kc.pods().withLabel("app", appId).watch(podWatcher);
-    return podWatcher.await(DEFAULT_AWAIT_TIME_SECONDS, TimeUnit.SECONDS);
+    try(Watch ignored = kc.pods().withLabel("app", appId).watch(podWatcher)) {
+      return podWatcher.await(DEFAULT_AWAIT_TIME_SECONDS, TimeUnit.SECONDS);
+    }
   }
 
   private static Pod retryDeployment(JKubeCase jKubeCase) throws InterruptedException, IOException {

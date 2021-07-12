@@ -18,7 +18,6 @@ import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.openshift.api.model.ImageStream;
 import io.fabric8.openshift.client.OpenShiftClient;
 import org.apache.maven.shared.invoker.InvocationResult;
-import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -36,6 +35,7 @@ import java.util.List;
 import static org.eclipse.jkube.integrationtests.Locks.CLUSTER_RESOURCE_INTENSIVE;
 import static org.eclipse.jkube.integrationtests.OpenShift.cleanUpCluster;
 import static org.eclipse.jkube.integrationtests.Tags.OPEN_SHIFT;
+import static org.eclipse.jkube.integrationtests.assertions.InvocationResultAssertion.assertInvocation;
 import static org.eclipse.jkube.integrationtests.assertions.YamlAssertion.yaml;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.anEmptyMap;
@@ -79,7 +79,7 @@ class ThorntailOcITCase extends Thorntail {
     // When
     final InvocationResult invocationResult = maven("oc:build");
     // Then
-    assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
+    assertInvocation(invocationResult);
     final ImageStream is = oc.imageStreams().withName("thorntail-microprofile").get();
     assertThat(is, notNullValue());
     assertThat(is.getStatus().getTags().iterator().next().getTag(), equalTo("latest"));
@@ -92,7 +92,7 @@ class ThorntailOcITCase extends Thorntail {
     // When
     final InvocationResult invocationResult = maven("clean oc:resource"); //Clean to free up DiskSpace
     // Then
-    assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
+    assertInvocation(invocationResult);
     final File metaInfDirectory = new File(
       String.format("../%s/target/classes/META-INF", PROJECT_THORNTAIL));
     assertThat(metaInfDirectory.exists(), equalTo(true));
@@ -110,7 +110,7 @@ class ThorntailOcITCase extends Thorntail {
     // When
     final InvocationResult invocationResult = maven("oc:apply");
     // Then
-    assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
+    assertInvocation(invocationResult);
     assertThatShouldApplyResources();
   }
 
@@ -121,7 +121,7 @@ class ThorntailOcITCase extends Thorntail {
     // When
     final InvocationResult invocationResult = maven("oc:undeploy");
     // Then
-    assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
+    assertInvocation(invocationResult);
     assertThatShouldDeleteAllAppliedResources(this);
     cleanUpCluster(oc, this);
   }

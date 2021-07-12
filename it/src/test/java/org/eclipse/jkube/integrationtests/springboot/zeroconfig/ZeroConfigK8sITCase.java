@@ -22,7 +22,6 @@ import okhttp3.Response;
 import org.apache.maven.shared.invoker.InvocationResult;
 import org.eclipse.jkube.integrationtests.docker.RegistryExtension;
 import org.eclipse.jkube.integrationtests.maven.MavenInvocationResult;
-import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -41,6 +40,7 @@ import static org.eclipse.jkube.integrationtests.Locks.CLUSTER_RESOURCE_INTENSIV
 import static org.eclipse.jkube.integrationtests.Tags.KUBERNETES;
 import static org.eclipse.jkube.integrationtests.assertions.DeploymentAssertion.awaitDeployment;
 import static org.eclipse.jkube.integrationtests.assertions.DockerAssertion.assertImageWasRecentlyBuilt;
+import static org.eclipse.jkube.integrationtests.assertions.InvocationResultAssertion.assertInvocation;
 import static org.eclipse.jkube.integrationtests.assertions.YamlAssertion.yaml;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
@@ -84,7 +84,7 @@ class ZeroConfigK8sITCase extends ZeroConfig {
     // When
     final InvocationResult invocationResult = maven("k8s:build");
     // Then
-    assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
+    assertInvocation(invocationResult);
     assertImageWasRecentlyBuilt("integration-tests", "spring-boot-zero-config");
   }
 
@@ -97,7 +97,7 @@ class ZeroConfigK8sITCase extends ZeroConfig {
     // When
     final InvocationResult invocationResult = maven("k8s:push", properties);
     // Then
-    assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
+    assertInvocation(invocationResult);
     final Response response = new OkHttpClient.Builder().build().newCall(new Request.Builder()
       .get().url("http://localhost:5000/v2/integration-tests/spring-boot-zero-config/tags/list").build())
       .execute();
@@ -112,7 +112,7 @@ class ZeroConfigK8sITCase extends ZeroConfig {
     // When
     final InvocationResult invocationResult = maven("k8s:resource");
     // Then
-    assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
+    assertInvocation(invocationResult);
     final File metaInfDirectory = new File(
         String.format("../%s/target/classes/META-INF", getProject()));
     assertThat(metaInfDirectory.exists(), equalTo(true));
@@ -128,7 +128,7 @@ class ZeroConfigK8sITCase extends ZeroConfig {
     // When
     final InvocationResult invocationResult = maven("k8s:helm");
     // Then
-    assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
+    assertInvocation(invocationResult);
     assertThat( new File(String.format("../%s/target/%s-0.0.0-SNAPSHOT-helm.tar.gz", getProject(), getApplication()))
       .exists(), equalTo(true));
     final File helmDirectory = new File(
@@ -146,7 +146,7 @@ class ZeroConfigK8sITCase extends ZeroConfig {
     // When
     final InvocationResult invocationResult = maven("k8s:apply");
     // Then
-    assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
+    assertInvocation(invocationResult);
     final Pod pod = assertThatShouldApplyResources();
     awaitDeployment(this, pod.getMetadata().getNamespace())
       .assertReplicas(equalTo(1))
@@ -169,7 +169,7 @@ class ZeroConfigK8sITCase extends ZeroConfig {
     // When
     final MavenInvocationResult invocationResult = maven("k8s:log", properties("jkube.log.follow", "false"));
     // Then
-    assertThat(invocationResult.getExitCode(), equalTo(0));
+    assertInvocation(invocationResult);
     assertThat(invocationResult.getStdOut(),
       stringContainsInOrder("Tomcat started on port(s): 8080", "Started ZeroConfigApplication in", "seconds"));
   }
@@ -181,7 +181,7 @@ class ZeroConfigK8sITCase extends ZeroConfig {
     // When
     final InvocationResult invocationResult = maven("k8s:undeploy");
     // Then
-    assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
+    assertInvocation(invocationResult);
     assertThatShouldDeleteAllAppliedResources(this);
     assertDeploymentDeleted(this);
   }

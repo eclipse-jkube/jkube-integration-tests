@@ -34,6 +34,7 @@ import java.io.File;
 import static org.eclipse.jkube.integrationtests.Locks.CLUSTER_RESOURCE_INTENSIVE;
 import static org.eclipse.jkube.integrationtests.OpenShift.cleanUpCluster;
 import static org.eclipse.jkube.integrationtests.Tags.OPEN_SHIFT;
+import static org.eclipse.jkube.integrationtests.assertions.InvocationResultAssertion.assertInvocation;
 import static org.eclipse.jkube.integrationtests.assertions.YamlAssertion.yaml;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.anEmptyMap;
@@ -67,7 +68,7 @@ class WildFlyOcITCase extends WildFly {
     //When
     final InvocationResult invocationResult = maven("oc:build");
     //Then
-    assertThat(invocationResult.getExitCode(), equalTo(0));
+    assertInvocation(invocationResult);
     final ImageStream is = oc.imageStreams().withName(getApplication()).get();
     assertThat(is, notNullValue());
     assertThat(is.getStatus().getTags().iterator().next().getTag(), equalTo("latest"));
@@ -80,7 +81,7 @@ class WildFlyOcITCase extends WildFly {
     //When
     final InvocationResult invocationResult = maven("oc:resource");
     //Then
-    assertThat(invocationResult.getExitCode(), equalTo(0));
+    assertInvocation(invocationResult);
     final File metaInfDirectory = new File(String.format("../%s/target/classes/META-INF", PROJECT_WILDFLY));
     assertThat(metaInfDirectory.exists(), equalTo(true));
     assertListResource(new File(metaInfDirectory, "/jkube/openshift.yml"));
@@ -97,7 +98,7 @@ class WildFlyOcITCase extends WildFly {
     //When
     final InvocationResult invocationResult = maven("oc:apply");
     //Then
-    assertThat(invocationResult.getExitCode(), equalTo(0));
+    assertInvocation(invocationResult);
     assertThatShouldApplyResources();
   }
 
@@ -108,7 +109,7 @@ class WildFlyOcITCase extends WildFly {
     // When
     final MavenInvocationResult invocationResult = maven("oc:log", properties("jkube.log.follow", "false"));
     // Then
-    assertThat(invocationResult.getExitCode(), equalTo(0));
+    assertInvocation(invocationResult);
     assertThat(invocationResult.getStdOut(), stringContainsInOrder(
       "Running wildfly/wildfly-centos7 image", "JBoss Bootstrap Environment", "Deployed \"ROOT.war\"")
     );
@@ -121,7 +122,7 @@ class WildFlyOcITCase extends WildFly {
     //When
     final InvocationResult invocationResult = maven("oc:undeploy");
     //Then
-    assertThat(invocationResult.getExitCode(), equalTo(0));
+    assertInvocation(invocationResult);
     assertThatShouldDeleteAllAppliedResources(this);
     cleanUpCluster(oc, this);
   }

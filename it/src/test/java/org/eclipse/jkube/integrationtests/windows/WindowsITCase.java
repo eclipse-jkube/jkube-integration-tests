@@ -21,7 +21,6 @@ import org.apache.maven.shared.invoker.MavenInvocationException;
 import org.eclipse.jkube.integrationtests.docker.RegistryExtension;
 import org.eclipse.jkube.integrationtests.maven.BaseMavenCase;
 import org.eclipse.jkube.integrationtests.maven.MavenInvocationResult;
-import org.hamcrest.Matchers;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -40,6 +39,7 @@ import java.util.regex.Pattern;
 
 import static org.eclipse.jkube.integrationtests.Tags.WINDOWS;
 import static org.eclipse.jkube.integrationtests.assertions.DockerAssertion.assertImageWasRecentlyBuilt;
+import static org.eclipse.jkube.integrationtests.assertions.InvocationResultAssertion.assertInvocation;
 import static org.eclipse.jkube.integrationtests.assertions.YamlAssertion.yaml;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.aMapWithSize;
@@ -69,7 +69,7 @@ public class WindowsITCase extends BaseMavenCase {
     // When
     final InvocationResult invocationResult = maven("k8s:build");
     // Then
-    assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
+    assertInvocation(invocationResult);
     assertImageWasRecentlyBuilt("integration-tests","windows");
     final File dockerDirectory = new File(
       String.format("..\\%s\\target\\docker\\integration-tests\\windows\\latest", getProject()));
@@ -94,7 +94,7 @@ public class WindowsITCase extends BaseMavenCase {
     // When
     final InvocationResult invocationResult = maven("k8s:push", properties);
     // Then
-    assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
+    assertInvocation(invocationResult);
     final Response response = new OkHttpClient.Builder().build().newCall(new Request.Builder()
       .get().url("http://localhost:5000/v2/integration-tests/windows/tags/list").build())
       .execute();
@@ -109,7 +109,7 @@ public class WindowsITCase extends BaseMavenCase {
     // When
     final InvocationResult invocationResult = maven("k8s:resource");
     // Then
-    assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
+    assertInvocation(invocationResult);
     final File metaInfDirectory = new File(
       String.format("..\\%s\\target\\classes\\META-INF", getProject()));
     assertThat(metaInfDirectory.exists(), equalTo(true));
@@ -125,7 +125,7 @@ public class WindowsITCase extends BaseMavenCase {
     // When
     final InvocationResult invocationResult = maven("oc:resource");
     // Then
-    assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
+    assertInvocation(invocationResult);
     final File metaInfDirectory = new File(
       String.format("..\\%s\\target\\classes\\META-INF", getProject()));
     assertThat(metaInfDirectory.exists(), equalTo(true));
@@ -142,7 +142,7 @@ public class WindowsITCase extends BaseMavenCase {
     // When
     final InvocationResult invocationResult = maven("k8s:helm");
     // Then
-    assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
+    assertInvocation(invocationResult);
     assertThat( new File(String.format("..\\%s\\target\\windows-0.0.0-SNAPSHOT-helm.tar.gz", getProject()))
       .exists(), equalTo(true));
     final File helmDirectory = new File(
@@ -158,7 +158,7 @@ public class WindowsITCase extends BaseMavenCase {
     // When
     final InvocationResult invocationResult = maven("oc:helm");
     // Then
-    assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
+    assertInvocation(invocationResult);
     assertThat( new File(String.format("..\\%s\\target\\windows-0.0.0-SNAPSHOT-helmshift.tar.gz", getProject()))
       .exists(), equalTo(true));
     final File helmDirectory = new File(

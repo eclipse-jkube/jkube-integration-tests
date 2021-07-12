@@ -18,7 +18,6 @@ import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import org.apache.maven.shared.invoker.InvocationResult;
 import org.eclipse.jkube.integrationtests.maven.MavenInvocationResult;
-import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -35,6 +34,7 @@ import static org.eclipse.jkube.integrationtests.Locks.CLUSTER_RESOURCE_INTENSIV
 import static org.eclipse.jkube.integrationtests.Tags.KUBERNETES;
 import static org.eclipse.jkube.integrationtests.assertions.DeploymentAssertion.awaitDeployment;
 import static org.eclipse.jkube.integrationtests.assertions.DockerAssertion.assertImageWasRecentlyBuilt;
+import static org.eclipse.jkube.integrationtests.assertions.InvocationResultAssertion.assertInvocation;
 import static org.eclipse.jkube.integrationtests.assertions.YamlAssertion.yaml;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
@@ -75,7 +75,7 @@ class OpenLibertyK8sITCase extends OpenLiberty {
     // When
     final InvocationResult invocationResult = maven("k8s:build");
     // Then
-    assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
+    assertInvocation(invocationResult);
     assertImageWasRecentlyBuilt("integration-tests", getApplication());
   }
 
@@ -86,7 +86,7 @@ class OpenLibertyK8sITCase extends OpenLiberty {
     // When
     final InvocationResult invocationResult = maven("k8s:resource");
     // Then
-    assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
+    assertInvocation(invocationResult);
     final File metaInfDirectory = new File(
       String.format("../%s/target/classes/META-INF", PROJECT_OPENLIBERTY));
     assertThat(metaInfDirectory.exists(), equalTo(true));
@@ -104,7 +104,7 @@ class OpenLibertyK8sITCase extends OpenLiberty {
     // When
     final InvocationResult invocationResult = maven("k8s:apply");
     // Then
-    assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
+    assertInvocation(invocationResult);
     final Pod pod = assertThatShouldApplyResources();
     awaitDeployment(this, pod.getMetadata().getNamespace())
       .assertReplicas(equalTo(1))
@@ -127,7 +127,7 @@ class OpenLibertyK8sITCase extends OpenLiberty {
     // When
     final MavenInvocationResult invocationResult = maven("k8s:log", properties("jkube.log.follow", "false"));
     // Then
-    assertThat(invocationResult.getExitCode(), equalTo(0));
+    assertInvocation(invocationResult);
     assertLog(invocationResult.getStdOut());
   }
 
@@ -138,7 +138,7 @@ class OpenLibertyK8sITCase extends OpenLiberty {
     // When
     final InvocationResult invocationResult = maven("k8s:undeploy");
     // Then
-    assertThat(invocationResult.getExitCode(), Matchers.equalTo(0));
+    assertInvocation(invocationResult);
     assertThatShouldDeleteAllAppliedResources(this);
     assertDeploymentDeleted(this);
   }

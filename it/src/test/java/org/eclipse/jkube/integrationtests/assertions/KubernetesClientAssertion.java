@@ -20,6 +20,8 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.eclipse.jkube.integrationtests.JKubeCase;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -27,12 +29,13 @@ import java.net.URL;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.ExecutorService;
 
 import static org.eclipse.jkube.integrationtests.cli.CliUtils.runCommand;
 
 public class KubernetesClientAssertion<T extends KubernetesResource> {
 
+  private static final Logger log = LoggerFactory.getLogger(KubernetesClientAssertion.class);
   static final long DEFAULT_AWAIT_TIME_SECONDS = 45L;
   static final Duration CONNECT_TIMEOUT = Duration.of(10L, ChronoUnit.SECONDS);
   static final Duration READ_TIMEOUT = Duration.of(30L, ChronoUnit.SECONDS);
@@ -48,17 +51,20 @@ public class KubernetesClientAssertion<T extends KubernetesResource> {
     return OkHttpClientHolder.INSTANCE;
   }
 
-  static CompletableFuture<Response> getWithRetry(String url) {
+  static CompletableFuture<Response> getWithRetry(ExecutorService executor, String url) {
     final var response = new CompletableFuture<Response>();
-    ForkJoinPool.commonPool().execute(() -> {
+    executor.submit(() -> {
       while (true) {
         try {
           response.complete(httpClient().newCall(new Request.Builder().get().url(url).build()).execute());
           break;
         } catch (IOException e) {
+          log.warn("Connection to {} failed, retrying", url);
+          Thread.sleep(3000L);
           // IGNORE
         }
       }
+      return null;
     });
     return response;
   }
