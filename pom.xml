@@ -36,7 +36,7 @@
     <apache.commons-codec.version>1.15</apache.commons-codec.version>
     <fabric8.kubernetes-client.version>5.5.0</fabric8.kubernetes-client.version>
     <jkube.version>1.4.0-SNAPSHOT</jkube.version>
-    <com.fasterxml.jackson.core.version>2.11.0</com.fasterxml.jackson.core.version>
+    <com.fasterxml.jackson.core.version>2.12.5</com.fasterxml.jackson.core.version>
     <com.fasterxml.jackson.dataformat.yaml.version>2.11.0</com.fasterxml.jackson.dataformat.yaml.version>
     <junit.version>5.6.2</junit.version>
     <license-maven-plugin.version>3.0</license-maven-plugin.version>
