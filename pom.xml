@@ -35,7 +35,7 @@
     <apache.maven.maven-invoker.version>3.1.0</apache.maven.maven-invoker.version>
     <apache.commons-codec.version>1.15</apache.commons-codec.version>
     <fabric8.kubernetes-client.version>5.5.0</fabric8.kubernetes-client.version>
-    <jkube.version>1.4.0-SNAPSHOT</jkube.version>
+    <jkube.version>1.6.0-SNAPSHOT</jkube.version>
     <com.fasterxml.jackson.core.version>2.12.5</com.fasterxml.jackson.core.version>
     <com.fasterxml.jackson.dataformat.yaml.version>2.11.0</com.fasterxml.jackson.dataformat.yaml.version>
     <junit.version>5.8.1</junit.version>
@@ -421,6 +421,7 @@
         <module>projects-to-be-tested/spring-boot/helm-config</module>
         <module>projects-to-be-tested/spring-boot/multi-profile</module>
         <module>projects-to-be-tested/spring-boot/zero-config</module>
+        <module>projects-to-be-tested/spring-boot/crd</module>
       </modules>
       <activation>
         <file>
