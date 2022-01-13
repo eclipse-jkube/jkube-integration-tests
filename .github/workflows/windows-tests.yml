@@ -45,6 +45,7 @@ jobs:
           distribution: 'adopt'
       - name: Checkout JKube Repository
         run: |
+          git config --system core.longpaths true
           git clone $env:JKUBE_REPOSITORY
           cd $env:JKUBE_DIR
           git checkout $env:JKUBE_REVISION
