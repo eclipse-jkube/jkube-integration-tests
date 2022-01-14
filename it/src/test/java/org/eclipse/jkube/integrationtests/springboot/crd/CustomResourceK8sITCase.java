@@ -132,8 +132,7 @@ public class CustomResourceK8sITCase extends CustomResourceApp {
     final InvocationResult invocationResult = maven("k8s:apply");
     // Then
     assertInvocation(invocationResult);
-    final String namespace = assertThatShouldApplyResources()
-      .getKubernetesResource().getMetadata().getNamespace();
+    final String namespace = assertThatShouldApplyResources().getMetadata().getNamespace();
     awaitDeployment(this, namespace)
       .assertReplicas(equalTo(1))
       .assertContainers(hasSize(1))

@@ -101,7 +101,7 @@ class MultiProfileITCase extends BaseMavenCase {
     assertPort("jkube/openshift.yml", 8080);
   }
 
-  @SuppressWarnings({"unchecked", "OptionalGetWithoutIsPresent"})
+  @SuppressWarnings("unchecked")
   private void assertPort(String yamlFile, int port) throws Exception {
     final File metaInfDirectory = new File(
         String.format("../%s/target/classes/META-INF", PROJECT_MULTI_PROFILE));
