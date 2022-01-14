@@ -34,10 +34,10 @@
     <apache.maven-failsafe-plugin.version>3.0.0-M4</apache.maven-failsafe-plugin.version>
     <apache.maven.maven-invoker.version>3.1.0</apache.maven.maven-invoker.version>
     <apache.commons-codec.version>1.15</apache.commons-codec.version>
-    <fabric8.kubernetes-client.version>5.5.0</fabric8.kubernetes-client.version>
+    <com.fasterxml.jackson.core.version>2.13.1</com.fasterxml.jackson.core.version>
+    <com.fasterxml.jackson.dataformat.yaml.version>2.13.1</com.fasterxml.jackson.dataformat.yaml.version>
+    <fabric8.kubernetes-client.version>5.11.2</fabric8.kubernetes-client.version>
     <jkube.version>1.6.0-SNAPSHOT</jkube.version>
-    <com.fasterxml.jackson.core.version>2.12.5</com.fasterxml.jackson.core.version>
-    <com.fasterxml.jackson.dataformat.yaml.version>2.11.0</com.fasterxml.jackson.dataformat.yaml.version>
     <junit.version>5.8.1</junit.version>
     <license-maven-plugin.version>3.0</license-maven-plugin.version>
     <hamcrest.version>2.0.0.0</hamcrest.version>
@@ -147,6 +147,11 @@
         <groupId>commons-codec</groupId>
         <artifactId>commons-codec</artifactId>
         <version>${apache.commons-codec.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.fabric8</groupId>
+        <artifactId>kubernetes-client</artifactId>
+        <version>${fabric8.kubernetes-client.version}</version>
       </dependency>
       <dependency>
         <groupId>io.fabric8</groupId>

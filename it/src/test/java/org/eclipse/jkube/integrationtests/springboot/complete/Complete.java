@@ -25,7 +25,7 @@ import static org.hamcrest.Matchers.hasSize;
 
 abstract class Complete extends BaseMavenCase implements JKubeCase {
 
-  static final String PROJECT_COMPLETE = "projects-to-be-tested/spring-boot/complete";
+  private static final String PROJECT_COMPLETE = "projects-to-be-tested/spring-boot/complete";
 
   @Override
   public String getProject() {
