@@ -47,7 +47,6 @@
     <vertx.version>3.9.1</vertx.version>
     <vertx.plugin.version>1.0.22</vertx.plugin.version>
     <wildfly.jar.plugin.version>2.0.1.Final</wildfly.jar.plugin.version>
-    <wildfly.swarm.version>2018.5.0</wildfly.swarm.version>
     <version.org.jboss.spec.javax.ws.jboss-jaxrs-api_2.1_spec>2.0.1.Final</version.org.jboss.spec.javax.ws.jboss-jaxrs-api_2.1_spec>
   </properties>
 
@@ -337,7 +336,6 @@
         <module>projects-to-be-tested/openliberty/rest</module>
         <module>projects-to-be-tested/thorntail/microprofile</module>
         <module>projects-to-be-tested/vertx/simplest</module>
-        <module>projects-to-be-tested/wildflyswarm/rest</module>
         <module>projects-to-be-tested/wildfly-jar/microprofile</module>
         <module>projects-to-be-tested/karaf/camel-log</module>
       </modules>
@@ -358,7 +356,6 @@
                 <include>**/integrationtests/openliberty/**/*ITCase.java</include>
                 <include>**/integrationtests/thorntail/**/*ITCase.java</include>
                 <include>**/integrationtests/vertx/**/*ITCase.java</include>
-                <include>**/integrationtests/wildflyswarm/**/*ITCase.java</include>
                 <include>**/integrationtests/wildfly/jar/**/*ITCase.java</include>
                 <include>**/integrationtests/karaf/**/*ITCase.java</include>
               </includes>
@@ -423,10 +420,10 @@
       <id>springboot</id>
       <modules>
         <module>projects-to-be-tested/spring-boot/complete</module>
+        <module>projects-to-be-tested/spring-boot/crd</module>
         <module>projects-to-be-tested/spring-boot/helm-config</module>
         <module>projects-to-be-tested/spring-boot/multi-profile</module>
         <module>projects-to-be-tested/spring-boot/zero-config</module>
-        <module>projects-to-be-tested/spring-boot/crd</module>
       </modules>
       <activation>
         <file>
