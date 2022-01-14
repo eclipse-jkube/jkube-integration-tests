@@ -34,20 +34,21 @@
     <apache.maven-failsafe-plugin.version>3.0.0-M4</apache.maven-failsafe-plugin.version>
     <apache.maven.maven-invoker.version>3.1.0</apache.maven.maven-invoker.version>
     <apache.commons-codec.version>1.15</apache.commons-codec.version>
-    <fabric8.kubernetes-client.version>5.5.0</fabric8.kubernetes-client.version>
+    <camel.version>2.25.4</camel.version>
+    <com.fasterxml.jackson.core.version>2.13.1</com.fasterxml.jackson.core.version>
+    <com.fasterxml.jackson.dataformat.yaml.version>2.13.1</com.fasterxml.jackson.dataformat.yaml.version>
+    <fabric8.kubernetes-client.version>5.11.2</fabric8.kubernetes-client.version>
     <jkube.version>1.6.0-SNAPSHOT</jkube.version>
-    <com.fasterxml.jackson.core.version>2.12.5</com.fasterxml.jackson.core.version>
-    <com.fasterxml.jackson.dataformat.yaml.version>2.11.0</com.fasterxml.jackson.dataformat.yaml.version>
     <junit.version>5.8.1</junit.version>
     <license-maven-plugin.version>3.0</license-maven-plugin.version>
     <hamcrest.version>2.0.0.0</hamcrest.version>
+    <karaf.version>4.3.6</karaf.version>
     <quarkus.version>1.8.3.Final</quarkus.version>
     <spring-boot.version>2.5.5</spring-boot.version>
     <thorntail.version>2.7.0.Final</thorntail.version>
-    <vertx.version>3.9.1</vertx.version>
+    <vertx.version>4.2.3</vertx.version>
     <vertx.plugin.version>1.0.22</vertx.plugin.version>
     <wildfly.jar.plugin.version>2.0.1.Final</wildfly.jar.plugin.version>
-    <wildfly.swarm.version>2018.5.0</wildfly.swarm.version>
     <version.org.jboss.spec.javax.ws.jboss-jaxrs-api_2.1_spec>2.0.1.Final</version.org.jboss.spec.javax.ws.jboss-jaxrs-api_2.1_spec>
   </properties>
 
@@ -147,6 +148,11 @@
         <groupId>commons-codec</groupId>
         <artifactId>commons-codec</artifactId>
         <version>${apache.commons-codec.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.fabric8</groupId>
+        <artifactId>kubernetes-client</artifactId>
+        <version>${fabric8.kubernetes-client.version}</version>
       </dependency>
       <dependency>
         <groupId>io.fabric8</groupId>
@@ -332,7 +338,6 @@
         <module>projects-to-be-tested/openliberty/rest</module>
         <module>projects-to-be-tested/thorntail/microprofile</module>
         <module>projects-to-be-tested/vertx/simplest</module>
-        <module>projects-to-be-tested/wildflyswarm/rest</module>
         <module>projects-to-be-tested/wildfly-jar/microprofile</module>
         <module>projects-to-be-tested/karaf/camel-log</module>
       </modules>
@@ -353,7 +358,6 @@
                 <include>**/integrationtests/openliberty/**/*ITCase.java</include>
                 <include>**/integrationtests/thorntail/**/*ITCase.java</include>
                 <include>**/integrationtests/vertx/**/*ITCase.java</include>
-                <include>**/integrationtests/wildflyswarm/**/*ITCase.java</include>
                 <include>**/integrationtests/wildfly/jar/**/*ITCase.java</include>
                 <include>**/integrationtests/karaf/**/*ITCase.java</include>
               </includes>
@@ -418,10 +422,10 @@
       <id>springboot</id>
       <modules>
         <module>projects-to-be-tested/spring-boot/complete</module>
+        <module>projects-to-be-tested/spring-boot/crd</module>
         <module>projects-to-be-tested/spring-boot/helm-config</module>
         <module>projects-to-be-tested/spring-boot/multi-profile</module>
         <module>projects-to-be-tested/spring-boot/zero-config</module>
-        <module>projects-to-be-tested/spring-boot/crd</module>
       </modules>
       <activation>
         <file>
