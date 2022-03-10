@@ -1,0 +1,132 @@
+#
+# Copyright (c) 2019 Red Hat, Inc.
+# This program and the accompanying materials are made
+# available under the terms of the Eclipse Public License 2.0
+# which is available at:
+#
+#     https://www.eclipse.org/legal/epl-2.0/
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+# Contributors:
+#   Red Hat, Inc. - initial API and implementation
+#
+
+name: JKube Smoke Testing
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Eclipse JKube version to test
+        required: true
+
+jobs:
+  build-jkube:
+    name: Build JKube
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup Java 11
+        uses: actions/setup-java@v2
+        with:
+          java-version: '11'
+          distribution: 'adopt'
+      - name: Install Integration Tests (Downloads dependencies)
+        run: |
+          ./mvnw -B -DskipTests clean install \
+          && ./mvnw -B -DskipTests clean  -P'quarkus','quarkus-native','springboot','webapp','other','dockerfile'
+
+  minikube:
+    name: K8S
+    needs: build-jkube
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        kubernetes: [v1.12.0,v1.20.1]
+        suite: ['quarkus','quarkus-native','springboot','webapp','other','dockerfile']
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup Java 11
+        uses: actions/setup-java@v2
+        with:
+          java-version: '11'
+          distribution: 'adopt'
+      - name: Setup Minikube-Kubernetes
+        uses: manusa/actions-setup-minikube@v2.4.3
+        with:
+          minikube version: v1.18.0
+          kubernetes version: ${{ matrix.kubernetes }}
+          github token: ${{ secrets.GITHUB_TOKEN }}
+          start args: --force
+      - name: Install and Run Integration Tests
+        run: |
+          ./mvnw -B -PKubernetes,${{ matrix.suite }} clean verify -Djkube.version={{ github.event.inputs.version }}
+      - name: Save reports as artifact
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: Test reports (Minikube ${{ matrix.kubernetes }}-${{ matrix.suite }})
+          path: ./it/target/jkube-test-report.txt
+
+  openshift:
+    name: OpenShift
+    needs: build-jkube
+    runs-on: ubuntu-18.04
+    strategy:
+      fail-fast: false
+      matrix:
+        openshift: [v3.9.0,v3.11.0]
+        suite: ['quarkus','springboot','webapp','other']
+    steps:
+      - name: Free up Space
+#            'linux-headers.*'                       \ # Takes > 2 minutes
+#            'google-cloud.*'                        \
+        run: |
+          sudo apt list --installed
+          sudo apt-get purge -y                     \
+            'aspnetcore.*'                          \
+            'cabal-install.*'                       \
+            'clang.*'                               \
+            'dotnet.*'                              \
+            'firefox.*'                             \
+            'ghc.*'                                 \
+            'google-chrome.*'                       \
+            'libmagic.*'                            \
+            'libmono.*'                             \
+            'mono-.*'                               \
+            'mysql.*'                               \
+            'php.*'                                 \
+            'ruby.*'
+          sudo apt-get autoremove
+          df -h
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup Java 11
+        uses: actions/setup-java@v2
+        with:
+          java-version: '11'
+          distribution: 'adopt'
+      - name: Setup OpenShift
+        uses: manusa/actions-setup-openshift@v1.1.3
+        with:
+          oc version: ${{ matrix.openshift }}
+          github token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Install and Run Integration Tests
+        run: |
+          ./mvnw -B -POpenShift,${{ matrix.suite }} verify -Djkube.version={{ github.event.inputs.version }} -Djunit.jupiter.execution.parallel.config.fixed.parallelism=4
+      - name: Save reports as artifact
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: Test reports (OpenShift ${{ matrix.openshift }}-${{ matrix.suite }})
+          path: ./it/target/jkube-test-report.txt
+      - name: Cluster Information
+        if: always()
+        run: |
+          oc login -u system:admin
+          oc describe node localhost
+          oc login -u developer
