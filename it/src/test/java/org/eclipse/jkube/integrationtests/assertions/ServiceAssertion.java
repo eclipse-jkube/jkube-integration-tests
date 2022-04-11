@@ -70,11 +70,6 @@ public class ServiceAssertion extends KubernetesClientAssertion<Service> {
     return assertService(service).apply(jKubeCase);
   }
 
-  public ServiceAssertion assertExposed() {
-    assertThat(getKubernetesResource().getMetadata().getLabels(), hasEntry("expose", "true"));
-    return this;
-  }
-
   public ServiceAssertion assertIsClusterIp() {
     assertThat(getKubernetesResource().getSpec().getType(), equalTo("ClusterIP"));
     return this;

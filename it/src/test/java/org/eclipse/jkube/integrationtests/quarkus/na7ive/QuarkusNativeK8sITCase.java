@@ -156,7 +156,6 @@ class QuarkusNativeK8sITCase extends BaseMavenCase implements JKubeCase {
     assertPod(pod).apply(this).logContains("quarkus-native 0.0.0-SNAPSHOT native (powered by Quarkus 2.8.3.Final) started in", 60);
     awaitService(this, pod.getMetadata().getNamespace())
       .assertIsNodePort()
-      .assertExposed()
       .assertPorts(hasSize(1))
       .assertPort("http", 8080, true)
       .assertNodePortResponse("http",

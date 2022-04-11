@@ -135,7 +135,6 @@ class ZeroConfigOcGradleITCase {
       .logContains("Started ZeroConfigApplication in", 40)
       .getKubernetesResource();
     awaitService(jKubeCase, pod.getMetadata().getNamespace())
-      .assertExposed()
       .assertPorts(hasSize(1))
       .assertPort("http", 8080, false);
     awaitDeploymentConfig(jKubeCase, pod.getMetadata().getNamespace())

@@ -51,7 +51,6 @@ abstract class ZeroConfig extends BaseMavenCase implements JKubeCase {
       .logContains("Started ZeroConfigApplication in", 40)
       .getKubernetesResource();
     awaitService(this, pod.getMetadata().getNamespace())
-      .assertExposed()
       .assertPorts(hasSize(1))
       .assertPort("http", 8080, false);
     return pod;

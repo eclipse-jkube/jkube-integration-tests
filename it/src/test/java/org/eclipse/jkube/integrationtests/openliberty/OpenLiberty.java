@@ -48,7 +48,6 @@ abstract class OpenLiberty extends BaseMavenCase implements JKubeCase {
       LOG_TIMEOUT);
     awaitService(this, pod.getMetadata().getNamespace())
       .assertIsNodePort()
-      .assertExposed()
       .assertPorts(hasSize(1))
       .assertPort("glrpc", 9080, true)
       .assertNodePortResponse("glrpc", equalTo("Hello, World."));
