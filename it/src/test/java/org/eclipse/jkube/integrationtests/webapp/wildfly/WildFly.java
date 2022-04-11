@@ -42,7 +42,6 @@ abstract class WildFly extends BaseMavenCase implements JKubeCase {
     assertPod(pod).apply(this).logContains("Deployed", 60);
     awaitService(this, pod.getMetadata().getNamespace())
       .assertIsNodePort()
-      .assertExposed()
       .assertPorts(hasSize(1))
       .assertPort("http", 8080, true)
       .assertNodePortResponse("http", containsString("<h2>Eclipse JKube rocks!!</h2>"));

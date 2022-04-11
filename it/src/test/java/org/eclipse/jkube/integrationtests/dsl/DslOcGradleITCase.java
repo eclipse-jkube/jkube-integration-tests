@@ -134,7 +134,6 @@ class DslOcGradleITCase {
       .logContains("May the 4th be with you", 40)
       .getKubernetesResource();
     awaitService(jKubeCase, pod.getMetadata().getNamespace())
-      .assertExposed()
       .assertPorts(hasSize(1))
       .assertPort("http", 8080, false);
     awaitDeploymentConfig(jKubeCase, pod.getMetadata().getNamespace())

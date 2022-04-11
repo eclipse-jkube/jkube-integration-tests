@@ -42,7 +42,6 @@ abstract class Vertx extends BaseMavenCase implements JKubeCase {
     assertPod(pod).apply(this).logContains("Succeeded in deploying verticle", 60);
     awaitService(this, pod.getMetadata().getNamespace())
       .assertIsNodePort()
-      .assertExposed()
       .assertPorts(hasSize(1))
       .assertPort("http", 8080, true)
       .assertNodePortResponse("http", equalTo("Hello from JKube!"));

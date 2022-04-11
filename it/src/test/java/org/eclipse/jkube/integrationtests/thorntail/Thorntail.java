@@ -42,7 +42,6 @@ abstract class Thorntail extends BaseMavenCase implements JKubeCase {
     assertPod(pod).apply(this).logContains("Deployed \"thorntail-microprofile-0.0.0-SNAPSHOT.war\"", 60);
     awaitService(this, pod.getMetadata().getNamespace())
       .assertIsNodePort()
-      .assertExposed()
       .assertPorts(hasSize(1))
       .assertPort("http", 8080, true)
       .assertNodePortResponse("http", equalTo("JKube from Thorntail rocks!"));

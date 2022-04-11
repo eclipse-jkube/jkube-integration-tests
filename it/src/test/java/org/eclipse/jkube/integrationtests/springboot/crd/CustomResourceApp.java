@@ -53,7 +53,6 @@ abstract class CustomResourceApp extends BaseMavenCase implements JKubeCase {
     assertFrameworkCustomResourceDefinitionApplied(this);
     assertFrameworkCustomResourcesApplied(this, namespace);
     awaitService(this, namespace)
-      .assertExposed()
       .assertPorts(hasSize(1))
       .assertPort("http", 8080, true)
       .assertNodePortResponse("http",

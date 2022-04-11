@@ -182,7 +182,6 @@ class SimpleK8sITCase extends BaseMavenCase implements JKubeCase {
       .logContains("Started Application in", 40)
       .getKubernetesResource();
     awaitService(this, pod.getMetadata().getNamespace())
-      .assertExposed()
       .assertIsNodePort()
       .assertPorts(hasSize(1))
       .assertPort("http", 8080, true)

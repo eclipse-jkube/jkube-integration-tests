@@ -45,7 +45,6 @@ abstract class WildflyJar extends BaseMavenCase implements JKubeCase {
       .logContains("WFLYSRV0025", 15);
     awaitService(this, pod.getMetadata().getNamespace())
       .assertIsNodePort()
-      .assertExposed()
       .assertPorts(hasSize(1))
       .assertPort("http", 8080, true)
       .assertNodePortResponse("http", equalTo("JKube from WildFly JAR rocks!"));
