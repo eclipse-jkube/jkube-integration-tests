@@ -53,7 +53,7 @@ import static org.hamcrest.Matchers.not;
 @Tag(WINDOWS)
 @ExtendWith(RegistryExtension.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class WindowsITCase extends BaseMavenCase {
+class WindowsITCase extends BaseMavenCase {
 
   private static final String PROJECT_WINDOWS = "projects-to-be-tested\\windows";
 

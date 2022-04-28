@@ -43,7 +43,7 @@ public class DeploymentAssertion extends KubernetesClientAssertion<Deployment> {
     assertThat(deploymentExists, existsMatcher);
   }
 
-  public static DeploymentAssertion awaitDeployment(JKubeCase jKubeCase, String namespace) throws InterruptedException {
+  public static DeploymentAssertion awaitDeployment(JKubeCase jKubeCase, String namespace) {
     final Deployment deployment = jKubeCase.getKubernetesClient().apps().deployments()
       .inNamespace(namespace)
       .withName(jKubeCase.getApplication())
