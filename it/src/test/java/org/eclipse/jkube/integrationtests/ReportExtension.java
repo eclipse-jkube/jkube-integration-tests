@@ -31,8 +31,8 @@ import static org.junit.jupiter.api.extension.ExtensionContext.Namespace.GLOBAL;
 public class ReportExtension implements BeforeAllCallback, AfterEachCallback, CloseableResource {
 
   private volatile boolean testsStarted = false;
-  private AtomicInteger testCount = new AtomicInteger(0);
-  private AtomicInteger failedTestCount = new AtomicInteger(0);
+  private final AtomicInteger testCount = new AtomicInteger(0);
+  private final AtomicInteger failedTestCount = new AtomicInteger(0);
   private File report;
 
   @Override

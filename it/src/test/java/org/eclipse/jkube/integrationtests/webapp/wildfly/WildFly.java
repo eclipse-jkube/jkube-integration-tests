@@ -22,7 +22,6 @@ import static org.eclipse.jkube.integrationtests.assertions.PodAssertion.assertP
 import static org.eclipse.jkube.integrationtests.assertions.PodAssertion.awaitPod;
 import static org.eclipse.jkube.integrationtests.assertions.ServiceAssertion.awaitService;
 import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 
 abstract class WildFly extends BaseMavenCase implements JKubeCase {

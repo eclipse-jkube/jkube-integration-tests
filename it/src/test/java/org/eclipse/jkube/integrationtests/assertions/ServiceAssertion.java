@@ -57,7 +57,7 @@ public class ServiceAssertion extends KubernetesClientAssertion<Service> {
     assertThat(servicesExists, existsMatcher);
   }
 
-  public static ServiceAssertion awaitService(JKubeCase jKubeCase, String namespace) throws InterruptedException {
+  public static ServiceAssertion awaitService(JKubeCase jKubeCase, String namespace) {
     final Service service = jKubeCase.getKubernetesClient().services()
       .inNamespace(namespace)
       .withName(jKubeCase.getApplication())
