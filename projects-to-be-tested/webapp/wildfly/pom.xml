@@ -48,10 +48,6 @@
     <plugins>
       <plugin>
         <artifactId>maven-war-plugin</artifactId>
-        <version>2.6</version>
-        <configuration>
-          <failOnMissingWebXml>false</failOnMissingWebXml>
-        </configuration>
       </plugin>
       <!-- this will cause the generator to trigger -->
       <plugin>
