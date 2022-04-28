@@ -33,7 +33,6 @@
     Thorntail MicroProfile OpenAPI project
   </description>
   <properties>
-    <failOnMissingWebXml>false</failOnMissingWebXml>
     <jkube.enricher.jkube-service.type>NodePort</jkube.enricher.jkube-service.type>
   </properties>
 

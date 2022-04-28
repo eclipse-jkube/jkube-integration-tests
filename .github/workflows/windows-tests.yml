@@ -42,7 +42,7 @@ jobs:
         uses: actions/setup-java@v2
         with:
           java-version: '11'
-          distribution: 'adopt'
+          distribution: 'temurin'
       - name: Checkout JKube Repository
         run: |
           git config --system core.longpaths true

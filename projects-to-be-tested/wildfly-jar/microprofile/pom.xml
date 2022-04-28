@@ -33,7 +33,6 @@
     WildFly bootable JAR MicroProfile project
   </description>
   <properties>
-    <failOnMissingWebXml>false</failOnMissingWebXml>
     <jkube.enricher.jkube-service.type>NodePort</jkube.enricher.jkube-service.type>
     <version.wildfly>21.0.0.Final</version.wildfly>
   </properties>

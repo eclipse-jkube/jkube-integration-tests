@@ -29,17 +29,17 @@
     <revision>0.0.0-SNAPSHOT</revision>
     <java.version>1.8</java.version>
     <global.name>JKube :: Integration Tests</global.name>
-    <apache.maven.maven-compiler-plugin.version>3.9.0</apache.maven.maven-compiler-plugin.version>
-    <apache.maven.maven-war-plugin.version>2.6</apache.maven.maven-war-plugin.version>
-    <apache.maven-failsafe-plugin.version>3.0.0-M4</apache.maven-failsafe-plugin.version>
+    <apache.maven.maven-compiler-plugin.version>3.10.1</apache.maven.maven-compiler-plugin.version>
+    <apache.maven.maven-war-plugin.version>3.3.1</apache.maven.maven-war-plugin.version>
+    <apache.maven-failsafe-plugin.version>3.0.0-M6</apache.maven-failsafe-plugin.version>
     <apache.maven.maven-invoker.version>3.1.0</apache.maven.maven-invoker.version>
     <apache.commons-codec.version>1.15</apache.commons-codec.version>
     <camel.version>2.25.4</camel.version>
-    <com.fasterxml.jackson.core.version>2.13.1</com.fasterxml.jackson.core.version>
-    <com.fasterxml.jackson.dataformat.yaml.version>2.13.1</com.fasterxml.jackson.dataformat.yaml.version>
+    <com.fasterxml.jackson.core.version>2.13.2</com.fasterxml.jackson.core.version>
+    <com.fasterxml.jackson.dataformat.yaml.version>2.13.2</com.fasterxml.jackson.dataformat.yaml.version>
     <fabric8.kubernetes-client.version>5.11.2</fabric8.kubernetes-client.version>
     <jkube.version>1.8.0-SNAPSHOT</jkube.version>
-    <junit.version>5.8.1</junit.version>
+    <junit.version>5.8.2</junit.version>
     <license-maven-plugin.version>3.0</license-maven-plugin.version>
     <hamcrest.version>2.0.0.0</hamcrest.version>
     <karaf.version>4.3.6</karaf.version>
@@ -255,6 +255,9 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-war-plugin</artifactId>
           <version>${apache.maven.maven-war-plugin.version}</version>
+          <configuration>
+            <failOnMissingWebXml>false</failOnMissingWebXml>
+          </configuration>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -282,7 +285,6 @@
       <plugin>
         <groupId>com.mycila</groupId>
         <artifactId>license-maven-plugin</artifactId>
-        <version>3.0</version>
         <configuration>
           <aggregate>true</aggregate>
           <header>header.txt</header>
