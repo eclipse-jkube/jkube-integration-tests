@@ -15,8 +15,8 @@ package org.eclipse.jkube.integrationtests.vertx.simplest;
 
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.AsyncResult;
-import io.vertx.core.Future;
 import io.vertx.core.Handler;
+import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.HttpServerRequest;
@@ -27,19 +27,19 @@ public class SimplestEmbedded extends AbstractVerticle {
 
   private static final Logger LOG = Logger.getLogger(SimplestEmbedded.class.getName());
   @Override
-  public void start(Future<Void> startFuture) {
+  public void start(Promise<Void> startFuture) {
     Vertx.vertx().createHttpServer()
       .requestHandler(SimplestEmbedded::requestHandler)
       .listen(8080, listenerHandler(startFuture));
   }
 
-  private static Handler<AsyncResult<HttpServer>> listenerHandler(Future<Void> verticleStart) {
-    return asyncResult -> {
-      if (asyncResult.succeeded()) {
+  private static Handler<AsyncResult<HttpServer>> listenerHandler(Promise<Void> verticleStart) {
+    return http -> {
+      if (http.succeeded()) {
         verticleStart.complete();
         LOG.info("Vert.x test application is ready");
       } else {
-        verticleStart.fail(asyncResult.cause());
+        verticleStart.fail(http.cause());
       }
     };
   }

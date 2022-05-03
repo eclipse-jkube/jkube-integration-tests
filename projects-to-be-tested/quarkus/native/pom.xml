@@ -56,30 +56,17 @@
   <build>
     <plugins>
       <plugin>
-        <groupId>io.quarkus</groupId>
+        <groupId>io.quarkus.platform</groupId>
         <artifactId>quarkus-maven-plugin</artifactId>
         <version>${quarkus.version}</version>
+        <extensions>true</extensions>
         <executions>
           <execution>
-            <id>package</id>
-            <phase>package</phase>
             <goals>
               <goal>build</goal>
+              <goal>generate-code</goal>
+              <goal>generate-code-tests</goal>
             </goals>
-          </execution>
-          <execution>
-            <id>native-image</id>
-            <goals>
-              <goal>native-image</goal>
-            </goals>
-            <configuration>
-              <enableHttpUrlHandler>true</enableHttpUrlHandler>
-              <dockerBuild>true</dockerBuild>
-              <additionalBuildArgs>
-                <additionalBuildArg>--allow-incomplete-classpath</additionalBuildArg>
-                <additionalBuildArg>-H:IncludeResources=.*\.json$</additionalBuildArg>
-              </additionalBuildArgs>
-            </configuration>
           </execution>
         </executions>
       </plugin>
@@ -119,8 +106,12 @@
         <activeByDefault>true</activeByDefault>
       </activation>
       <properties>
+        <quarkus.package.type>native</quarkus.package.type>
+        <quarkus.native.additional-build-args>
+          --allow-incomplete-classpath,
+          -H:IncludeResources=.*\.json$
+        </quarkus.native.additional-build-args>
         <jkube.generator.name>integration-tests/quarkus-native-is-amazing</jkube.generator.name>
-        <jkube.generator.quarkus.nativeImage>true</jkube.generator.quarkus.nativeImage>
       </properties>
     </profile>
   </profiles>
