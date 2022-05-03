@@ -11,7 +11,7 @@
  * Contributors:
  *   Red Hat, Inc. - initial API and implementation
  */
-package org.eclipse.jkube.integrationtests.docker;
+package org.eclipse.jkube.integrationtests.jupiter.api.extension;
 
 import org.eclipse.jkube.integrationtests.cli.CliUtils;
 import org.hamcrest.Matchers;
