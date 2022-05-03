@@ -78,7 +78,7 @@ class WindowsITCase extends BaseMavenCase {
     assertThat(new File(dockerDirectory, "build\\Dockerfile").exists(), equalTo(true));
     final String dockerFileContent = String.join("\n",
       Files.readAllLines(new File(dockerDirectory, "build\\Dockerfile").toPath()));
-    assertThat(dockerFileContent, containsString("FROM mcr.microsoft.com/windows/nanoserver:1809-amd64"));
+    assertThat(dockerFileContent, containsString("FROM mcr.microsoft.com/windows/nanoserver:ltsc2022"));
     final Matcher deploymentDirMatcher = Pattern.compile("COPY ([^\\s]*)", Pattern.MULTILINE).matcher(dockerFileContent);
     assertThat(deploymentDirMatcher.find(), equalTo(true));
     assertThat(new File(dockerDirectory,
@@ -96,7 +96,7 @@ class WindowsITCase extends BaseMavenCase {
     // Then
     assertInvocation(invocationResult);
     final Response response = new OkHttpClient.Builder().build().newCall(new Request.Builder()
-      .get().url("http://localhost:5000/v2/integration-tests/windows/tags/list").build())
+        .get().url("http://localhost:5000/v2/integration-tests/windows/tags/list").build())
       .execute();
     assertThat(response.body().string(),
       containsString("{\"name\":\"integration-tests/windows\",\"tags\":[\"latest\"]}"));
