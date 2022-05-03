@@ -43,10 +43,10 @@
     <license-maven-plugin.version>3.0</license-maven-plugin.version>
     <hamcrest.version>2.0.0.0</hamcrest.version>
     <karaf.version>4.3.6</karaf.version>
-    <quarkus.version>1.8.3.Final</quarkus.version>
+    <quarkus.version>2.8.1.Final</quarkus.version>
     <spring-boot.version>2.6.6</spring-boot.version>
     <thorntail.version>2.7.0.Final</thorntail.version>
-    <vertx.version>3.9.1</vertx.version>
+    <vertx.version>4.2.7</vertx.version>
     <vertx.plugin.version>1.0.22</vertx.plugin.version>
     <wildfly.jar.plugin.version>2.0.1.Final</wildfly.jar.plugin.version>
     <version.org.jboss.spec.javax.ws.jboss-jaxrs-api_2.1_spec>2.0.1.Final</version.org.jboss.spec.javax.ws.jboss-jaxrs-api_2.1_spec>
@@ -160,19 +160,16 @@
         <version>${fabric8.kubernetes-client.version}</version>
       </dependency>
       <dependency>
-        <groupId>io.quarkus</groupId>
-        <artifactId>quarkus-arc</artifactId>
+        <groupId>io.quarkus.platform</groupId>
+        <artifactId>quarkus-bom</artifactId>
         <version>${quarkus.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
       </dependency>
       <dependency>
-        <groupId>io.quarkus</groupId>
-        <artifactId>quarkus-resteasy</artifactId>
-        <version>${quarkus.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>io.quarkus</groupId>
-        <artifactId>quarkus-resteasy-jackson</artifactId>
-        <version>${quarkus.version}</version>
+        <groupId>io.vertx</groupId>
+        <artifactId>vertx-core</artifactId>
+        <version>${vertx.version}</version>
       </dependency>
       <dependency>
         <groupId>io.thorntail</groupId>
@@ -183,11 +180,6 @@
           <groupId>org.jboss.spec.javax.ws.rs</groupId>
           <artifactId>jboss-jaxrs-api_2.1_spec</artifactId>
           <version>${version.org.jboss.spec.javax.ws.jboss-jaxrs-api_2.1_spec}</version>
-      </dependency>
-      <dependency>
-        <groupId>io.vertx</groupId>
-        <artifactId>vertx-core</artifactId>
-        <version>${vertx.version}</version>
       </dependency>
       <dependency>
         <groupId>org.springframework.boot</groupId>
