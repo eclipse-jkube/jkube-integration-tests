@@ -33,7 +33,7 @@
   </description>
   <properties>
     <java.version>11</java.version>
-    <jkube.generator.from>mcr.microsoft.com/windows/nanoserver:1809-amd64</jkube.generator.from>
+    <jkube.generator.from>mcr.microsoft.com/windows/nanoserver:ltsc2022</jkube.generator.from>
   </properties>
 
   <build>

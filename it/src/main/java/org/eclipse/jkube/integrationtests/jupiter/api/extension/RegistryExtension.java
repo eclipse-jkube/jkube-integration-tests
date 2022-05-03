@@ -66,6 +66,6 @@ public class RegistryExtension implements BeforeAllCallback, CloseableResource {
     if (!registry.exists() && !registry.mkdirs()) {
       throw new IllegalStateException("Directory C:\\registry cannot be created");
     }
-    return CliUtils.runCommand("docker run --rm -d -p 5000:5000 --name registry -v C:\\registry:C:\\registry stefanscherer/registry-windows:2.6.2");
+    return CliUtils.runCommand("docker run --rm -d -p 5000:5000 --name registry -v C:\\registry:C:\\registry marcnuri/docker-registry-windows:ltsc2022");
   }
 }
