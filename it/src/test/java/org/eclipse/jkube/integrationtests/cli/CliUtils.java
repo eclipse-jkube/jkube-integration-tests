@@ -42,7 +42,7 @@ public class CliUtils {
     return new CliResult(exitCode, output);
   }
 
-  private static boolean isWindows() {
+  public static boolean isWindows() {
     return System.getProperty(PROP_OS_NAME).toLowerCase().contains("win");
   }
 
