@@ -19,7 +19,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.apache.maven.shared.invoker.InvocationResult;
-import org.eclipse.jkube.integrationtests.docker.RegistryExtension;
+import org.eclipse.jkube.integrationtests.jupiter.api.extension.RegistryExtension;
 import org.eclipse.jkube.integrationtests.maven.MavenInvocationResult;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
