@@ -32,7 +32,7 @@
     <apache.maven.maven-compiler-plugin.version>3.10.1</apache.maven.maven-compiler-plugin.version>
     <apache.maven.maven-war-plugin.version>3.3.2</apache.maven.maven-war-plugin.version>
     <apache.maven-failsafe-plugin.version>3.0.0-M6</apache.maven-failsafe-plugin.version>
-    <apache.maven.maven-invoker.version>3.1.0</apache.maven.maven-invoker.version>
+    <apache.maven.maven-invoker.version>3.2.0</apache.maven.maven-invoker.version>
     <apache.commons-codec.version>1.15</apache.commons-codec.version>
     <camel.version>2.25.4</camel.version>
     <com.fasterxml.jackson.core.version>2.13.2</com.fasterxml.jackson.core.version>
@@ -51,7 +51,7 @@
     <vertx.version>4.2.7</vertx.version>
     <vertx.plugin.version>1.0.22</vertx.plugin.version>
     <wildfly.jar.plugin.version>2.0.1.Final</wildfly.jar.plugin.version>
-    <version.org.jboss.spec.javax.ws.jboss-jaxrs-api_2.1_spec>2.0.1.Final</version.org.jboss.spec.javax.ws.jboss-jaxrs-api_2.1_spec>
+    <version.org.jboss.spec.javax.ws.jboss-jaxrs-api_2.1_spec>2.0.2.Final</version.org.jboss.spec.javax.ws.jboss-jaxrs-api_2.1_spec>
   </properties>
 
   <repositories>
