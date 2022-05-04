@@ -37,7 +37,7 @@
     <camel.version>2.25.4</camel.version>
     <com.fasterxml.jackson.core.version>2.13.2</com.fasterxml.jackson.core.version>
     <com.fasterxml.jackson.dataformat.yaml.version>2.13.2</com.fasterxml.jackson.dataformat.yaml.version>
-    <fabric8.kubernetes-client.version>5.11.2</fabric8.kubernetes-client.version>
+    <fabric8.kubernetes-client.version>5.12.2</fabric8.kubernetes-client.version>
     <jkube.version>1.8.0-SNAPSHOT</jkube.version>
     <junit.version>5.8.2</junit.version>
     <license-maven-plugin.version>3.0</license-maven-plugin.version>
