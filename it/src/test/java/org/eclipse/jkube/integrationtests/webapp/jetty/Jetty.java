@@ -27,7 +27,7 @@ import static org.hamcrest.Matchers.stringContainsInOrder;
 
 abstract class Jetty extends BaseMavenCase implements JKubeCase {
 
-  static final String PROJECT_JETTY = "projects-to-be-tested/webapp/jetty";
+  static final String PROJECT_JETTY = "projects-to-be-tested/maven/webapp/jetty";
 
   @Override
   public String getProject() {

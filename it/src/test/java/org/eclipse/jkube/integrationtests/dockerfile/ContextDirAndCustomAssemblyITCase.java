@@ -37,7 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @Tag(KUBERNETES)
 public class ContextDirAndCustomAssemblyITCase extends BaseMavenCase implements JKubeCase {
 
-  private static final String PROJECT_CONTEXT_DIR_AND_CUSTOM_ASSEMBLY = "projects-to-be-tested/dockerfile/context-dir-and-custom-assembly";
+  private static final String PROJECT_CONTEXT_DIR_AND_CUSTOM_ASSEMBLY = "projects-to-be-tested/maven/dockerfile/context-dir-and-custom-assembly";
 
   @Override
   public KubernetesClient getKubernetesClient() {

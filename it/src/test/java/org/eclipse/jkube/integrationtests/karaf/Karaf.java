@@ -33,7 +33,7 @@ import static org.hamcrest.core.AllOf.allOf;
 
 abstract class Karaf extends BaseMavenCase implements JKubeCase {
 
-  private static final String PROJECT_KARAF = "projects-to-be-tested/karaf/camel-log";
+  private static final String PROJECT_KARAF = "projects-to-be-tested/maven/karaf/camel-log";
   private static final int LOG_TIMEOUT = 60;
 
   @TempDir

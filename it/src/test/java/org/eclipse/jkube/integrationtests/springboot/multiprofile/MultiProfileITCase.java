@@ -43,7 +43,7 @@ import static org.hamcrest.Matchers.hasKey;
 
 class MultiProfileITCase extends BaseMavenCase {
 
-  private static final String PROJECT_MULTI_PROFILE = "projects-to-be-tested/spring-boot/multi-profile";
+  private static final String PROJECT_MULTI_PROFILE = "projects-to-be-tested/maven/spring-boot/multi-profile";
 
   private ObjectMapper objectMapper;
 

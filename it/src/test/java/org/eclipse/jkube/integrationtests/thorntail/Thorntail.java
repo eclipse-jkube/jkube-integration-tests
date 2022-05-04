@@ -25,7 +25,7 @@ import static org.hamcrest.Matchers.hasSize;
 
 abstract class Thorntail extends BaseMavenCase implements JKubeCase {
 
-  static final String PROJECT_THORNTAIL = "projects-to-be-tested/thorntail/microprofile";
+  static final String PROJECT_THORNTAIL = "projects-to-be-tested/maven/thorntail/microprofile";
 
   @Override
   public String getProject() {

@@ -62,7 +62,7 @@ import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class SimpleK8sITCase extends BaseMavenCase implements JKubeCase {
 
-  private static final String PROJECT_SIMPLE = "projects-to-be-tested/dockerfile/simple";
+  private static final String PROJECT_SIMPLE = "projects-to-be-tested/maven/dockerfile/simple";
 
   private KubernetesClient k;
 

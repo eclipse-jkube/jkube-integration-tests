@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright (c) 2019 Red Hat, Inc.
+    This program and the accompanying materials are made
+    available under the terms of the Eclipse Public License 2.0
+    which is available at:
+
+        https://www.eclipse.org/legal/epl-2.0/
+
+    SPDX-License-Identifier: EPL-2.0
+
+    Contributors:
+      Red Hat, Inc. - initial API and implementation
+
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.eclipse.jkube.integration-tests</groupId>
+    <artifactId>jkube-integration-tests-project</artifactId>
+    <version>${revision}</version>
+    <relativePath>../../../../pom.xml</relativePath>
+  </parent>
+
+  <artifactId>vertx-simplest</artifactId>
+  <name>${global.name} :: Vert.x :: Simplest</name>
+  <description>
+    Vert.x simplest project
+  </description>
+  <dependencies>
+    <dependency>
+      <groupId>io.vertx</groupId>
+      <artifactId>vertx-core</artifactId>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>io.reactiverse</groupId>
+        <artifactId>vertx-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>vertx-maven-plugin</id>
+            <phase>package</phase>
+            <goals>
+              <goal>package</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <verticle>org.eclipse.jkube.integrationtests.vertx.simplest.SimplestEmbedded</verticle>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.eclipse.jkube</groupId>
+        <artifactId>kubernetes-maven-plugin</artifactId>
+        <configuration>
+          <enricher>
+            <config>
+              <jkube-service>
+                <type>NodePort</type>
+              </jkube-service>
+            </config>
+          </enricher>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.eclipse.jkube</groupId>
+        <artifactId>openshift-maven-plugin</artifactId>
+          <configuration>
+              <enricher>
+                <config>
+                  <jkube-service>
+                    <type>NodePort</type>
+                  </jkube-service>
+                </config>
+              </enricher>
+          </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>

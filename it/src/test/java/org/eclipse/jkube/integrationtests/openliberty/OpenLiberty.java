@@ -27,7 +27,7 @@ import static org.hamcrest.Matchers.stringContainsInOrder;
 
 abstract class OpenLiberty extends BaseMavenCase implements JKubeCase {
 
-  static final String PROJECT_OPENLIBERTY = "projects-to-be-tested/openliberty/rest";
+  static final String PROJECT_OPENLIBERTY = "projects-to-be-tested/maven/openliberty/rest";
   private static final int LOG_TIMEOUT = 60;
 
   @Override
