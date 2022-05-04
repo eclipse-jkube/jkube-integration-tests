@@ -20,7 +20,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.apache.maven.shared.invoker.InvocationResult;
-import org.eclipse.jkube.integrationtests.jupiter.api.extension.RegistryExtension;
+import org.eclipse.jkube.integrationtests.jupiter.api.DockerRegistry;
 import org.eclipse.jkube.integrationtests.maven.MavenInvocationResult;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,7 +30,6 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.parallel.ResourceLock;
 
 import java.io.File;
@@ -55,7 +54,7 @@ import static org.hamcrest.Matchers.stringContainsInOrder;
 import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 
 @Tag(KUBERNETES)
-@ExtendWith(RegistryExtension.class)
+@DockerRegistry
 @TestMethodOrder(OrderAnnotation.class)
 class ZeroConfigK8sITCase extends ZeroConfig {
 

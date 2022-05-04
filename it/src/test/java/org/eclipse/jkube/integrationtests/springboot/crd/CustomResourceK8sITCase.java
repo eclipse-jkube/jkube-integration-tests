@@ -20,7 +20,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 import org.apache.maven.shared.invoker.InvocationResult;
 import org.eclipse.jkube.integrationtests.RequireK8sVersionAtLeast;
-import org.eclipse.jkube.integrationtests.jupiter.api.extension.RegistryExtension;
+import org.eclipse.jkube.integrationtests.jupiter.api.DockerRegistry;
 import org.eclipse.jkube.integrationtests.maven.MavenInvocationResult;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,7 +30,6 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.parallel.ResourceLock;
 
 import java.io.File;
@@ -55,9 +54,9 @@ import static org.hamcrest.Matchers.stringContainsInOrder;
 import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 
 @Tag(KUBERNETES)
-@ExtendWith(RegistryExtension.class)
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@DockerRegistry
 @RequireK8sVersionAtLeast(majorVersion = "1", minorVersion = "16")
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class CustomResourceK8sITCase extends CustomResourceApp {
 
   private KubernetesClient k;
