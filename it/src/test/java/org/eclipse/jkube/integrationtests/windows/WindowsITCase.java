@@ -54,7 +54,7 @@ import static org.hamcrest.Matchers.not;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class WindowsITCase extends BaseMavenCase {
 
-  private static final String PROJECT_WINDOWS = "projects-to-be-tested\\windows";
+  private static final String PROJECT_WINDOWS = "projects-to-be-tested\\maven\\windows";
 
   @Override
   public String getProject() {

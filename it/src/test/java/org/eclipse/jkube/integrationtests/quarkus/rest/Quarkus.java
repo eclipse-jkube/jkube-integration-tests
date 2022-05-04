@@ -34,7 +34,7 @@ import static org.hamcrest.Matchers.not;
 
 abstract class Quarkus extends BaseMavenCase implements JKubeCase {
 
-  private static final String PROJECT_QUARKUS_REST = "projects-to-be-tested/quarkus/rest";
+  private static final String PROJECT_QUARKUS_REST = "projects-to-be-tested/maven/quarkus/rest";
 
   @Override
   public String getProject() {

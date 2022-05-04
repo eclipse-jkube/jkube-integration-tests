@@ -25,7 +25,7 @@ import static org.hamcrest.Matchers.hasSize;
 
 abstract class WildflyJar extends BaseMavenCase implements JKubeCase {
 
-  static final String PROJECT_WILDFLY_JAR = "projects-to-be-tested/wildfly-jar/microprofile";
+  static final String PROJECT_WILDFLY_JAR = "projects-to-be-tested/maven/wildfly-jar/microprofile";
 
   @Override
   public String getProject() {

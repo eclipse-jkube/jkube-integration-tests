@@ -37,7 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @Tag(KUBERNETES)
 public class DockerFileITCase extends BaseMavenCase implements JKubeCase {
 
-  private static final String PROJECT_DOCKER_FILE = "projects-to-be-tested/dockerfile/docker-file";
+  private static final String PROJECT_DOCKER_FILE = "projects-to-be-tested/maven/dockerfile/docker-file";
 
   @Override
   public KubernetesClient getKubernetesClient() {

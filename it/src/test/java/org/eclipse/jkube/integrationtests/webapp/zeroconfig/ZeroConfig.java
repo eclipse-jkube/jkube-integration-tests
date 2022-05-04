@@ -32,7 +32,7 @@ import static org.hamcrest.Matchers.stringContainsInOrder;
 
 abstract class ZeroConfig extends BaseMavenCase implements JKubeCase {
 
-  static final String PROJECT_ZERO_CONFIG = "projects-to-be-tested/webapp/zero-config";
+  static final String PROJECT_ZERO_CONFIG = "projects-to-be-tested/maven/webapp/zero-config";
 
   @Override
   public String getProject() {

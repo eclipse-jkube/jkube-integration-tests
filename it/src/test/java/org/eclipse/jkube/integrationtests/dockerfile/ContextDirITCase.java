@@ -37,7 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @Tag(KUBERNETES)
 public class ContextDirITCase extends BaseMavenCase implements JKubeCase {
 
-  private static final String PROJECT_CONTEXT_DIR = "projects-to-be-tested/dockerfile/context-dir";
+  private static final String PROJECT_CONTEXT_DIR = "projects-to-be-tested/maven/dockerfile/context-dir";
 
   @Override
   public KubernetesClient getKubernetesClient() {

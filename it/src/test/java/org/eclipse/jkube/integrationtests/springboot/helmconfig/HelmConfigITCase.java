@@ -42,7 +42,7 @@ import static org.hamcrest.Matchers.not;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class HelmConfigITCase extends BaseMavenCase {
 
-  private static final String PROJECT_HELM = "projects-to-be-tested/spring-boot/helm-config";
+  private static final String PROJECT_HELM = "projects-to-be-tested/maven/spring-boot/helm-config";
 
   @Override
   public String getProject() {

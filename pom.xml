@@ -291,7 +291,7 @@
             <exclude>.mvn/wrapper/**/*</exclude>
             <exclude>mvnw</exclude>
             <exclude>mvnw.cmd</exclude>
-            <exclude>projects-to-be-tested/spring-boot/complete/src/main/**/*.txt</exclude>
+            <exclude>projects-to-be-tested/maven/spring-boot/complete/src/main/**/*.txt</exclude>
           </excludes>
         </configuration>
       </plugin>
@@ -301,16 +301,16 @@
     <profile>
       <id>dockerfile</id>
       <modules>
-        <module>projects-to-be-tested/dockerfile/context-dir</module>
-        <module>projects-to-be-tested/dockerfile/context-dir-and-custom-assembly</module>
-        <module>projects-to-be-tested/dockerfile/context-dir-and-docker-file</module>
-        <module>projects-to-be-tested/dockerfile/docker-file</module>
-        <module>projects-to-be-tested/dockerfile/simple</module>
+        <module>projects-to-be-tested/maven/dockerfile/context-dir</module>
+        <module>projects-to-be-tested/maven/dockerfile/context-dir-and-custom-assembly</module>
+        <module>projects-to-be-tested/maven/dockerfile/context-dir-and-docker-file</module>
+        <module>projects-to-be-tested/maven/dockerfile/docker-file</module>
+        <module>projects-to-be-tested/maven/dockerfile/simple</module>
       </modules>
       <activation>
         <file>
           <exists>
-            projects-to-be-tested/dockerfile/simple/target
+            projects-to-be-tested/maven/dockerfile/simple/target
           </exists>
         </file>
       </activation>
@@ -331,16 +331,16 @@
     <profile>
       <id>other</id>
       <modules>
-        <module>projects-to-be-tested/openliberty/rest</module>
-        <module>projects-to-be-tested/thorntail/microprofile</module>
-        <module>projects-to-be-tested/vertx/simplest</module>
-        <module>projects-to-be-tested/wildfly-jar/microprofile</module>
-        <module>projects-to-be-tested/karaf/camel-log</module>
+        <module>projects-to-be-tested/maven/openliberty/rest</module>
+        <module>projects-to-be-tested/maven/thorntail/microprofile</module>
+        <module>projects-to-be-tested/maven/vertx/simplest</module>
+        <module>projects-to-be-tested/maven/wildfly-jar/microprofile</module>
+        <module>projects-to-be-tested/maven/karaf/camel-log</module>
       </modules>
       <activation>
         <file>
           <exists>
-            projects-to-be-tested/thorntail/microprofile/target
+            projects-to-be-tested/maven/thorntail/microprofile/target
           </exists>
         </file>
       </activation>
@@ -365,12 +365,12 @@
     <profile>
       <id>quarkus</id>
       <modules>
-        <module>projects-to-be-tested/quarkus/rest</module>
+        <module>projects-to-be-tested/maven/quarkus/rest</module>
       </modules>
       <activation>
         <file>
           <exists>
-            projects-to-be-tested/quarkus/rest/target
+            projects-to-be-tested/maven/quarkus/rest/target
           </exists>
         </file>
       </activation>
@@ -391,12 +391,12 @@
     <profile>
       <id>quarkus-native</id>
       <modules>
-        <module>projects-to-be-tested/quarkus/native</module>
+        <module>projects-to-be-tested/maven/quarkus/native</module>
       </modules>
       <activation>
         <file>
           <exists>
-            projects-to-be-tested/quarkus/native/target
+            projects-to-be-tested/maven/quarkus/native/target
           </exists>
         </file>
       </activation>
@@ -417,16 +417,16 @@
     <profile>
       <id>springboot</id>
       <modules>
-        <module>projects-to-be-tested/spring-boot/complete</module>
-        <module>projects-to-be-tested/spring-boot/crd</module>
-        <module>projects-to-be-tested/spring-boot/helm-config</module>
-        <module>projects-to-be-tested/spring-boot/multi-profile</module>
-        <module>projects-to-be-tested/spring-boot/zero-config</module>
+        <module>projects-to-be-tested/maven/spring-boot/complete</module>
+        <module>projects-to-be-tested/maven/spring-boot/crd</module>
+        <module>projects-to-be-tested/maven/spring-boot/helm-config</module>
+        <module>projects-to-be-tested/maven/spring-boot/multi-profile</module>
+        <module>projects-to-be-tested/maven/spring-boot/zero-config</module>
       </modules>
       <activation>
         <file>
           <exists>
-            projects-to-be-tested/spring-boot/complete/target
+            projects-to-be-tested/maven/spring-boot/complete/target
           </exists>
         </file>
       </activation>
@@ -447,14 +447,14 @@
     <profile>
       <id>webapp</id>
       <modules>
-        <module>projects-to-be-tested/webapp/jetty</module>
-        <module>projects-to-be-tested/webapp/wildfly</module>
-        <module>projects-to-be-tested/webapp/zero-config</module>
+        <module>projects-to-be-tested/maven/webapp/jetty</module>
+        <module>projects-to-be-tested/maven/webapp/wildfly</module>
+        <module>projects-to-be-tested/maven/webapp/zero-config</module>
       </modules>
       <activation>
         <file>
           <exists>
-            projects-to-be-tested/webapp/zero-config/target
+            projects-to-be-tested/maven/webapp/zero-config/target
           </exists>
         </file>
       </activation>
@@ -475,7 +475,7 @@
     <profile>
       <id>Windows</id>
       <modules>
-        <module>projects-to-be-tested/windows</module>
+        <module>projects-to-be-tested/maven/windows</module>
       </modules>
       <build>
         <plugins>

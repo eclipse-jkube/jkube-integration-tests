@@ -54,7 +54,7 @@ import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 @TestMethodOrder(OrderAnnotation.class)
 class QuarkusNativeK8sITCase extends BaseMavenCase implements JKubeCase {
 
-  static final String PROJECT_QUARKUS_NATIVE = "projects-to-be-tested/quarkus/native";
+  static final String PROJECT_QUARKUS_NATIVE = "projects-to-be-tested/maven/quarkus/native";
 
   private KubernetesClient k;
 

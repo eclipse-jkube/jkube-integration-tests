@@ -25,7 +25,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasSize;
 
 abstract class WildFly extends BaseMavenCase implements JKubeCase {
-  static final String PROJECT_WILDFLY="projects-to-be-tested/webapp/wildfly";
+  static final String PROJECT_WILDFLY="projects-to-be-tested/maven/webapp/wildfly";
 
   @Override
   public String getProject() {

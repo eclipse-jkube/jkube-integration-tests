@@ -25,7 +25,7 @@ import static org.hamcrest.Matchers.hasSize;
 
 abstract class Vertx extends BaseMavenCase implements JKubeCase {
 
-  static final String PROJECT_VERTX = "projects-to-be-tested/vertx/simplest";
+  static final String PROJECT_VERTX = "projects-to-be-tested/maven/vertx/simplest";
 
   @Override
   public String getProject() {

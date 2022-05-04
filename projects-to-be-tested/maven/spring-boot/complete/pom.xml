@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright (c) 2019 Red Hat, Inc.
+    This program and the accompanying materials are made
+    available under the terms of the Eclipse Public License 2.0
+    which is available at:
+
+        https://www.eclipse.org/legal/epl-2.0/
+
+    SPDX-License-Identifier: EPL-2.0
+
+    Contributors:
+      Red Hat, Inc. - initial API and implementation
+
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.eclipse.jkube.integration-tests</groupId>
+    <artifactId>jkube-integration-tests-project</artifactId>
+    <version>${revision}</version>
+    <relativePath>../../../../pom.xml</relativePath>
+  </parent>
+
+  <artifactId>spring-boot-complete</artifactId>
+  <name>${global.name} :: Spring Boot :: Complete</name>
+  <description>
+    Spring Boot with Everything
+  </description>
+  <properties>
+    <java.version>11</java.version>
+    <jkube.environment>default</jkube.environment>
+  </properties>
+
+  <dependencies>
+    <!-- Dependencies only for debugging purposes -->
+    <dependency>
+      <groupId>org.eclipse.jkube</groupId>
+      <artifactId>kubernetes-maven-plugin</artifactId>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jkube</groupId>
+      <artifactId>openshift-maven-plugin</artifactId>
+      <scope>compile</scope>
+    </dependency>
+    <!-- ***************************************  -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
+      <scope>compile</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>repackage</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+  <profiles>
+    <profile>
+      <id>Docker-Assembly</id>
+      <properties>
+        <jkube.environment>docker</jkube.environment>
+        <jkube.targetDir>${project.build.outputDirectory}/META-INF/jkube-docker</jkube.targetDir>
+        <jkube.kubernetesManifest>${project.build.outputDirectory}/META-INF/jkube-docker/kubernetes.yml</jkube.kubernetesManifest>
+        <jkube.generator.from>adoptopenjdk/openjdk11:jdk-11.0.6_10-alpine-slim</jkube.generator.from>
+      </properties>
+      <build>
+      <plugins>
+        <plugin>
+          <groupId>org.eclipse.jkube</groupId>
+          <artifactId>kubernetes-maven-plugin</artifactId>
+          <configuration>
+            <resources>
+              <labels>
+                <all>
+                  <app>docker-${project.artifactId}</app>
+                </all>
+              </labels>
+            </resources>
+            <images>
+              <image>
+                <name>integration-tests/docker-${project.artifactId}</name>
+                <build>
+                  <cleanup>remove</cleanup>
+                  <compression>gzip</compression>
+                  <from>adoptopenjdk/openjdk11:alpine-slim</from>
+                  <tags>
+                    <tag>latest</tag>
+                    <tag>1337</tag>
+                  </tags>
+                  <labels>
+                    <some.label>The value</some.label>
+                  </labels>
+                  <user>1000</user>
+                  <entryPoint>
+                    <exec>
+                      <arg>java</arg>
+                      <arg>-jar</arg>
+                      <arg>/deployments/${project.artifactId}-${project.version}.jar</arg>
+                    </exec>
+                  </entryPoint>
+                  <env>
+                    <JAVA_APP_DIR>/deployments</JAVA_APP_DIR>
+                  </env>
+                  <assembly>
+                    <mode>dir</mode>
+                    <targetDir>/deployments</targetDir>
+                    <inline>
+                      <id>spring-boot-complete</id>
+                      <files>
+                        <file>
+                          <source>src/main/assembly-test/inlined-file.txt</source>
+                          <outputDirectory>assembly-test/</outputDirectory>
+                        </file>
+                      </files>
+                      <fileSets>
+                        <fileSet>
+                          <directory>${project.basedir}/src/main/static</directory>
+                          <outputDirectory>static/</outputDirectory>
+                          <includes>
+                            <include>static-file.txt</include>
+                          </includes>
+                          <fileMode>755</fileMode>
+                        </fileSet>
+                      </fileSets>
+                    </inline>
+                  </assembly>
+                  <ports>8082,8778,9779</ports>
+                </build>
+              </image>
+            </images>
+          </configuration>
+        </plugin>
+      </plugins>
+    </build>
+    </profile>
+    <profile>
+      <id>JIB</id>
+      <properties>
+        <jkube.build.strategy>jib</jkube.build.strategy>
+        <jkube.targetDir>${project.build.outputDirectory}/META-INF/jkube-jib</jkube.targetDir>
+        <jkube.kubernetesManifest>${project.build.outputDirectory}/META-INF/jkube-jib/kubernetes.yml</jkube.kubernetesManifest>
+        <jkube.generator.name>localhost:5000/sb/sb-complete</jkube.generator.name>
+        <jkube.enricher.jkube-controller.name>spring-boot-complete-jib</jkube.enricher.jkube-controller.name>
+        <jkube.enricher.jkube-project-label.app>spring-boot-complete-jib</jkube.enricher.jkube-project-label.app>
+        <jkube.enricher.jkube-service.name>spring-boot-complete-jib</jkube.enricher.jkube-service.name>
+        <jkube.enricher.jkube-service.type>NodePort</jkube.enricher.jkube-service.type>
+      </properties>
+    </profile>
+    <profile>
+      <id>Kubernetes</id>
+      <properties>
+        <jkube.environment>k8s</jkube.environment>
+      </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.eclipse.jkube</groupId>
+            <artifactId>kubernetes-maven-plugin</artifactId>
+            <configuration>
+              <resources>
+                <labels>
+                  <all>
+                    <jkube.spring-boot.example>complete</jkube.spring-boot.example>
+                  </all>
+                </labels>
+              </resources>
+              <enricher>
+                <config>
+                  <jkube-service>
+                    <type>NodePort</type>
+                  </jkube-service>
+                </config>
+              </enricher>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>OpenShift</id>
+      <properties>
+        <jkube.environment>oc</jkube.environment>
+      </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.eclipse.jkube</groupId>
+            <artifactId>openshift-maven-plugin</artifactId>
+            <configuration>
+              <enricher>
+                <resources>
+                  <labels>
+                    <all>
+                      <jkube.spring-boot.example>complete</jkube.spring-boot.example>
+                    </all>
+                  </labels>
+                </resources>
+                <config>
+                  <jkube-service>
+                    <type>NodePort</type>
+                  </jkube-service>
+                </config>
+              </enricher>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+
+</project>
