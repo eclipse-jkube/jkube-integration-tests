@@ -30,7 +30,6 @@
     <packaging>war</packaging>
 
     <properties>
-        <version.openliberty>21.0.0.6</version.openliberty>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -44,7 +43,7 @@
         <dependency>
             <groupId>io.openliberty.features</groupId>
             <artifactId>jaxrs-2.1</artifactId>
-            <version>${version.openliberty}</version>
+            <version>${openliberty.version}</version>
             <type>esa</type>
             <scope>provided</scope>
         </dependency>
@@ -56,14 +55,13 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
-                <version>3.3.2</version>
             </plugin>
 
             <!-- Enable liberty-maven plugin -->
             <plugin>
                 <groupId>io.openliberty.tools</groupId>
                 <artifactId>liberty-maven-plugin</artifactId>
-                <version>3.0.1</version>
+                <version>${openliberty.plugin.version}</version>
 
                 <configuration>
                     <assemblyArtifact>
