@@ -39,6 +39,7 @@ import static org.eclipse.jkube.integrationtests.Tags.KUBERNETES;
 import static org.eclipse.jkube.integrationtests.assertions.DeploymentAssertion.awaitDeployment;
 import static org.eclipse.jkube.integrationtests.assertions.DockerAssertion.assertImageWasRecentlyBuilt;
 import static org.eclipse.jkube.integrationtests.assertions.InvocationResultAssertion.assertInvocation;
+import static org.eclipse.jkube.integrationtests.assertions.JKubeAssertions.assertJKube;
 import static org.eclipse.jkube.integrationtests.assertions.YamlAssertion.yaml;
 import static org.eclipse.jkube.integrationtests.docker.DockerUtils.listImageFiles;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -180,7 +181,8 @@ class CompleteDockerITCase extends Complete {
     final InvocationResult invocationResult = maven("k8s:undeploy", properties);
     // Then
     assertInvocation(invocationResult);
-    assertThatShouldDeleteAllAppliedResources(this);
-    assertDeploymentDeleted(this);
+    assertJKube(this)
+      .assertThatShouldDeleteAllAppliedResources()
+      .assertDeploymentDeleted();
   }
 }

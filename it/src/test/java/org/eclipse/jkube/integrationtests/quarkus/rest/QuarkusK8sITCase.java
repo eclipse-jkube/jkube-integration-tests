@@ -34,6 +34,7 @@ import static org.eclipse.jkube.integrationtests.Tags.KUBERNETES;
 import static org.eclipse.jkube.integrationtests.assertions.DeploymentAssertion.awaitDeployment;
 import static org.eclipse.jkube.integrationtests.assertions.DockerAssertion.assertImageWasRecentlyBuilt;
 import static org.eclipse.jkube.integrationtests.assertions.InvocationResultAssertion.assertInvocation;
+import static org.eclipse.jkube.integrationtests.assertions.JKubeAssertions.assertJKube;
 import static org.eclipse.jkube.integrationtests.assertions.YamlAssertion.yaml;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
@@ -151,7 +152,8 @@ class QuarkusK8sITCase extends Quarkus {
     final InvocationResult invocationResult = maven("k8s:undeploy");
     // Then
     assertInvocation(invocationResult);
-    assertThatShouldDeleteAllAppliedResources(this);
-    assertDeploymentDeleted(this);
+    assertJKube(this)
+      .assertThatShouldDeleteAllAppliedResources()
+      .assertDeploymentDeleted();
   }
 }

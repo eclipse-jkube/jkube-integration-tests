@@ -38,6 +38,7 @@ import java.util.List;
 import static org.eclipse.jkube.integrationtests.Locks.CLUSTER_RESOURCE_INTENSIVE;
 import static org.eclipse.jkube.integrationtests.Tags.KUBERNETES;
 import static org.eclipse.jkube.integrationtests.assertions.InvocationResultAssertion.assertInvocation;
+import static org.eclipse.jkube.integrationtests.assertions.JKubeAssertions.assertJKube;
 import static org.eclipse.jkube.integrationtests.assertions.YamlAssertion.yaml;
 import static org.eclipse.jkube.integrationtests.docker.DockerUtils.loadTar;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -153,7 +154,8 @@ public class CompleteK8sJibITCase extends Complete {
     final InvocationResult invocationResult = maven("k8s:undeploy");
     // Then
     assertInvocation(invocationResult);
-    assertThatShouldDeleteAllAppliedResources(this);
-    assertDeploymentDeleted(this);
+    assertJKube(this)
+      .assertThatShouldDeleteAllAppliedResources()
+      .assertDeploymentDeleted();
   }
 }

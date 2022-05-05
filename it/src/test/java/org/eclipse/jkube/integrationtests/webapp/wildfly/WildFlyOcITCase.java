@@ -35,6 +35,7 @@ import static org.eclipse.jkube.integrationtests.Locks.CLUSTER_RESOURCE_INTENSIV
 import static org.eclipse.jkube.integrationtests.OpenShift.cleanUpCluster;
 import static org.eclipse.jkube.integrationtests.Tags.OPEN_SHIFT;
 import static org.eclipse.jkube.integrationtests.assertions.InvocationResultAssertion.assertInvocation;
+import static org.eclipse.jkube.integrationtests.assertions.JKubeAssertions.assertJKube;
 import static org.eclipse.jkube.integrationtests.assertions.YamlAssertion.yaml;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.anEmptyMap;
@@ -123,7 +124,8 @@ class WildFlyOcITCase extends WildFly {
     final InvocationResult invocationResult = maven("oc:undeploy");
     //Then
     assertInvocation(invocationResult);
-    assertThatShouldDeleteAllAppliedResources(this);
+    assertJKube(this)
+      .assertThatShouldDeleteAllAppliedResources();
     cleanUpCluster(oc, this);
   }
 }
