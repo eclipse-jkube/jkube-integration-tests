@@ -55,7 +55,7 @@ import static org.hamcrest.Matchers.stringContainsInOrder;
 import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 
 @Tag(KUBERNETES)
-@DockerRegistry
+@DockerRegistry(port = 5010)
 @RequireK8sVersionAtLeast(majorVersion = "1", minorVersion = "16")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class CustomResourceK8sITCase extends CustomResourceApp {
@@ -94,13 +94,13 @@ public class CustomResourceK8sITCase extends CustomResourceApp {
   @DisplayName("k8s:push, should push image to remote registry")
   void k8sPush() throws Exception {
     // Given
-    final Properties properties = properties("jkube.docker.push.registry", "localhost:5000");
+    final Properties properties = properties("jkube.docker.push.registry", "localhost:5010");
     // When
     final InvocationResult invocationResult = maven("k8s:push", properties);
     // Then
     assertInvocation(invocationResult);
     final Response response = new OkHttpClient.Builder().build().newCall(new Request.Builder()
-        .get().url("http://localhost:5000/v2/integration-tests/spring-boot-crd/tags/list").build())
+        .get().url("http://localhost:5010/v2/integration-tests/spring-boot-crd/tags/list").build())
       .execute();
     assertThat(response.body().string(),
       containsString("{\"name\":\"integration-tests/spring-boot-crd\",\"tags\":[\"latest\"]}"));
