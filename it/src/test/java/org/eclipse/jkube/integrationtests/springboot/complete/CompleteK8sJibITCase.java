@@ -50,7 +50,7 @@ import static org.hamcrest.Matchers.stringContainsInOrder;
 import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 
 @Tag(KUBERNETES)
-@DockerRegistry
+@DockerRegistry(port = 5005)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class CompleteK8sJibITCase extends Complete {
 
@@ -123,7 +123,7 @@ public class CompleteK8sJibITCase extends Complete {
     assertInvocation(invocationResult);
     assertThat(invocationResult.getStdOut(), containsString("JIB> [==============================] 100.0% complete"));
     final Response response = new OkHttpClient.Builder().build().newCall(new Request.Builder()
-      .get().url("http://localhost:5000/v2/sb/sb-complete/tags/list").build())
+      .get().url("http://localhost:5005/v2/sb/sb-complete/tags/list").build())
       .execute();
     assertThat(response.body().string(),
       containsString("{\"name\":\"sb/sb-complete\",\"tags\":[\"latest\"]}"));
@@ -137,7 +137,7 @@ public class CompleteK8sJibITCase extends Complete {
     // Given
     // No easy way to share a local registry within Minikube and test runner host (for every environment)
     loadTar(new File(String.format(
-      "../%s/target/docker/localhost/5000/sb/sb-complete/tmp/docker-build.tar", getProject())));
+      "../%s/target/docker/localhost/5005/sb/sb-complete/tmp/docker-build.tar", getProject())));
     // When
     final InvocationResult invocationResult = maven("k8s:apply");
     // Then

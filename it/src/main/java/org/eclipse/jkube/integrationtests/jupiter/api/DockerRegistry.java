@@ -29,4 +29,5 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @ExtendWith(RegistryExtension.class)
 public @interface DockerRegistry {
   String containerName() default "docker-registry";
+  int port() default 5000;
 }
