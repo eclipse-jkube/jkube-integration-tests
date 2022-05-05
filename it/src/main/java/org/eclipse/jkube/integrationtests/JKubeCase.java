@@ -20,4 +20,5 @@ public interface JKubeCase {
   KubernetesClient getKubernetesClient();
 
   String getApplication();
+
 }

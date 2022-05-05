@@ -37,6 +37,7 @@ import static org.eclipse.jkube.integrationtests.OpenShift.cleanUpCluster;
 import static org.eclipse.jkube.integrationtests.Tags.OPEN_SHIFT;
 import static org.eclipse.jkube.integrationtests.assertions.InvocationResultAssertion.assertInvocation;
 import static org.eclipse.jkube.integrationtests.assertions.JKubeAssertions.assertJKube;
+import static org.eclipse.jkube.integrationtests.assertions.KubernetesListAssertion.assertListResource;
 import static org.eclipse.jkube.integrationtests.assertions.YamlAssertion.yaml;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.anEmptyMap;
@@ -49,7 +50,7 @@ import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 @Tag(OPEN_SHIFT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @RequireK8sVersionAtLeast(majorVersion = "1", minorVersion = "16")
-public class CustomResourceOcITCase extends CustomResourceApp {
+class CustomResourceOcITCase extends CustomResourceApp {
 
   private OpenShiftClient oc;
 

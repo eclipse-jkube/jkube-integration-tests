@@ -1,0 +1,11 @@
+plugins {
+  id 'org.eclipse.jkube.kubernetes' version "${jkube_version}"
+  id 'org.eclipse.jkube.openshift' version "${jkube_version}"
+  id 'org.springframework.boot' version "${spring_boot_version}"
+  id 'io.spring.dependency-management' version "${spring_boot_dependency_management_version}"
+  id 'java'
+}
+
+dependencies {
+  implementation 'org.springframework.boot:spring-boot-starter-web'
+}

@@ -55,7 +55,7 @@ jobs:
       - name: Install Integration Tests (Downloads dependencies)
         run: |
           ./mvnw -B -DskipTests clean install \
-          && ./mvnw -B -DskipTests clean  -P'quarkus','quarkus-native','springboot','webapp','other','dockerfile'
+          && ./mvnw -B -DskipTests clean  -P'quarkus','quarkus-native','springboot','springboot-gradle','webapp','other','dockerfile'
 
   minikube:
     name: K8S
@@ -65,7 +65,7 @@ jobs:
       fail-fast: false
       matrix:
         kubernetes: [v1.12.0,v1.23.5]
-        suite: ['quarkus','quarkus-native','springboot','webapp','other','dockerfile']
+        suite: ['quarkus','quarkus-native','springboot','springboot-gradle','webapp','other','dockerfile']
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -107,7 +107,7 @@ jobs:
       fail-fast: false
       matrix:
         openshift: [v3.9.0,v3.11.0]
-        suite: ['quarkus','springboot','webapp','other']
+        suite: ['quarkus','springboot','springboot-gradle','webapp','other']
     steps:
       - name: Free up Space
 #            'linux-headers.*'                       \ # Takes > 2 minutes

@@ -16,7 +16,6 @@ package org.eclipse.jkube.integrationtests.assertions;
 import io.fabric8.kubernetes.api.model.Pod;
 import org.eclipse.jkube.integrationtests.JKubeCase;
 
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -41,7 +40,7 @@ public class JKubeAssertions {
   }
 
   public JKubeAssertions assertPodDeleted() throws InterruptedException {
-    final Optional<Pod> matchingPod = jKubeCase.getKubernetesClient().pods().list().getItems().stream()
+    final var matchingPod = jKubeCase.getKubernetesClient().pods().list().getItems().stream()
       .filter(p -> p.getMetadata().getName().startsWith(jKubeCase.getApplication()))
       .filter(p -> p.getMetadata().getLabels().getOrDefault("app", "").equals(jKubeCase.getApplication()))
       .filter(Predicate.not(p -> p.getMetadata().getName().endsWith("-build")))

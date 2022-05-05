@@ -39,6 +39,7 @@ import static org.eclipse.jkube.integrationtests.Locks.CLUSTER_RESOURCE_INTENSIV
 import static org.eclipse.jkube.integrationtests.Tags.KUBERNETES;
 import static org.eclipse.jkube.integrationtests.assertions.InvocationResultAssertion.assertInvocation;
 import static org.eclipse.jkube.integrationtests.assertions.JKubeAssertions.assertJKube;
+import static org.eclipse.jkube.integrationtests.assertions.KubernetesListAssertion.assertListResource;
 import static org.eclipse.jkube.integrationtests.assertions.YamlAssertion.yaml;
 import static org.eclipse.jkube.integrationtests.docker.DockerUtils.loadTar;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -52,7 +53,7 @@ import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 @Tag(KUBERNETES)
 @DockerRegistry(port = 5005)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class CompleteK8sJibITCase extends Complete {
+class CompleteK8sJibITCase extends Complete {
 
   private KubernetesClient k;
 

@@ -15,6 +15,7 @@ package org.eclipse.jkube.integrationtests.assertions;
 
 import org.eclipse.jkube.integrationtests.JKubeCase;
 import org.hamcrest.Matcher;
+import org.hamcrest.Matchers;
 
 import java.util.Map;
 import java.util.function.Supplier;
@@ -22,6 +23,7 @@ import java.util.function.Supplier;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.hasEntry;
+import static org.hamcrest.Matchers.startsWith;
 
 public class LabelAssertion {
 
@@ -44,7 +46,7 @@ public class LabelAssertion {
   public static void assertGlobalLabels(Supplier<Map<String, String>> labelSupplier) {
     assertLabels(labelSupplier, allOf(
       hasEntry("provider", "jkube"),
-      hasEntry("group", "org.eclipse.jkube.integration-tests")
+      hasEntry(Matchers.<String>equalTo("group"), startsWith("org.eclipse.jkube.integration-tests"))
     ));
   }
 

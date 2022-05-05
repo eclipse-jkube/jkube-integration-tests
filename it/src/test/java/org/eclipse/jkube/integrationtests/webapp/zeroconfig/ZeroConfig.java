@@ -20,7 +20,6 @@ import io.fabric8.kubernetes.client.dsl.ServiceResource;
 import org.eclipse.jkube.integrationtests.JKubeCase;
 import org.eclipse.jkube.integrationtests.maven.BaseMavenCase;
 
-import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 import static org.eclipse.jkube.integrationtests.assertions.PodAssertion.assertPod;
@@ -44,7 +43,7 @@ abstract class ZeroConfig extends BaseMavenCase implements JKubeCase {
     return "webapp-zero-config";
   }
 
-  final Pod assertThatShouldApplyResources() throws InterruptedException, IOException {
+  final Pod assertThatShouldApplyResources() throws Exception {
     final Pod pod = awaitPod(this).getKubernetesResource();
     assertPod(pod).apply(this).logContains("Catalina.start Server startup", 60);
     awaitService(this, pod.getMetadata().getNamespace())
@@ -55,7 +54,7 @@ abstract class ZeroConfig extends BaseMavenCase implements JKubeCase {
   }
 
   @SuppressWarnings("squid:S2925")
-  final Service serviceSpecTypeToNodePort() throws InterruptedException, IOException {
+  final Service serviceSpecTypeToNodePort() throws Exception {
     final Pod pod = awaitPod(this).getKubernetesResource();
     final Service serviceToUpdate = service(pod.getMetadata().getNamespace())
       .edit(s -> new ServiceBuilder(s).editSpec().withType("NodePort").endSpec().build());
