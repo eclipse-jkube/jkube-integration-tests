@@ -11,8 +11,8 @@
  * Contributors:
  *   Red Hat, Inc. - initial API and implementation
  */
-package org.eclipse.jkube.integrationtests.maven;
+package org.eclipse.jkube.integrationtests;
 
-public interface MavenProject {
+public interface Project {
   String getProject();
 }

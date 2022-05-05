@@ -38,6 +38,7 @@ import static org.eclipse.jkube.integrationtests.Tags.KUBERNETES;
 import static org.eclipse.jkube.integrationtests.assertions.DeploymentAssertion.awaitDeployment;
 import static org.eclipse.jkube.integrationtests.assertions.DockerAssertion.assertImageWasRecentlyBuilt;
 import static org.eclipse.jkube.integrationtests.assertions.InvocationResultAssertion.assertInvocation;
+import static org.eclipse.jkube.integrationtests.assertions.JKubeAssertions.assertJKube;
 import static org.eclipse.jkube.integrationtests.assertions.PodAssertion.awaitPod;
 import static org.eclipse.jkube.integrationtests.assertions.ServiceAssertion.awaitService;
 import static org.eclipse.jkube.integrationtests.assertions.YamlAssertion.yaml;
@@ -170,8 +171,9 @@ class SimpleK8sITCase extends BaseMavenCase implements JKubeCase {
     final InvocationResult invocationResult = maven("k8s:undeploy");
     // Then
     assertInvocation(invocationResult);
-    assertThatShouldDeleteAllAppliedResources(this);
-    assertDeploymentDeleted(this);
+    assertJKube(this)
+      .assertThatShouldDeleteAllAppliedResources()
+      .assertDeploymentDeleted();
   }
 
   final Pod assertThatShouldApplyResources() throws Exception {

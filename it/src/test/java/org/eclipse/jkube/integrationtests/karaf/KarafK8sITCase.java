@@ -38,6 +38,7 @@ import static org.eclipse.jkube.integrationtests.assertions.DeploymentAssertion.
 import static org.eclipse.jkube.integrationtests.assertions.DeploymentAssertion.awaitDeployment;
 import static org.eclipse.jkube.integrationtests.assertions.DockerAssertion.assertImageWasRecentlyBuilt;
 import static org.eclipse.jkube.integrationtests.assertions.InvocationResultAssertion.assertInvocation;
+import static org.eclipse.jkube.integrationtests.assertions.JKubeAssertions.assertJKube;
 import static org.eclipse.jkube.integrationtests.assertions.YamlAssertion.yaml;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
@@ -142,7 +143,8 @@ class KarafK8sITCase extends Karaf {
     final InvocationResult invocationResult = maven("k8s:undeploy");
     //Then
     assertInvocation(invocationResult);
-    assertThatShouldDeleteAllAppliedResources(this);
+    assertJKube(this)
+      .assertThatShouldDeleteAllAppliedResources();
     assertDeploymentExists(this,equalTo(false));
   }
 
