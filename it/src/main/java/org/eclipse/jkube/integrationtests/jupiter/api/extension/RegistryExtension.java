@@ -15,20 +15,23 @@ package org.eclipse.jkube.integrationtests.jupiter.api.extension;
 
 import org.eclipse.jkube.integrationtests.cli.CliUtils;
 import org.eclipse.jkube.integrationtests.jupiter.api.DockerRegistry;
+import org.eclipse.jkube.integrationtests.jupiter.api.DockerRegistryUrl;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
+import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.platform.commons.logging.Logger;
 import org.junit.platform.commons.logging.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 
 import static org.eclipse.jkube.integrationtests.cli.CliUtils.isWindows;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-public class RegistryExtension extends BaseExtension implements BeforeAllCallback, AfterAllCallback {
+public class RegistryExtension extends BaseExtension implements BeforeAllCallback, BeforeEachCallback, AfterAllCallback {
 
   private static final Logger logger = LoggerFactory.getLogger(RegistryExtension.class);
   @Override
@@ -49,6 +52,16 @@ public class RegistryExtension extends BaseExtension implements BeforeAllCallbac
     }
     assertThat(dockerRegistry.getOutput(), dockerRegistry.getExitCode(), Matchers.equalTo(0));
     logger.debug(() -> "Docker Registry started successfully");
+  }
+
+  @Override
+  public void beforeEach(ExtensionContext context) throws Exception {
+    final var annotation = context.getRequiredTestClass().getAnnotation(DockerRegistry.class);
+    for (Field f : context.getRequiredTestClass().getDeclaredFields()) {
+      if (f.isAnnotationPresent(DockerRegistryUrl.class) && f.getType() == String.class) {
+        setFieldValue(f, context.getRequiredTestInstance(), getDockerHostUrl() + ":" + annotation.port());
+      }
+    }
   }
 
   @Override
@@ -75,5 +88,15 @@ public class RegistryExtension extends BaseExtension implements BeforeAllCallbac
 
   private static String getName(DockerRegistry dockerRegistry) {
     return dockerRegistry.containerName() + "-" + dockerRegistry.port();
+  }
+
+  private static String getDockerHostUrl() {
+    final var dockerHost = System.getenv("DOCKER_HOST");
+    if (dockerHost == null) {
+      return "http://localhost";
+    } else {
+      return dockerHost.replaceAll("^tcp://", "http://")
+        .replaceAll(":\\d+$", "");
+    }
   }
 }

@@ -33,3 +33,7 @@ e.g. Spring Boot tests when running in an Open Shift cluster `mvn verify -POpenS
 command prior to anything else so that all `target` directories get deleted,
 else other profiles will get triggered.
 
+## Gradle
+
+The Gradle tests run using the local Gradle installation. This approach was selected due to issues when running the
+tests on the GitHub Actions CI pipeline environment.

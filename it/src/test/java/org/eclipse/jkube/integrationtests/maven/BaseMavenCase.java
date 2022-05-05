@@ -30,25 +30,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 
-import static org.eclipse.jkube.integrationtests.assertions.YamlAssertion.yaml;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.anEmptyMap;
-import static org.hamcrest.Matchers.hasEntry;
-import static org.hamcrest.Matchers.not;
-
 public abstract class BaseMavenCase implements Project {
 
   protected List<String> getProfiles() {
     return new ArrayList<>();
-  }
-
-  protected static void assertListResource(File file) {
-    assertThat(file, yaml(allOf(
-      not(anEmptyMap()),
-      hasEntry("kind", "List"),
-      hasEntry("apiVersion", "v1")
-    )));
   }
 
   protected Properties properties(Map<String, String> propertyMap) {

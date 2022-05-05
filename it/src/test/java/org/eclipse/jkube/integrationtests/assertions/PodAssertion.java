@@ -15,14 +15,12 @@ package org.eclipse.jkube.integrationtests.assertions;
 
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.client.KubernetesClient;
-import io.fabric8.kubernetes.client.Watch;
 import io.fabric8.kubernetes.client.dsl.PodResource;
+import io.fabric8.kubernetes.client.internal.readiness.Readiness;
 import io.fabric8.openshift.api.model.DeploymentConfigBuilder;
 import io.fabric8.openshift.client.OpenShiftClient;
 import org.eclipse.jkube.integrationtests.JKubeCase;
-import org.eclipse.jkube.integrationtests.PodReadyWatcher;
 
-import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -46,7 +44,7 @@ public class PodAssertion extends KubernetesClientAssertion<Pod> {
     return jKubeCase -> new PodAssertion(jKubeCase, pod);
   }
 
-  public static PodAssertion awaitPod(JKubeCase jKubeCase) throws InterruptedException, IOException {
+  public static PodAssertion awaitPod(JKubeCase jKubeCase) throws Exception {
     Pod pod = awaitPod(jKubeCase.getKubernetesClient(), jKubeCase.getApplication());
     if (pod == null) {
       printDiagnosis(jKubeCase);
@@ -86,14 +84,16 @@ public class PodAssertion extends KubernetesClientAssertion<Pod> {
       .withName(getKubernetesResource().getMetadata().getName());
   }
 
-  private static Pod awaitPod(KubernetesClient kc,String appId) throws InterruptedException {
-    final PodReadyWatcher podWatcher = new PodReadyWatcher();
-    try(Watch ignored = kc.pods().withLabel("app", appId).watch(podWatcher)) {
-      return podWatcher.await(DEFAULT_AWAIT_TIME_SECONDS, TimeUnit.SECONDS);
-    }
+  private static Pod awaitPod(KubernetesClient kc,String appId) throws Exception {
+    return kc.pods().withLabel("app", appId)
+      .informOnCondition(p -> p.stream().anyMatch(Readiness::isPodReady))
+      .get(DEFAULT_AWAIT_TIME_SECONDS, TimeUnit.SECONDS).stream()
+      .filter(Readiness::isPodReady)
+      .findFirst()
+      .orElse(null);
   }
 
-  private static Pod retryDeployment(JKubeCase jKubeCase) throws InterruptedException, IOException {
+  private static Pod retryDeployment(JKubeCase jKubeCase) throws Exception {
     if (jKubeCase.getKubernetesClient().isAdaptable(OpenShiftClient.class)) {
       System.err.println("\n\n===========================\nDeleting unusable PODs");
       jKubeCase.getKubernetesClient().pods().list().getItems().stream()

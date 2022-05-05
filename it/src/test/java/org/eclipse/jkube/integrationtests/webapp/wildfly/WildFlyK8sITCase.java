@@ -37,6 +37,7 @@ import static org.eclipse.jkube.integrationtests.assertions.DeploymentAssertion.
 import static org.eclipse.jkube.integrationtests.assertions.DockerAssertion.assertImageWasRecentlyBuilt;
 import static org.eclipse.jkube.integrationtests.assertions.InvocationResultAssertion.assertInvocation;
 import static org.eclipse.jkube.integrationtests.assertions.JKubeAssertions.assertJKube;
+import static org.eclipse.jkube.integrationtests.assertions.KubernetesListAssertion.assertListResource;
 import static org.eclipse.jkube.integrationtests.assertions.YamlAssertion.yaml;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;

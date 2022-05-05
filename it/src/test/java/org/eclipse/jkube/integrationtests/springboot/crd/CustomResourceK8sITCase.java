@@ -41,6 +41,7 @@ import static org.eclipse.jkube.integrationtests.assertions.DeploymentAssertion.
 import static org.eclipse.jkube.integrationtests.assertions.DockerAssertion.assertImageWasRecentlyBuilt;
 import static org.eclipse.jkube.integrationtests.assertions.InvocationResultAssertion.assertInvocation;
 import static org.eclipse.jkube.integrationtests.assertions.JKubeAssertions.assertJKube;
+import static org.eclipse.jkube.integrationtests.assertions.KubernetesListAssertion.assertListResource;
 import static org.eclipse.jkube.integrationtests.assertions.YamlAssertion.yaml;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
@@ -58,7 +59,7 @@ import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 @DockerRegistry(port = 5010)
 @RequireK8sVersionAtLeast(majorVersion = "1", minorVersion = "16")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class CustomResourceK8sITCase extends CustomResourceApp {
+class CustomResourceK8sITCase extends CustomResourceApp {
 
   private KubernetesClient k;
 

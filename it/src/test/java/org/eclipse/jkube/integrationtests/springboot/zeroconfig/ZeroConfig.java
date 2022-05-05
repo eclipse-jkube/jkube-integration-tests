@@ -46,7 +46,7 @@ abstract class ZeroConfig extends BaseMavenCase implements JKubeCase {
     return "spring-boot-zero-config";
   }
 
-  final Pod assertThatShouldApplyResources() throws InterruptedException, IOException {
+  final Pod assertThatShouldApplyResources() throws Exception {
     final Pod pod = awaitPod(this)
       .logContains("Started ZeroConfigApplication in", 40)
       .getKubernetesResource();
@@ -57,7 +57,7 @@ abstract class ZeroConfig extends BaseMavenCase implements JKubeCase {
     return pod;
   }
 
-  final void assertHelm(File helmDirectory) {
+  static void assertHelm(File helmDirectory) {
     assertThat(helmDirectory.exists(), equalTo(true));
     assertThat(new File(helmDirectory, "Chart.yaml"), yaml(allOf(
       aMapWithSize(4),
