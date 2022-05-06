@@ -15,7 +15,7 @@ package org.eclipse.jkube.integrationtests.jupiter.api.extension;
 
 import org.eclipse.jkube.integrationtests.cli.CliUtils;
 import org.eclipse.jkube.integrationtests.jupiter.api.DockerRegistry;
-import org.eclipse.jkube.integrationtests.jupiter.api.DockerRegistryUrl;
+import org.eclipse.jkube.integrationtests.jupiter.api.DockerRegistryHost;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
@@ -58,8 +58,8 @@ public class RegistryExtension extends BaseExtension implements BeforeAllCallbac
   public void beforeEach(ExtensionContext context) throws Exception {
     final var annotation = context.getRequiredTestClass().getAnnotation(DockerRegistry.class);
     for (Field f : context.getRequiredTestClass().getDeclaredFields()) {
-      if (f.isAnnotationPresent(DockerRegistryUrl.class) && f.getType() == String.class) {
-        setFieldValue(f, context.getRequiredTestInstance(), getDockerHostUrl() + ":" + annotation.port());
+      if (f.isAnnotationPresent(DockerRegistryHost.class) && f.getType() == String.class) {
+        setFieldValue(f, context.getRequiredTestInstance(), getDockerHost() + ":" + annotation.port());
       }
     }
   }
@@ -90,12 +90,12 @@ public class RegistryExtension extends BaseExtension implements BeforeAllCallbac
     return dockerRegistry.containerName() + "-" + dockerRegistry.port();
   }
 
-  private static String getDockerHostUrl() {
+  private static String getDockerHost() {
     final var dockerHost = System.getenv("DOCKER_HOST");
     if (dockerHost == null) {
-      return "http://localhost";
+      return "localhost";
     } else {
-      return dockerHost.replaceAll("^tcp://", "http://")
+      return dockerHost.replaceAll("^tcp://", "")
         .replaceAll(":\\d+$", "");
     }
   }

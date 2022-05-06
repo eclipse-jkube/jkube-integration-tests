@@ -450,25 +450,6 @@
               <includes>
                 <include>**/integrationtests/springboot/**/*ITCase.java</include>
               </includes>
-              <excludes>
-                <exclude>**/integrationtests/springboot/**/*GradleITCase.java</exclude>
-              </excludes>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    <profile>
-      <id>springboot-gradle</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-failsafe-plugin</artifactId>
-            <configuration>
-              <includes>
-                <include>**/integrationtests/springboot/**/*GradleITCase.java</include>
-              </includes>
             </configuration>
           </plugin>
         </plugins>

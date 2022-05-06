@@ -21,6 +21,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 import org.apache.maven.shared.invoker.InvocationResult;
 import org.eclipse.jkube.integrationtests.jupiter.api.DockerRegistry;
+import org.eclipse.jkube.integrationtests.jupiter.api.DockerRegistryHost;
 import org.eclipse.jkube.integrationtests.maven.MavenInvocationResult;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -62,6 +63,9 @@ class ZeroConfigK8sITCase extends ZeroConfig {
 
   private KubernetesClient k;
 
+  @DockerRegistryHost
+  private String registry;
+
   @BeforeEach
   void setUp() {
     k = new DefaultKubernetesClient();
@@ -94,16 +98,16 @@ class ZeroConfigK8sITCase extends ZeroConfig {
   @DisplayName("k8s:push, should push image to remote registry")
   void k8sPush() throws Exception {
     // Given
-    final Properties properties = properties("jkube.docker.push.registry", "localhost:5000");
+    final Properties properties = properties("jkube.docker.push.registry", registry);
     // When
     final InvocationResult invocationResult = maven("k8s:push", properties);
     // Then
     assertInvocation(invocationResult);
-    final Response response = new OkHttpClient.Builder().build().newCall(new Request.Builder()
-      .get().url("http://localhost:5000/v2/integration-tests/spring-boot-zero-config/tags/list").build())
-      .execute();
-    assertThat(response.body().string(),
-      containsString("{\"name\":\"integration-tests/spring-boot-zero-config\",\"tags\":[\"latest\"]}"));
+    try (Response response = new OkHttpClient.Builder().build().newCall(new Request.Builder()
+      .get().url("http://" + registry + "/v2/integration-tests/spring-boot-zero-config/tags/list").build()).execute()) {
+      assertThat(response.body().string(),
+        containsString("{\"name\":\"integration-tests/spring-boot-zero-config\",\"tags\":[\"latest\"]}"));
+    }
   }
 
   @Test

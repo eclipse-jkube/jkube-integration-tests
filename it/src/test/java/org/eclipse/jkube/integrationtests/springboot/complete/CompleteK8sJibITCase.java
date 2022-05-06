@@ -20,6 +20,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 import org.apache.maven.shared.invoker.InvocationResult;
 import org.eclipse.jkube.integrationtests.jupiter.api.DockerRegistry;
+import org.eclipse.jkube.integrationtests.jupiter.api.DockerRegistryHost;
 import org.eclipse.jkube.integrationtests.maven.MavenInvocationResult;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,6 +35,7 @@ import org.junit.jupiter.api.parallel.ResourceLock;
 import java.io.File;
 import java.util.Collections;
 import java.util.List;
+import java.util.Properties;
 
 import static org.eclipse.jkube.integrationtests.Locks.CLUSTER_RESOURCE_INTENSIVE;
 import static org.eclipse.jkube.integrationtests.Tags.KUBERNETES;
@@ -57,9 +59,16 @@ class CompleteK8sJibITCase extends Complete {
 
   private KubernetesClient k;
 
+  @DockerRegistryHost
+  private String registry;
+
+  private Properties mvnProperties;
+
   @BeforeEach
   void setUp() {
     k = new DefaultKubernetesClient();
+    mvnProperties = new Properties();
+    mvnProperties.setProperty("jkube.generator.name", registry + "/sb/sb-complete");
   }
 
   @AfterEach
@@ -88,7 +97,7 @@ class CompleteK8sJibITCase extends Complete {
   @DisplayName("k8s:resource, should create manifests")
   void k8sResource() throws Exception {
     // When
-    final InvocationResult invocationResult = maven("k8s:resource");
+    final InvocationResult invocationResult = maven("k8s:resource", mvnProperties);
     // Then
     assertInvocation(invocationResult);
     final File metaInfDirectory = new File(
@@ -104,7 +113,7 @@ class CompleteK8sJibITCase extends Complete {
   @DisplayName("k8s:build, should create JIB image")
   void k8sBuild() throws Exception {
     // When
-    final MavenInvocationResult invocationResult = maven("k8s:build");
+    final MavenInvocationResult invocationResult = maven("k8s:build", mvnProperties);
     // Then
     assertInvocation(invocationResult);
     assertThat(invocationResult.getStdOut(), stringContainsInOrder(
@@ -119,15 +128,15 @@ class CompleteK8sJibITCase extends Complete {
   @DisplayName("k8s:push, should push image to remote registry")
   void k8sPush() throws Exception {
     // When
-    final MavenInvocationResult invocationResult = maven("k8s:push");
+    final MavenInvocationResult invocationResult = maven("k8s:push", mvnProperties);
     // Then
     assertInvocation(invocationResult);
     assertThat(invocationResult.getStdOut(), containsString("JIB> [==============================] 100.0% complete"));
-    final Response response = new OkHttpClient.Builder().build().newCall(new Request.Builder()
-      .get().url("http://localhost:5005/v2/sb/sb-complete/tags/list").build())
-      .execute();
-    assertThat(response.body().string(),
-      containsString("{\"name\":\"sb/sb-complete\",\"tags\":[\"latest\"]}"));
+    try (Response response = new OkHttpClient.Builder().build().newCall(new Request.Builder()
+      .get().url("http://" + registry + "/v2/sb/sb-complete/tags/list").build()).execute()) {
+      assertThat(response.body().string(),
+        containsString("{\"name\":\"sb/sb-complete\",\"tags\":[\"latest\"]}"));
+    }
   }
 
   @Test
@@ -140,7 +149,7 @@ class CompleteK8sJibITCase extends Complete {
     loadTar(new File(String.format(
       "../%s/target/docker/localhost/5005/sb/sb-complete/tmp/docker-build.tar", getProject())));
     // When
-    final InvocationResult invocationResult = maven("k8s:apply");
+    final InvocationResult invocationResult = maven("k8s:apply", mvnProperties);
     // Then
     assertInvocation(invocationResult);
     assertThatShouldApplyResources()
@@ -152,7 +161,7 @@ class CompleteK8sJibITCase extends Complete {
   @DisplayName("k8s:undeploy, should delete all applied resources")
   void k8sUndeploy() throws Exception {
     // When
-    final InvocationResult invocationResult = maven("k8s:undeploy");
+    final InvocationResult invocationResult = maven("k8s:undeploy", mvnProperties);
     // Then
     assertInvocation(invocationResult);
     assertJKube(this)
