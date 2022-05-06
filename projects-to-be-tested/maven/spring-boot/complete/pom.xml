@@ -160,7 +160,6 @@
         <jkube.build.strategy>jib</jkube.build.strategy>
         <jkube.targetDir>${project.build.outputDirectory}/META-INF/jkube-jib</jkube.targetDir>
         <jkube.kubernetesManifest>${project.build.outputDirectory}/META-INF/jkube-jib/kubernetes.yml</jkube.kubernetesManifest>
-        <jkube.generator.name>localhost:5005/sb/sb-complete</jkube.generator.name>
         <jkube.enricher.jkube-controller.name>spring-boot-complete-jib</jkube.enricher.jkube-controller.name>
         <jkube.enricher.jkube-project-label.app>spring-boot-complete-jib</jkube.enricher.jkube-project-label.app>
         <jkube.enricher.jkube-service.name>spring-boot-complete-jib</jkube.enricher.jkube-service.name>

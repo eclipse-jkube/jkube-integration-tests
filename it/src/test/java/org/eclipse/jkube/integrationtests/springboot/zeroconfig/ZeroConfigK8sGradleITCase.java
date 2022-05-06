@@ -20,7 +20,7 @@ import okhttp3.Response;
 import org.eclipse.jkube.integrationtests.JKubeCase;
 import org.eclipse.jkube.integrationtests.gradle.JKubeGradleRunner;
 import org.eclipse.jkube.integrationtests.jupiter.api.DockerRegistry;
-import org.eclipse.jkube.integrationtests.jupiter.api.DockerRegistryUrl;
+import org.eclipse.jkube.integrationtests.jupiter.api.DockerRegistryHost;
 import org.eclipse.jkube.integrationtests.jupiter.api.GradleTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
@@ -57,7 +57,7 @@ import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 
 @Tag(KUBERNETES)
 @GradleTest(
-  project = "spring-boot-zero-config")
+  project = "sb-zero-config")
 @DockerRegistry(port = 5015)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class ZeroConfigK8sGradleITCase {
@@ -66,8 +66,8 @@ class ZeroConfigK8sGradleITCase {
 
   private JKubeCase jKubeCase;
 
-  @DockerRegistryUrl
-  private String registryUrl;
+  @DockerRegistryHost
+  private String registry;
 
   @Test
   @Order(1)
@@ -80,9 +80,9 @@ class ZeroConfigK8sGradleITCase {
       .resolve("main").resolve("META-INF").resolve("jkube");
     assertThat(resourcePath.toFile(), anExistingDirectory());
     assertListResource(resourcePath.resolve("kubernetes.yml"));
-    assertThat(resourcePath.resolve("kubernetes").resolve("spring-boot-zero-config-deployment.yml").toFile(),
+    assertThat(resourcePath.resolve("kubernetes").resolve("sb-zero-config-deployment.yml").toFile(),
       yaml(not(anEmptyMap())));
-    assertThat(resourcePath.resolve("kubernetes").resolve("spring-boot-zero-config-service.yml").toFile(),
+    assertThat(resourcePath.resolve("kubernetes").resolve("sb-zero-config-service.yml").toFile(),
       yaml(not(anEmptyMap())));
   }
   @Test
@@ -100,10 +100,10 @@ class ZeroConfigK8sGradleITCase {
   @DisplayName("k8sPush, should push image to remote registry")
   void k8sPush() throws Exception {
     // When
-    gradle.tasks("-Pjkube.docker.push.registry=localhost:5015", "k8sPush").build();
+    gradle.tasks("-Pjkube.docker.push.registry=" + registry, "k8sPush").build();
     // Then
     try (Response response = new OkHttpClient.Builder().build().newCall(new Request.Builder()
-      .get().url(registryUrl + "/v2/gradle/" + jKubeCase.getApplication() + "/tags/list").build()).execute()) {
+      .get().url("http://" + registry + "/v2/gradle/" + jKubeCase.getApplication() + "/tags/list").build()).execute()) {
       assertThat(response.body().string(),
         containsString("{\"name\":\"gradle/" + jKubeCase.getApplication() + "\",\"tags\":[\"latest\"]}"));
     }
@@ -129,9 +129,9 @@ class ZeroConfigK8sGradleITCase {
       hasEntry("version", "0.0.0-SNAPSHOT")
     )));
     assertThat(helmDirectory.resolve("values.yaml").toFile(), yaml(anEmptyMap()));
-    assertThat(helmDirectory.resolve("templates").resolve("spring-boot-zero-config-service.yaml").toFile(),
+    assertThat(helmDirectory.resolve("templates").resolve("sb-zero-config-service.yaml").toFile(),
       yaml(not(anEmptyMap())));
-    assertThat(helmDirectory.resolve("templates").resolve("spring-boot-zero-config-deployment.yaml").toFile(),
+    assertThat(helmDirectory.resolve("templates").resolve("sb-zero-config-deployment.yaml").toFile(),
       yaml(not(anEmptyMap())));
   }
 
@@ -156,7 +156,7 @@ class ZeroConfigK8sGradleITCase {
       .assertReplicas(equalTo(1))
       .assertContainers(hasSize(1))
       .assertContainers(hasItems(allOf(
-        hasProperty("image", equalTo("gradle/spring-boot-zero-config:latest")),
+        hasProperty("image", equalTo("gradle/sb-zero-config:latest")),
         hasProperty("name", equalTo("spring-boot")),
         hasProperty("ports", hasSize(3)),
         hasProperty("ports", hasItems(allOf(
