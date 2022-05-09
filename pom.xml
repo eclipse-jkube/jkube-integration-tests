@@ -42,7 +42,7 @@
     <hamcrest.version>2.0.0.0</hamcrest.version>
     <jkube.version>1.8.0-SNAPSHOT</jkube.version>
     <junit.version>5.8.2</junit.version>
-    <karaf.version>4.3.6</karaf.version>
+    <karaf.version>4.4.0</karaf.version>
     <license-maven-plugin.version>3.0</license-maven-plugin.version>
     <openliberty.version>21.0.0.6</openliberty.version>
     <openliberty.plugin.version>3.0.1</openliberty.plugin.version>
