@@ -46,7 +46,7 @@
     <license-maven-plugin.version>3.0</license-maven-plugin.version>
     <openliberty.version>21.0.0.6</openliberty.version>
     <openliberty.plugin.version>3.0.1</openliberty.plugin.version>
-    <quarkus.version>2.8.1.Final</quarkus.version>
+    <quarkus.version>2.8.3.Final</quarkus.version>
     <spring-boot.version>2.6.7</spring-boot.version>
     <thorntail.version>2.7.0.Final</thorntail.version>
     <vertx.version>4.2.7</vertx.version>
