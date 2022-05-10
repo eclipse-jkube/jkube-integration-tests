@@ -82,7 +82,7 @@ jobs:
             ./jkube
           key: cache-it-${{ github.run_id }}
       - name: Setup Minikube-Kubernetes
-        uses: manusa/actions-setup-minikube@v2.4.3
+        uses: manusa/actions-setup-minikube@v2.6.0
         with:
           minikube version: v1.25.2
           kubernetes version: ${{ matrix.kubernetes }}
