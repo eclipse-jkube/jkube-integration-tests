@@ -14,10 +14,15 @@
 package org.eclipse.jkube.integrationtests;
 
 import io.fabric8.kubernetes.client.KubernetesClient;
+import io.fabric8.openshift.client.OpenShiftClient;
 
 public interface JKubeCase {
 
   KubernetesClient getKubernetesClient();
+
+  default OpenShiftClient getOpenShiftClient() {
+    return getKubernetesClient().adapt(OpenShiftClient.class);
+  }
 
   String getApplication();
 
