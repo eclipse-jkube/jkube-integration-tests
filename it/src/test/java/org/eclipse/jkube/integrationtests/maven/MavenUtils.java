@@ -29,9 +29,10 @@ import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static org.eclipse.jkube.integrationtests.JKubeCase.JKUBE_VERSION_SYSTEM_PROPERTY;
+
 public class MavenUtils {
 
-  private static final String JKUBE_VERSION_SYSTEM_PROPERTY = "jkubeVersion";
   private static final String JKUBE_VERSION_MAVEN_PROPERTY = "jkube.version";
 
   private static String mavenLocation;

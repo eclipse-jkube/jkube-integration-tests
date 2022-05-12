@@ -29,6 +29,10 @@ import java.nio.file.Path;
 import java.util.Collections;
 
 public class GradleExtension extends BaseExtension implements BeforeAllCallback, BeforeEachCallback {
+
+
+  private volatile boolean cleanBuild = false;
+
   @Override
   ExtensionContext.Namespace getNamespace() {
     return ExtensionContext.Namespace.create(GradleExtension.class);
@@ -48,12 +52,13 @@ public class GradleExtension extends BaseExtension implements BeforeAllCallback,
     if (annotation.forwardOutput()) {
       gradleRunner.forwardOutput();
     }
-    if (annotation.clean()) {
+    if (!cleanBuild && annotation.clean()) {
       gradleRunner.withArguments("clean").build();
     }
-    if (annotation.build()) {
-      gradleRunner.withArguments("build").build();
+    if (!cleanBuild && annotation.build()) {
+      gradleRunner.withArguments("--offline", "build", "k8sConfigView", "ocConfigView").build();
     }
+    cleanBuild = true;
     gradleRunner.withArguments(Collections.emptyList());
     final var jKubeGradleRunner = new JKubeGradleRunner(gradleRunner, String.join(":", annotation.project()), projectPath);
     getStore(context).put("jKubeGradleRunner", jKubeGradleRunner);
