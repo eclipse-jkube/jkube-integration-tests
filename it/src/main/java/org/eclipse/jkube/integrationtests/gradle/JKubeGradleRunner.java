@@ -16,11 +16,15 @@ package org.eclipse.jkube.integrationtests.gradle;
 import org.gradle.testkit.runner.GradleRunner;
 
 import java.nio.file.Path;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.Optional;
 import java.util.stream.Stream;
+
+import static org.eclipse.jkube.integrationtests.JKubeCase.JKUBE_VERSION_SYSTEM_PROPERTY;
 
 public class JKubeGradleRunner {
 
+  private static final String JKUBE_VERSION_GRADLE_PROPERTY = JKUBE_VERSION_SYSTEM_PROPERTY;
   private final GradleRunner gradleRunner;
 
   private final String module;
@@ -34,8 +38,14 @@ public class JKubeGradleRunner {
   }
 
   public GradleRunner tasks(String... tasks) {
-    return gradleRunner.withArguments(Stream.of(tasks)
-      .map(s -> s.startsWith("-") ? s : ":" + module + ":" +s).collect(Collectors.toList()));
+    final ArrayList<String> arguments = new ArrayList<>();
+    arguments.add("--offline");
+    Stream.of(tasks)
+      .map(s -> s.startsWith("-") ? s : ":" + module + ":" +s)
+      .forEach(arguments::add);
+    Optional.ofNullable(System.getProperty(JKUBE_VERSION_SYSTEM_PROPERTY)).ifPresent(jkubeVersion ->
+      arguments.add(0, "-P" + JKUBE_VERSION_GRADLE_PROPERTY + "=" + jkubeVersion));
+    return gradleRunner.withArguments(arguments);
   }
 
   public Path getProjectPath() {

@@ -11,10 +11,9 @@
  * Contributors:
  *   Red Hat, Inc. - initial API and implementation
  */
-package org.eclipse.jkube.integrationtests.springboot.zeroconfig;
+package org.eclipse.jkube.integrationtests.dsl;
 
 import io.fabric8.kubernetes.api.model.Pod;
-import io.fabric8.openshift.api.model.ImageStream;
 import org.eclipse.jkube.integrationtests.JKubeCase;
 import org.eclipse.jkube.integrationtests.gradle.JKubeGradleRunner;
 import org.eclipse.jkube.integrationtests.jupiter.api.GradleTest;
@@ -27,9 +26,9 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.parallel.ResourceLock;
 
 import static org.eclipse.jkube.integrationtests.Locks.CLUSTER_RESOURCE_INTENSIVE;
-import static org.eclipse.jkube.integrationtests.OpenShift.cleanUpCluster;
-import static org.eclipse.jkube.integrationtests.Tags.OPEN_SHIFT;
-import static org.eclipse.jkube.integrationtests.assertions.DeploymentConfigAssertion.awaitDeploymentConfig;
+import static org.eclipse.jkube.integrationtests.Tags.KUBERNETES;
+import static org.eclipse.jkube.integrationtests.assertions.DeploymentAssertion.awaitDeployment;
+import static org.eclipse.jkube.integrationtests.assertions.DockerAssertion.assertImageWasRecentlyBuilt;
 import static org.eclipse.jkube.integrationtests.assertions.JKubeAssertions.assertJKube;
 import static org.eclipse.jkube.integrationtests.assertions.KubernetesListAssertion.assertListResource;
 import static org.eclipse.jkube.integrationtests.assertions.PodAssertion.awaitPod;
@@ -39,24 +38,22 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.aMapWithSize;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.anEmptyMap;
-import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.stringContainsInOrder;
 import static org.hamcrest.io.FileMatchers.anExistingDirectory;
 import static org.hamcrest.io.FileMatchers.anExistingFile;
 import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 
-@Tag(OPEN_SHIFT)
+@Tag(KUBERNETES)
 @GradleTest(
-  project = "sb-zero-config")
+  project = "dsl")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class ZeroConfigOcGradleITCase {
+class DslK8sGradleITCase {
 
   private static JKubeGradleRunner gradle;
 
@@ -64,48 +61,43 @@ class ZeroConfigOcGradleITCase {
 
   @Test
   @Order(1)
-  @DisplayName("ocResource, should create manifests")
-  void ocResource() {
+  @DisplayName("k8sResource, should create manifests")
+  void k8sResource() {
     // When
-    gradle.tasks("ocResource").build();
+    gradle.tasks("k8sResource").build();
     // Then
     var resourcePath = gradle.getModulePath().resolve("build").resolve("classes").resolve("java")
       .resolve("main").resolve("META-INF").resolve("jkube");
     assertThat(resourcePath.toFile(), anExistingDirectory());
-    assertListResource(resourcePath.resolve("openshift.yml"));
-    assertThat(resourcePath.resolve("openshift").resolve("sb-zero-config-deploymentconfig.yml").toFile(),
+    assertListResource(resourcePath.resolve("kubernetes.yml"));
+    assertThat(resourcePath.resolve("kubernetes").resolve("dsl-deployment.yml").toFile(),
       yaml(not(anEmptyMap())));
-    assertThat(resourcePath.resolve("openshift").resolve("sb-zero-config-route.yml").toFile(),
-      yaml(not(anEmptyMap())));
-    assertThat(resourcePath.resolve("openshift").resolve("sb-zero-config-service.yml").toFile(),
+    assertThat(resourcePath.resolve("kubernetes").resolve("dsl-service.yml").toFile(),
       yaml(not(anEmptyMap())));
   }
 
   @Test
   @Order(1)
-  @ResourceLock(value = CLUSTER_RESOURCE_INTENSIVE, mode = READ_WRITE)
-  @DisplayName("ocBuild, should create image")
-  void ocBuild() {
+  @DisplayName("k8sBuild, should create image")
+  void k8sBuild() throws Exception {
     // When
-    gradle.tasks("ocBuild").build();
+    gradle.tasks("k8sBuild").build();
     // Then
-    final ImageStream is = jKubeCase.getOpenShiftClient().imageStreams().withName(jKubeCase.getApplication()).get();
-    assertThat(is, notNullValue());
-    assertThat(is.getStatus().getTags().iterator().next().getTag(), equalTo("latest"));
+    assertImageWasRecentlyBuilt("gradle", jKubeCase.getApplication());
   }
 
   @Test
   @Order(2)
-  @DisplayName("ocHelm, should create Helm charts")
-  void ocHelm() {
+  @DisplayName("k8sHelm, should create Helm charts")
+  void k8sHelm() {
     // When
-    gradle.tasks("ocHelm").build();
+    gradle.tasks("k8sHelm").build();
     // Then
     assertThat(gradle.getModulePath().resolve("build")
-        .resolve(jKubeCase.getApplication() + "-0.0.0-SNAPSHOT-helmshift.tar.gz").toFile(),
+        .resolve(jKubeCase.getApplication() + "-0.0.0-SNAPSHOT-helm.tar.gz").toFile(),
       anExistingFile());
     final var helmDirectory = gradle.getModulePath().resolve("build").resolve("jkube")
-      .resolve("helm").resolve(jKubeCase.getApplication()).resolve("openshift");
+      .resolve("helm").resolve(jKubeCase.getApplication()).resolve("kubernetes");
     assertThat(helmDirectory.resolve("Chart.yaml").toFile(), yaml(allOf(
       aMapWithSize(3),
       hasEntry("apiVersion", "v1"),
@@ -113,38 +105,35 @@ class ZeroConfigOcGradleITCase {
       hasEntry("version", "0.0.0-SNAPSHOT")
     )));
     assertThat(helmDirectory.resolve("values.yaml").toFile(), yaml(anEmptyMap()));
-    assertThat(helmDirectory.resolve("templates").resolve("sb-zero-config-deploymentconfig.yaml").toFile(),
+    assertThat(helmDirectory.resolve("templates").resolve("dsl-service.yaml").toFile(),
       yaml(not(anEmptyMap())));
-    assertThat(helmDirectory.resolve("templates").resolve("sb-zero-config-route.yaml").toFile(),
-      yaml(not(anEmptyMap())));
-    assertThat(helmDirectory.resolve("templates").resolve("sb-zero-config-service.yaml").toFile(),
+    assertThat(helmDirectory.resolve("templates").resolve("dsl-deployment.yaml").toFile(),
       yaml(not(anEmptyMap())));
   }
-
 
   @Test
   @Order(2)
   @ResourceLock(value = CLUSTER_RESOURCE_INTENSIVE, mode = READ_WRITE)
-  @DisplayName("ocApply, should deploy pod and service")
+  @DisplayName("k8sApply, should deploy pod and service")
   @SuppressWarnings("unchecked")
-  void ocApply() throws Exception {
+  void k8sApply() throws Exception {
     // When
-    gradle.tasks("ocApply").build();
+    gradle.tasks("k8sApply").build();
     // Then
     final Pod pod = awaitPod(jKubeCase)
-      .logContains("Started ZeroConfigApplication in", 40)
+      .logContains("May the 4th be with you", 40)
       .getKubernetesResource();
     awaitService(jKubeCase, pod.getMetadata().getNamespace())
       .assertExposed()
       .assertPorts(hasSize(1))
       .assertPort("http", 8080, false);
-    awaitDeploymentConfig(jKubeCase, pod.getMetadata().getNamespace())
+    awaitDeployment(jKubeCase, pod.getMetadata().getNamespace())
       .assertReplicas(equalTo(1))
       .assertContainers(hasSize(1))
       .assertContainers(hasItems(allOf(
-        hasProperty("image", containsString("sb-zero-config@sha256")),
-        hasProperty("name", equalTo("spring-boot")),
-        hasProperty("ports", hasSize(3)),
+        hasProperty("image", equalTo("gradle/dsl:latest")),
+        hasProperty("name", equalTo("gradle-dsl")),
+        hasProperty("ports", hasSize(1)),
         hasProperty("ports", hasItems(allOf(
           hasProperty("name", equalTo("http")),
           hasProperty("containerPort", equalTo(8080))
@@ -154,25 +143,24 @@ class ZeroConfigOcGradleITCase {
 
   @Test
   @Order(3)
-  @DisplayName("ocLog, should retrieve log")
-  void ocLog() {
+  @DisplayName("k8sLog, should retrieve log")
+  void k8sLog() {
     // When
-    final var result = gradle.tasks("ocLog", "-Pjkube.log.follow=false").build();
+    final var result = gradle.tasks("k8sLog", "-Pjkube.log.follow=false").build();
     // Then
     assertThat(result.getOutput(),
-      stringContainsInOrder("Tomcat started on port(s): 8080", "Started ZeroConfigApplication in", "seconds"));
+      stringContainsInOrder("May the 4th be with you"));
   }
 
   @Test
   @Order(4)
-  @DisplayName("ocUndeploy, should delete all applied resources")
-  void ocUndeploy() throws Exception {
+  @DisplayName("k8sUndeploy, should delete all applied resources")
+  void k8sUndeploy() throws Exception {
     // When
-    gradle.tasks("ocUndeploy").build();
+    gradle.tasks("k8sUndeploy").build();
     // Then
     assertJKube(jKubeCase)
       .assertThatShouldDeleteAllAppliedResources()
       .assertDeploymentDeleted();
-    cleanUpCluster(jKubeCase.getOpenShiftClient(), jKubeCase);
   }
 }

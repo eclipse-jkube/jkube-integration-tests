@@ -1,0 +1,47 @@
+plugins {
+  id 'org.eclipse.jkube.kubernetes' version "${jkube_version}"
+  id 'org.eclipse.jkube.openshift' version "${jkube_version}"
+  id 'java'
+}
+
+jar {
+  manifest {
+    attributes 'Main-Class': 'org.eclipse.jkube.integrationtests.dsl.Main'
+  }
+}
+
+def imageDef = {
+  name = "gradle/${project.name}"
+  build {
+    from = 'openjdk:11-jre-slim'
+    env {
+      GREETING = 'May the 4th be with you'
+    }
+    assembly {
+      targetDir = '/deployments'
+      layers =
+        [{
+           fileSets =
+             [{
+                directory = file("${project.rootDir}/build/libs")
+              }]
+         }]
+    }
+    ports = ['8080']
+    entryPoint {
+      shell = "java -jar /deployments/${project.name}-${project.version}.jar"
+    }
+  }
+}
+
+kubernetes {
+  images {
+    image = imageDef
+  }
+}
+
+openshift {
+  images {
+    image = imageDef
+  }
+}

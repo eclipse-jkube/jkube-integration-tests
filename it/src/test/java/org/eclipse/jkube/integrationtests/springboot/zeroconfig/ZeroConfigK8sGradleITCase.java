@@ -109,7 +109,6 @@ class ZeroConfigK8sGradleITCase {
     }
   }
 
-
   @Test
   @Order(2)
   @DisplayName("k8sHelm, should create Helm charts")
@@ -134,7 +133,6 @@ class ZeroConfigK8sGradleITCase {
     assertThat(helmDirectory.resolve("templates").resolve("sb-zero-config-deployment.yaml").toFile(),
       yaml(not(anEmptyMap())));
   }
-
 
   @Test
   @Order(3)

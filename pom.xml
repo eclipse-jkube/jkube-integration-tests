@@ -367,6 +367,7 @@
                 <include>**/integrationtests/vertx/**/*ITCase.java</include>
                 <include>**/integrationtests/wildfly/jar/**/*ITCase.java</include>
                 <include>**/integrationtests/karaf/**/*ITCase.java</include>
+                <include>**/integrationtests/dsl/**/*ITCase.java</include>
               </includes>
             </configuration>
           </plugin>

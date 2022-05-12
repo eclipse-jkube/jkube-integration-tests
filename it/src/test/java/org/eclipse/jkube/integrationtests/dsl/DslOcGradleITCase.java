@@ -11,7 +11,7 @@
  * Contributors:
  *   Red Hat, Inc. - initial API and implementation
  */
-package org.eclipse.jkube.integrationtests.springboot.zeroconfig;
+package org.eclipse.jkube.integrationtests.dsl;
 
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.openshift.api.model.ImageStream;
@@ -29,7 +29,7 @@ import org.junit.jupiter.api.parallel.ResourceLock;
 import static org.eclipse.jkube.integrationtests.Locks.CLUSTER_RESOURCE_INTENSIVE;
 import static org.eclipse.jkube.integrationtests.OpenShift.cleanUpCluster;
 import static org.eclipse.jkube.integrationtests.Tags.OPEN_SHIFT;
-import static org.eclipse.jkube.integrationtests.assertions.DeploymentConfigAssertion.awaitDeploymentConfig;
+import static org.eclipse.jkube.integrationtests.assertions.DeploymentAssertion.awaitDeployment;
 import static org.eclipse.jkube.integrationtests.assertions.JKubeAssertions.assertJKube;
 import static org.eclipse.jkube.integrationtests.assertions.KubernetesListAssertion.assertListResource;
 import static org.eclipse.jkube.integrationtests.assertions.PodAssertion.awaitPod;
@@ -54,9 +54,9 @@ import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 
 @Tag(OPEN_SHIFT)
 @GradleTest(
-  project = "sb-zero-config")
+  project = "dsl")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class ZeroConfigOcGradleITCase {
+class DslOcGradleITCase {
 
   private static JKubeGradleRunner gradle;
 
@@ -73,11 +73,11 @@ class ZeroConfigOcGradleITCase {
       .resolve("main").resolve("META-INF").resolve("jkube");
     assertThat(resourcePath.toFile(), anExistingDirectory());
     assertListResource(resourcePath.resolve("openshift.yml"));
-    assertThat(resourcePath.resolve("openshift").resolve("sb-zero-config-deploymentconfig.yml").toFile(),
+    assertThat(resourcePath.resolve("openshift").resolve("dsl-deploymentconfig.yml").toFile(),
       yaml(not(anEmptyMap())));
-    assertThat(resourcePath.resolve("openshift").resolve("sb-zero-config-route.yml").toFile(),
+    assertThat(resourcePath.resolve("openshift").resolve("dsl-route.yml").toFile(),
       yaml(not(anEmptyMap())));
-    assertThat(resourcePath.resolve("openshift").resolve("sb-zero-config-service.yml").toFile(),
+    assertThat(resourcePath.resolve("openshift").resolve("dsl-service.yml").toFile(),
       yaml(not(anEmptyMap())));
   }
 
@@ -102,7 +102,7 @@ class ZeroConfigOcGradleITCase {
     gradle.tasks("ocHelm").build();
     // Then
     assertThat(gradle.getModulePath().resolve("build")
-        .resolve(jKubeCase.getApplication() + "-0.0.0-SNAPSHOT-helmshift.tar.gz").toFile(),
+        .resolve(jKubeCase.getApplication() + "-0.0.0-SNAPSHOT-helm.tar.gz").toFile(),
       anExistingFile());
     final var helmDirectory = gradle.getModulePath().resolve("build").resolve("jkube")
       .resolve("helm").resolve(jKubeCase.getApplication()).resolve("openshift");
@@ -113,14 +113,13 @@ class ZeroConfigOcGradleITCase {
       hasEntry("version", "0.0.0-SNAPSHOT")
     )));
     assertThat(helmDirectory.resolve("values.yaml").toFile(), yaml(anEmptyMap()));
-    assertThat(helmDirectory.resolve("templates").resolve("sb-zero-config-deploymentconfig.yaml").toFile(),
+    assertThat(helmDirectory.resolve("templates").resolve("dsl-deploymentconfig.yaml").toFile(),
       yaml(not(anEmptyMap())));
-    assertThat(helmDirectory.resolve("templates").resolve("sb-zero-config-route.yaml").toFile(),
+    assertThat(helmDirectory.resolve("templates").resolve("dsl-route.yaml").toFile(),
       yaml(not(anEmptyMap())));
-    assertThat(helmDirectory.resolve("templates").resolve("sb-zero-config-service.yaml").toFile(),
+    assertThat(helmDirectory.resolve("templates").resolve("dsl-service.yaml").toFile(),
       yaml(not(anEmptyMap())));
   }
-
 
   @Test
   @Order(2)
@@ -132,19 +131,19 @@ class ZeroConfigOcGradleITCase {
     gradle.tasks("ocApply").build();
     // Then
     final Pod pod = awaitPod(jKubeCase)
-      .logContains("Started ZeroConfigApplication in", 40)
+      .logContains("May the 4th be with you", 40)
       .getKubernetesResource();
     awaitService(jKubeCase, pod.getMetadata().getNamespace())
       .assertExposed()
       .assertPorts(hasSize(1))
       .assertPort("http", 8080, false);
-    awaitDeploymentConfig(jKubeCase, pod.getMetadata().getNamespace())
+    awaitDeployment(jKubeCase, pod.getMetadata().getNamespace())
       .assertReplicas(equalTo(1))
       .assertContainers(hasSize(1))
       .assertContainers(hasItems(allOf(
-        hasProperty("image", containsString("sb-zero-config@sha256")),
-        hasProperty("name", equalTo("spring-boot")),
-        hasProperty("ports", hasSize(3)),
+        hasProperty("image", containsString("dsl@sha256")),
+        hasProperty("name", equalTo("gradle-dsl")),
+        hasProperty("ports", hasSize(1)),
         hasProperty("ports", hasItems(allOf(
           hasProperty("name", equalTo("http")),
           hasProperty("containerPort", equalTo(8080))
@@ -160,7 +159,7 @@ class ZeroConfigOcGradleITCase {
     final var result = gradle.tasks("ocLog", "-Pjkube.log.follow=false").build();
     // Then
     assertThat(result.getOutput(),
-      stringContainsInOrder("Tomcat started on port(s): 8080", "Started ZeroConfigApplication in", "seconds"));
+      stringContainsInOrder("May the 4th be with you"));
   }
 
   @Test
@@ -175,4 +174,5 @@ class ZeroConfigOcGradleITCase {
       .assertDeploymentDeleted();
     cleanUpCluster(jKubeCase.getOpenShiftClient(), jKubeCase);
   }
+
 }

@@ -18,6 +18,8 @@ import io.fabric8.openshift.client.OpenShiftClient;
 
 public interface JKubeCase {
 
+  String JKUBE_VERSION_SYSTEM_PROPERTY = "jkubeVersion";
+
   KubernetesClient getKubernetesClient();
 
   default OpenShiftClient getOpenShiftClient() {
