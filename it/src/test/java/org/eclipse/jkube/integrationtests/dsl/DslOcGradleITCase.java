@@ -29,7 +29,7 @@ import org.junit.jupiter.api.parallel.ResourceLock;
 import static org.eclipse.jkube.integrationtests.Locks.CLUSTER_RESOURCE_INTENSIVE;
 import static org.eclipse.jkube.integrationtests.OpenShift.cleanUpCluster;
 import static org.eclipse.jkube.integrationtests.Tags.OPEN_SHIFT;
-import static org.eclipse.jkube.integrationtests.assertions.DeploymentAssertion.awaitDeployment;
+import static org.eclipse.jkube.integrationtests.assertions.DeploymentConfigAssertion.awaitDeploymentConfig;
 import static org.eclipse.jkube.integrationtests.assertions.JKubeAssertions.assertJKube;
 import static org.eclipse.jkube.integrationtests.assertions.KubernetesListAssertion.assertListResource;
 import static org.eclipse.jkube.integrationtests.assertions.PodAssertion.awaitPod;
@@ -102,7 +102,7 @@ class DslOcGradleITCase {
     gradle.tasks("ocHelm").build();
     // Then
     assertThat(gradle.getModulePath().resolve("build")
-        .resolve(jKubeCase.getApplication() + "-0.0.0-SNAPSHOT-helm.tar.gz").toFile(),
+        .resolve(jKubeCase.getApplication() + "-0.0.0-SNAPSHOT-helmshift.tar.gz").toFile(),
       anExistingFile());
     final var helmDirectory = gradle.getModulePath().resolve("build").resolve("jkube")
       .resolve("helm").resolve(jKubeCase.getApplication()).resolve("openshift");
@@ -137,7 +137,7 @@ class DslOcGradleITCase {
       .assertExposed()
       .assertPorts(hasSize(1))
       .assertPort("http", 8080, false);
-    awaitDeployment(jKubeCase, pod.getMetadata().getNamespace())
+    awaitDeploymentConfig(jKubeCase, pod.getMetadata().getNamespace())
       .assertReplicas(equalTo(1))
       .assertContainers(hasSize(1))
       .assertContainers(hasItems(allOf(
