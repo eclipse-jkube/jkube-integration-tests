@@ -26,7 +26,9 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 public class GradleExtension extends BaseExtension implements BeforeAllCallback, BeforeEachCallback {
 
@@ -52,11 +54,17 @@ public class GradleExtension extends BaseExtension implements BeforeAllCallback,
     if (annotation.forwardOutput()) {
       gradleRunner.forwardOutput();
     }
-    if (!cleanBuild && annotation.clean()) {
-      gradleRunner.withArguments("clean").build();
-    }
-    if (!cleanBuild && annotation.build()) {
-      gradleRunner.withArguments("--offline", "build", "k8sConfigView", "ocConfigView").build();
+    if (!cleanBuild) {
+      final List<String> cleanBuildTasks = new ArrayList<>();
+      if (annotation.clean()) {
+        cleanBuildTasks.add("clean");
+        cleanBuildTasks.add("k8sConfigView");
+        cleanBuildTasks.add("ocConfigView");
+      }
+      if (annotation.build()) {
+        cleanBuildTasks.add("build");
+      }
+      gradleRunner.withArguments(cleanBuildTasks).build();
     }
     cleanBuild = true;
     gradleRunner.withArguments(Collections.emptyList());
