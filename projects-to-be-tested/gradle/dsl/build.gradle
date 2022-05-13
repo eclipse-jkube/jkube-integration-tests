@@ -41,6 +41,7 @@ kubernetes {
 }
 
 openshift {
+  buildStrategy = 'docker'
   images {
     image = imageDef
   }
