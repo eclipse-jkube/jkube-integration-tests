@@ -28,10 +28,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Setup Java 17
+      - name: Setup Java 11
         uses: actions/setup-java@v2
         with:
-          java-version: '17'
+          java-version: '11'
           distribution: 'adopt'
       - name: Install Integration Tests (Downloads dependencies)
         run: |
@@ -50,10 +50,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Setup Java 17
+      - name: Setup Java 11
         uses: actions/setup-java@v2
         with:
-          java-version: '17'
+          java-version: '11'
           distribution: 'adopt'
       - name: Setup Minikube-Kubernetes
         uses: manusa/actions-setup-minikube@v2.4.3
@@ -105,10 +105,10 @@ jobs:
           df -h
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Setup Java 17
+      - name: Setup Java 11
         uses: actions/setup-java@v2
         with:
-          java-version: '17'
+          java-version: '11'
           distribution: 'adopt'
       - name: Setup OpenShift
         uses: manusa/actions-setup-openshift@v1.1.3
