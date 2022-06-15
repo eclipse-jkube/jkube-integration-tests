@@ -16,7 +16,8 @@ package org.eclipse.jkube.integrationtests.assertions;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.dsl.PodResource;
-import io.fabric8.kubernetes.client.internal.readiness.Readiness;
+import io.fabric8.kubernetes.client.readiness.Readiness;
+import io.fabric8.openshift.api.model.DeploymentConfig;
 import io.fabric8.openshift.api.model.DeploymentConfigBuilder;
 import io.fabric8.openshift.client.OpenShiftClient;
 import org.eclipse.jkube.integrationtests.JKubeCase;
@@ -78,7 +79,7 @@ public class PodAssertion extends KubernetesClientAssertion<Pod> {
     return this;
   }
 
-  private PodResource<Pod> podResource() {
+  private PodResource podResource() {
     return getKubernetesClient().pods()
       .inNamespace(getKubernetesResource().getMetadata().getNamespace())
       .withName(getKubernetesResource().getMetadata().getName());
@@ -94,7 +95,7 @@ public class PodAssertion extends KubernetesClientAssertion<Pod> {
   }
 
   private static Pod retryDeployment(JKubeCase jKubeCase) throws Exception {
-    if (jKubeCase.getKubernetesClient().isAdaptable(OpenShiftClient.class)) {
+    if (jKubeCase.getKubernetesClient().supports(DeploymentConfig.class)) {
       System.err.println("\n\n===========================\nDeleting unusable PODs");
       jKubeCase.getKubernetesClient().pods().list().getItems().stream()
         .filter(pod-> pod.getMetadata().getName().startsWith(jKubeCase.getApplication()))

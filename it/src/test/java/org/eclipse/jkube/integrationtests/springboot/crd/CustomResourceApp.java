@@ -66,7 +66,8 @@ abstract class CustomResourceApp extends BaseMavenCase implements JKubeCase {
   }
 
   protected void assertFrameworkCustomResourcesApplied(JKubeCase jKubeCase, String namespace) {
-    MixedOperation<Framework, KubernetesResourceList<Framework>, Resource<Framework>> frameworkClient = jKubeCase.getKubernetesClient().customResources(Framework.class);
+    MixedOperation<Framework, KubernetesResourceList<Framework>, Resource<Framework>> frameworkClient =
+      jKubeCase.getKubernetesClient().resources(Framework.class);
     KubernetesResourceList<Framework> frameworks = frameworkClient.inNamespace(namespace).list();
     assertThat(frameworks, notNullValue());
     assertThat(frameworks.getItems(), hasSize(3));
