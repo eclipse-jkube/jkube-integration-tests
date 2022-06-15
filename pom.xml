@@ -37,7 +37,7 @@
     <camel.version>2.25.4</camel.version>
     <com.fasterxml.jackson.core.version>2.13.2</com.fasterxml.jackson.core.version>
     <com.fasterxml.jackson.dataformat.yaml.version>2.13.2</com.fasterxml.jackson.dataformat.yaml.version>
-    <fabric8.kubernetes-client.version>5.12.2</fabric8.kubernetes-client.version>
+    <fabric8.kubernetes-client.version>6.0.0-RC1</fabric8.kubernetes-client.version>
     <gradle.version>6.1.1</gradle.version>
     <hamcrest.version>2.0.0.0</hamcrest.version>
     <jkube.version>1.8.0-SNAPSHOT</jkube.version>

@@ -13,8 +13,6 @@
  */
 package org.eclipse.jkube.quickstart.springboot.crd;
 
-import io.fabric8.kubernetes.api.model.GenericKubernetesResource;
-import io.fabric8.kubernetes.api.model.ObjectMeta;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.dsl.base.CustomResourceDefinitionContext;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +20,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -37,10 +34,9 @@ public class FrameworkResource {
     this.crdContext = crdContext;
   }
 
-  @SuppressWarnings("unchecked")
   @GetMapping
   public List<String> get() {
-    return ((List<Map<String, Object>>)kubernetesClient.customResource(crdContext).list().get("items")).stream()
-         .map(m -> (String)((Map<String, Object>)m.get("metadata")).get("name")).collect(Collectors.toList());
+    return kubernetesClient.genericKubernetesResources(crdContext).list().getItems().stream()
+         .map(m -> m.getMetadata().getName()).collect(Collectors.toList());
   }
 }
