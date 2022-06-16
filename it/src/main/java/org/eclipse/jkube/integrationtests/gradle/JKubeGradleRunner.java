@@ -14,16 +14,18 @@
 package org.eclipse.jkube.integrationtests.gradle;
 
 import org.gradle.testkit.runner.GradleRunner;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 import static org.eclipse.jkube.integrationtests.JKubeCase.JKUBE_VERSION_SYSTEM_PROPERTY;
 
 public class JKubeGradleRunner {
 
+  private static final Logger log = LoggerFactory.getLogger(JKubeGradleRunner.class);
   private static final String JKUBE_VERSION_GRADLE_PROPERTY = JKUBE_VERSION_SYSTEM_PROPERTY;
   private final GradleRunner gradleRunner;
 
@@ -38,13 +40,22 @@ public class JKubeGradleRunner {
   }
 
   public GradleRunner tasks(String... tasks) {
+    return tasks(true, true, tasks);
+  }
+
+  public GradleRunner tasks(boolean offline, boolean forModule, String... tasks) {
     final ArrayList<String> arguments = new ArrayList<>();
-    arguments.add("--offline");
+    if (offline) {
+      arguments.add("--offline");
+    }
     Stream.of(tasks)
-      .map(s -> s.startsWith("-") ? s : ":" + module + ":" +s)
+      .map(s -> forModule && !s.startsWith("-") ? ":" + module + ":" + s : s)
       .forEach(arguments::add);
-    Optional.ofNullable(System.getProperty(JKUBE_VERSION_SYSTEM_PROPERTY)).ifPresent(jkubeVersion ->
-      arguments.add(0, "-P" + JKUBE_VERSION_GRADLE_PROPERTY + "=" + jkubeVersion));
+    final var jKubeVersion = System.getProperty(JKUBE_VERSION_SYSTEM_PROPERTY);
+    if (jKubeVersion != null) {
+      arguments.add(0, "-P" + JKUBE_VERSION_GRADLE_PROPERTY + "=" + jKubeVersion);
+    }
+    log.info("Running 'gradle {}'", String.join(" ", arguments));
     return gradleRunner.withArguments(arguments);
   }
 

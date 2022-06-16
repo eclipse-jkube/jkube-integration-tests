@@ -54,6 +54,8 @@ public class GradleExtension extends BaseExtension implements BeforeAllCallback,
     if (annotation.forwardOutput()) {
       gradleRunner.forwardOutput();
     }
+    final var jKubeGradleRunner = new JKubeGradleRunner(
+      gradleRunner, String.join(":", annotation.project()), projectPath);
     if (!cleanBuild) {
       final List<String> cleanBuildTasks = new ArrayList<>();
       if (annotation.clean()) {
@@ -64,11 +66,10 @@ public class GradleExtension extends BaseExtension implements BeforeAllCallback,
       if (annotation.build()) {
         cleanBuildTasks.add("build");
       }
-      gradleRunner.withArguments(cleanBuildTasks).build();
+      jKubeGradleRunner.tasks(false, false, cleanBuildTasks.toArray(new String[0])).build();
     }
     cleanBuild = true;
     gradleRunner.withArguments(Collections.emptyList());
-    final var jKubeGradleRunner = new JKubeGradleRunner(gradleRunner, String.join(":", annotation.project()), projectPath);
     getStore(context).put("jKubeGradleRunner", jKubeGradleRunner);
     for (Field field : extractFields(context, JKubeGradleRunner.class, f -> Modifier.isStatic(f.getModifiers()))) {
       setFieldValue(field, null, jKubeGradleRunner);

@@ -33,7 +33,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 public class RegistryExtension extends BaseExtension implements BeforeAllCallback, BeforeEachCallback, AfterAllCallback {
 
-  private static final Logger logger = LoggerFactory.getLogger(RegistryExtension.class);
+  private static final Logger log = LoggerFactory.getLogger(RegistryExtension.class);
   @Override
   ExtensionContext.Namespace getNamespace() {
     return ExtensionContext.Namespace.create(RegistryExtension.class);
@@ -43,7 +43,7 @@ public class RegistryExtension extends BaseExtension implements BeforeAllCallbac
   public void beforeAll(ExtensionContext context) throws Exception {
     final var annotation = context.getRequiredTestClass().getAnnotation(DockerRegistry.class);
     CliUtils.runCommand("docker rm -f " + getName(annotation));
-    logger.debug(() -> "Starting Docker Registry Extension");
+    log.debug(() -> "Starting Docker Registry Extension");
     final CliUtils.CliResult dockerRegistry;
     if (isWindows()) {
       dockerRegistry = startWindowsDockerRegistry(annotation);
@@ -51,7 +51,7 @@ public class RegistryExtension extends BaseExtension implements BeforeAllCallbac
       dockerRegistry = startRegularDockerRegistry(annotation);
     }
     assertThat(dockerRegistry.getOutput(), dockerRegistry.getExitCode(), Matchers.equalTo(0));
-    logger.debug(() -> "Docker Registry started successfully");
+    log.debug(() -> "Docker Registry started successfully");
   }
 
   @Override
@@ -66,18 +66,18 @@ public class RegistryExtension extends BaseExtension implements BeforeAllCallbac
 
   @Override
   public void afterAll(ExtensionContext context) throws Exception {
-    logger.debug(() -> "Closing Docker Registry");
+    log.debug(() -> "Closing Docker Registry");
     CliUtils.runCommand("docker stop " + getName(context.getRequiredTestClass().getAnnotation(DockerRegistry.class)));
   }
 
   private static CliUtils.CliResult startRegularDockerRegistry(DockerRegistry dockerRegistry) throws IOException, InterruptedException {
-    logger.debug(() -> "Starting standard Docker Registry");
+    log.debug(() -> "Starting standard Docker Registry");
     return CliUtils.runCommand("docker run --rm -d -p " + dockerRegistry.port() +":5000 --name " +
       getName(dockerRegistry) + " registry:2");
   }
 
   private static CliUtils.CliResult startWindowsDockerRegistry(DockerRegistry dockerRegistry) throws IOException, InterruptedException {
-    logger.debug(() -> "Starting Windows specific Docker Registry");
+    log.debug(() -> "Starting Windows specific Docker Registry");
     final var registry = new File("C:\\registry");
     if (!registry.exists() && !registry.mkdirs()) {
       throw new IllegalStateException("Directory C:\\registry cannot be created");
