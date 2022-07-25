@@ -24,6 +24,7 @@ import org.hamcrest.Matcher;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -61,7 +62,7 @@ public class ServiceAssertion extends KubernetesClientAssertion<Service> {
     final Service service = jKubeCase.getKubernetesClient().services()
       .inNamespace(namespace)
       .withName(jKubeCase.getApplication())
-      .waitUntilReady(DEFAULT_AWAIT_TIME_SECONDS, TimeUnit.SECONDS);
+      .waitUntilCondition(Objects::nonNull, DEFAULT_AWAIT_TIME_SECONDS, TimeUnit.SECONDS);
     assertThat(service, notNullValue());
     assertLabels(jKubeCase)
       .assertStandardLabels(service.getMetadata()::getLabels)
