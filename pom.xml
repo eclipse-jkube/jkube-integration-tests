@@ -452,6 +452,32 @@
       </build>
     </profile>
     <profile>
+      <id>docker-watch</id>
+      <modules>
+        <module>projects-to-be-tested/maven/webapp/jetty</module>
+      </modules>
+      <activation>
+        <file>
+          <exists>
+            projects-to-be-tested/maven/webapp/jetty/target
+          </exists>
+        </file>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <configuration>
+              <includes>
+                <include>**/integrationtests/webapp/jetty/JettyK8sWatchITCase.java</include>
+              </includes>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
       <id>webapp</id>
       <modules>
         <module>projects-to-be-tested/maven/webapp/jetty</module>
@@ -476,6 +502,9 @@
               <includes>
                 <include>**/integrationtests/webapp/**/*ITCase.java</include>
               </includes>
+              <excludes>
+                <exclude>**/JettyK8sWatchITCase.java</exclude>
+              </excludes>
             </configuration>
           </plugin>
         </plugins>
