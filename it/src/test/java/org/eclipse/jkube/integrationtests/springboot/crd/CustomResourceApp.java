@@ -32,7 +32,7 @@ import static org.hamcrest.Matchers.nullValue;
 
 abstract class CustomResourceApp extends BaseMavenCase implements JKubeCase {
 
-  private static final String PROJECT_CUSTOMRESOURCE = "projects-to-be-tested/maven/spring-boot/crd";
+  private static final String PROJECT_CUSTOMRESOURCE = "projects-to-be-tested/maven/spring/crd";
   private static final String FRAMEWORKS_CRD = "frameworks.jkube.eclipse.org";
 
   @Override

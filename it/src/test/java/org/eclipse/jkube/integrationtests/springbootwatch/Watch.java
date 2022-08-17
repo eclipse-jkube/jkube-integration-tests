@@ -11,39 +11,39 @@
  * Contributors:
  *   Red Hat, Inc. - initial API and implementation
  */
-package org.eclipse.jkube.integrationtests.springboot.complete;
+package org.eclipse.jkube.integrationtests.springbootwatch;
 
 import io.fabric8.kubernetes.api.model.Pod;
 import org.eclipse.jkube.integrationtests.JKubeCase;
-import org.eclipse.jkube.integrationtests.assertions.ServiceAssertion;
 import org.eclipse.jkube.integrationtests.maven.BaseMavenCase;
 
-import static org.eclipse.jkube.integrationtests.assertions.PodAssertion.assertPod;
 import static org.eclipse.jkube.integrationtests.assertions.PodAssertion.awaitPod;
 import static org.eclipse.jkube.integrationtests.assertions.ServiceAssertion.awaitService;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 
-abstract class Complete extends BaseMavenCase implements JKubeCase {
+abstract class Watch  extends BaseMavenCase implements JKubeCase {
 
-  private static final String PROJECT_COMPLETE = "projects-to-be-tested/maven/spring/complete";
+  private static final String PROJECT_SPRING_BOOT_WATCH = "projects-to-be-tested/maven/spring/watch";
 
   @Override
   public String getProject() {
-    return PROJECT_COMPLETE;
+    return PROJECT_SPRING_BOOT_WATCH;
   }
 
   @Override
   public String getApplication() {
-    return "spring-boot-complete";
+    return "spring-boot-watch";
   }
 
-  final ServiceAssertion assertThatShouldApplyResources() throws Exception {
-    final Pod pod = awaitPod(this).getKubernetesResource();
-    assertPod(pod).apply(this).logContains("CompleteApplication   : Started CompleteApplication in", 60);
-    return awaitService(this, pod.getMetadata().getNamespace())
-      .assertIsNodePort()
+  final Pod assertThatShouldApplyResources(String expectedMessage) throws Exception {
+    final Pod pod = awaitPod(this)
+      .logContains("Started SpringBootWatchApplication in", 40)
+      .getKubernetesResource();
+    awaitService(this, pod.getMetadata().getNamespace())
       .assertPorts(hasSize(1))
-      .assertPort("us-cli", 8082, true);
+      .assertPort("http", 8080, true)
+      .assertNodePortResponse("http", equalTo(expectedMessage));
+    return pod;
   }
-
 }
