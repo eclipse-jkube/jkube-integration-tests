@@ -48,7 +48,7 @@
     <openliberty.plugin.version>3.0.1</openliberty.plugin.version>
     <quarkus.version>2.8.3.Final</quarkus.version>
     <slf4j.version>1.7.36</slf4j.version>
-    <spring-boot.version>2.7.1</spring-boot.version>
+    <spring-boot.version>2.7.2</spring-boot.version>
     <thorntail.version>2.7.0.Final</thorntail.version>
     <vertx.version>4.2.7</vertx.version>
     <vertx.plugin.version>1.0.27</vertx.plugin.version>
@@ -199,10 +199,22 @@
         <artifactId>spring-boot-starter-web</artifactId>
         <version>${spring-boot.version}</version>
       </dependency>
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-devtools</artifactId>
+        <version>${spring-boot.version}</version>
+      </dependency>
+
       <!-- Test dependencies -->
       <dependency>
         <groupId>org.junit.jupiter</groupId>
         <artifactId>junit-jupiter</artifactId>
+        <version>${junit.version}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.junit.jupiter</groupId>
+        <artifactId>junit-jupiter-params</artifactId>
         <version>${junit.version}</version>
         <scope>test</scope>
       </dependency>
@@ -297,7 +309,7 @@
             <exclude>.mvn/wrapper/**/*</exclude>
             <exclude>mvnw</exclude>
             <exclude>mvnw.cmd</exclude>
-            <exclude>projects-to-be-tested/maven/spring-boot/complete/src/main/**/*.txt</exclude>
+            <exclude>projects-to-be-tested/maven/spring/complete/src/main/**/*.txt</exclude>
           </excludes>
         </configuration>
       </plugin>
@@ -424,16 +436,16 @@
     <profile>
       <id>springboot</id>
       <modules>
-        <module>projects-to-be-tested/maven/spring-boot/complete</module>
-        <module>projects-to-be-tested/maven/spring-boot/crd</module>
-        <module>projects-to-be-tested/maven/spring-boot/helm-config</module>
-        <module>projects-to-be-tested/maven/spring-boot/multi-profile</module>
-        <module>projects-to-be-tested/maven/spring-boot/zero-config</module>
+        <module>projects-to-be-tested/maven/spring/complete</module>
+        <module>projects-to-be-tested/maven/spring/crd</module>
+        <module>projects-to-be-tested/maven/spring/helm-config</module>
+        <module>projects-to-be-tested/maven/spring/multi-profile</module>
+        <module>projects-to-be-tested/maven/spring/zero-config</module>
       </modules>
       <activation>
         <file>
           <exists>
-            projects-to-be-tested/maven/spring-boot/complete/target
+            projects-to-be-tested/maven/spring/complete/target
           </exists>
         </file>
       </activation>
@@ -452,14 +464,14 @@
       </build>
     </profile>
     <profile>
-      <id>docker-watch</id>
+      <id>springboot-watch</id>
       <modules>
-        <module>projects-to-be-tested/maven/webapp/jetty</module>
+        <module>projects-to-be-tested/maven/spring/watch</module>
       </modules>
       <activation>
         <file>
           <exists>
-            projects-to-be-tested/maven/webapp/jetty/target
+            projects-to-be-tested/maven/spring/watch/target
           </exists>
         </file>
       </activation>
@@ -470,7 +482,7 @@
             <artifactId>maven-failsafe-plugin</artifactId>
             <configuration>
               <includes>
-                <include>**/integrationtests/webapp/jetty/JettyK8sWatchITCase.java</include>
+                <include>**/integrationtests/springbootwatch/**/*ITCase.java</include>
               </includes>
             </configuration>
           </plugin>
@@ -505,6 +517,32 @@
               <excludes>
                 <exclude>**/JettyK8sWatchITCase.java</exclude>
               </excludes>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>docker-watch</id>
+      <modules>
+        <module>projects-to-be-tested/maven/webapp/jetty</module>
+      </modules>
+      <activation>
+        <file>
+          <exists>
+            projects-to-be-tested/maven/webapp/jetty/target
+          </exists>
+        </file>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <configuration>
+              <includes>
+                <include>**/integrationtests/webapp/jetty/JettyK8sWatchITCase.java</include>
+              </includes>
             </configuration>
           </plugin>
         </plugins>

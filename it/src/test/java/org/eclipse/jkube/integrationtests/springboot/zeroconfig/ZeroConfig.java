@@ -34,7 +34,7 @@ import static org.hamcrest.Matchers.not;
 
 abstract class ZeroConfig extends BaseMavenCase implements JKubeCase {
 
-  private static final String PROJECT_ZERO_CONFIG = "projects-to-be-tested/maven/spring-boot/zero-config";
+  private static final String PROJECT_ZERO_CONFIG = "projects-to-be-tested/maven/spring/zero-config";
 
   @Override
   public String getProject() {
