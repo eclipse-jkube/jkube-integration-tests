@@ -468,6 +468,8 @@
         <module>projects-to-be-tested/maven/webapp/jetty</module>
         <module>projects-to-be-tested/maven/webapp/wildfly</module>
         <module>projects-to-be-tested/maven/webapp/zero-config</module>
+        <module>projects-to-be-tested/maven/webapp/tomcat-jakartaee</module>
+        <module>projects-to-be-tested/maven/webapp/tomcat-javaeelegacy</module>
       </modules>
       <activation>
         <file>
