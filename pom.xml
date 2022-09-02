@@ -37,7 +37,7 @@
     <camel.version>2.25.4</camel.version>
     <com.fasterxml.jackson.core.version>2.13.2</com.fasterxml.jackson.core.version>
     <com.fasterxml.jackson.dataformat.yaml.version>2.13.2</com.fasterxml.jackson.dataformat.yaml.version>
-    <fabric8.kubernetes-client.version>6.0.0</fabric8.kubernetes-client.version>
+    <fabric8.kubernetes-client.version>6.1.1</fabric8.kubernetes-client.version>
     <gradle.version>6.1.1</gradle.version>
     <hamcrest.version>2.0.0.0</hamcrest.version>
     <jkube.version>1.9.0-SNAPSHOT</jkube.version>
@@ -109,11 +109,7 @@
         <exclusions>
           <exclusion>
             <groupId>io.fabric8</groupId>
-            <artifactId>kubernetes-client</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>io.fabric8</groupId>
-            <artifactId>openshift-client</artifactId>
+            <artifactId>*</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
@@ -124,11 +120,7 @@
         <exclusions>
           <exclusion>
             <groupId>io.fabric8</groupId>
-            <artifactId>kubernetes-client</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>io.fabric8</groupId>
-            <artifactId>openshift-client</artifactId>
+            <artifactId>*</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
@@ -155,13 +147,10 @@
       </dependency>
       <dependency>
         <groupId>io.fabric8</groupId>
-        <artifactId>kubernetes-client</artifactId>
+        <artifactId>kubernetes-client-bom</artifactId>
         <version>${fabric8.kubernetes-client.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>io.fabric8</groupId>
-        <artifactId>openshift-client</artifactId>
-        <version>${fabric8.kubernetes-client.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
       </dependency>
       <dependency>
         <groupId>io.quarkus.platform</groupId>
