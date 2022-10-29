@@ -107,7 +107,7 @@ jobs:
       fail-fast: false
       matrix:
         openshift: [v3.9.0,v3.11.0]
-        suite: ['quarkus','springboot','springboot-watch','webapp','other']
+        suite: ['quarkus','springboot','webapp','other']
     steps:
       - name: Free up Space
 #            'linux-headers.*'                       \ # Takes > 2 minutes
