@@ -40,7 +40,7 @@ import java.util.concurrent.TimeUnit;
 
 import static org.eclipse.jkube.integrationtests.Locks.CLUSTER_RESOURCE_INTENSIVE;
 import static org.eclipse.jkube.integrationtests.Tags.OPEN_SHIFT;
-import static org.eclipse.jkube.integrationtests.WaitUtil.waitUntilCondition;
+import static org.eclipse.jkube.integrationtests.WaitUtil.await;
 import static org.eclipse.jkube.integrationtests.assertions.InvocationResultAssertion.assertInvocation;
 import static org.eclipse.jkube.integrationtests.assertions.JKubeAssertions.assertJKube;
 import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
@@ -88,7 +88,7 @@ class WatchOcITCase extends Watch {
           throw new RuntimeException(e);
         }
       });
-      waitUntilCondition(baos, b -> b.toString().contains("Started RemoteSpringApplication"), TimeUnit.MINUTES, 2);
+      await(baos::toString).apply(log -> log.contains("Started RemoteSpringApplication")).get(2, TimeUnit.MINUTES);
 
       // When
       assertThatShouldApplyResources("Spring Boot Watch v1");
@@ -97,9 +97,9 @@ class WatchOcITCase extends Watch {
       Files.write(f.toPath(), newContent.getBytes());
       final MavenInvocationResult packageInvocationResult = maven("package");
       assertInvocation(packageInvocationResult);
-      waitUntilCondition(baos, b -> b.toString().contains("triggering LiveReload"), TimeUnit.MINUTES, 2);
-      waitUntilCondition(baos, b -> b.toString().contains("Uploaded"), TimeUnit.SECONDS, 30);
-      waitUntilCondition(baos, b -> b.toString().contains("Completed initialization"), TimeUnit.SECONDS, 30);
+      await(baos::toString).apply(log -> log.contains("triggering LiveReload")).get(2, TimeUnit.MINUTES);
+      await(baos::toString).apply(log -> log.contains("Uploaded")).get(30, TimeUnit.SECONDS);
+      await(baos::toString).apply(log -> log.contains("Completed initialization")).get(30, TimeUnit.SECONDS);
 
       // Then
       assertThatShouldApplyResources("Spring Boot Watch v2");
