@@ -22,14 +22,13 @@ import io.fabric8.openshift.api.model.DeploymentConfigBuilder;
 import io.fabric8.openshift.client.OpenShiftClient;
 import org.eclipse.jkube.integrationtests.JKubeCase;
 
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
+import static org.eclipse.jkube.integrationtests.WaitUtil.await;
 import static org.eclipse.jkube.integrationtests.assertions.LabelAssertion.assertLabels;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.notNullValue;
@@ -58,25 +57,17 @@ public class PodAssertion extends KubernetesClientAssertion<Pod> {
   }
 
   public PodAssertion logContains(CharSequence sequence, long timeoutSeconds) throws InterruptedException {
-    final CountDownLatch latch = new CountDownLatch(1);
     final AtomicReference<String> lastLog = new AtomicReference<>("");
-    final ScheduledExecutorService es = Executors.newSingleThreadScheduledExecutor();
-    final Runnable waitCondition = () -> {
-      lastLog.set(podResource().getLog());
-      if (lastLog.get().contains(sequence)) {
-        latch.countDown();
-      }
-    };
-    @SuppressWarnings("rawtypes")
-    final Future task = es.scheduleAtFixedRate(waitCondition, 0L, 500L, TimeUnit.MILLISECONDS);
-    final boolean logContainsSequence = latch.await(timeoutSeconds, TimeUnit.SECONDS);
-    task.cancel(true);
-    es.shutdown();
-    if (!logContainsSequence) {
-      throw new AssertionError(String.format("Error awaiting for log to contain:%n %s%nBut was:%n%s",
-        sequence, lastLog.get()));
+    try {
+      await(() -> lastLog.updateAndGet(old -> podResource().getLog()))
+        .apply(l -> l.contains(sequence))
+        .get(timeoutSeconds, TimeUnit.SECONDS);
+      return this;
+    } catch (ExecutionException | TimeoutException ignore) {
+      // NO OP
     }
-    return this;
+    throw new AssertionError(String.format("Error awaiting for log to contain:%n %s%nBut was:%n%s",
+      sequence, lastLog.get()));
   }
 
   private PodResource podResource() {
