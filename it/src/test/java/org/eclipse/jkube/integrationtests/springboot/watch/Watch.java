@@ -11,7 +11,7 @@
  * Contributors:
  *   Red Hat, Inc. - initial API and implementation
  */
-package org.eclipse.jkube.integrationtests.springbootwatch;
+package org.eclipse.jkube.integrationtests.springboot.watch;
 
 import io.fabric8.kubernetes.api.model.Pod;
 import org.eclipse.jkube.integrationtests.JKubeCase;

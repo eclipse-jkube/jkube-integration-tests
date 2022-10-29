@@ -31,7 +31,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 public @interface GradleTest {
   String[] project();
 
-  boolean forwardOutput() default true; // TODO change to false
+  boolean forwardOutput() default false;
   boolean clean() default true;
 
   boolean build() default true;
