@@ -13,15 +13,17 @@
  */
 package org.eclipse.jkube.integrationtests.springboot.watch;
 
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.parallel.Isolated;
 
-import static org.eclipse.jkube.integrationtests.Tags.OPEN_SHIFT;
+import static org.eclipse.jkube.integrationtests.Tags.KUBERNETES;
 
-@Tag(OPEN_SHIFT)
-class WatchOcITCase extends Watch {
+@Tag(KUBERNETES)
+@Isolated
+public class WatchK8sITCase extends Watch {
   @Override
   String getPrefix() {
-    return "oc";
+    return "k8s";
   }
 }
-

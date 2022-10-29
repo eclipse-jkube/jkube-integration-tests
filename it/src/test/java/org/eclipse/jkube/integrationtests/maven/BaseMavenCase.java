@@ -95,7 +95,7 @@ public abstract class BaseMavenCase implements Project {
       try (
         final var baos = new ByteArrayOutputStream();
         final var tee = new TeeOutputStream(baos, out == null ? OutputStream.nullOutputStream() : out);
-        final var printStream = new PrintStream(tee)
+        final var printStream = new PrintStream(tee, true)
       ) {
         final MavenUtils.InvocationRequestCustomizer recordStdOutCustomizer = invocationRequest ->
           invocationRequest.setOutputHandler(new PrintStreamHandler(printStream, true));
