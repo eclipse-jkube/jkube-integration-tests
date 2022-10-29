@@ -26,6 +26,7 @@ public class InvocationResultAssertion {
       if (invocationResult.getExecutionException() != null) {
         message.append("\n").append(invocationResult.getExecutionException().getMessage());
       }
+      throw new AssertionError(message.toString());
     }
   }
 }

@@ -13,20 +13,32 @@
  */
 package org.eclipse.jkube.integrationtests;
 
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 public class WaitUtil {
   private WaitUtil() { }
 
-  public static <T> void waitUntilCondition(T t, Predicate<T> condition, TimeUnit timeUnit, int nUnits) throws InterruptedException, TimeoutException {
-    for (int i = 0; i < nUnits && !Thread.currentThread().isInterrupted(); i++) {
-      if (condition.test(t)) {
-        return;
+  // Initialization on demand
+  private static class ExecutorServiceHolder {
+    public static final ExecutorService INSTANCE = Executors.newCachedThreadPool();
+  }
+
+  public static <T> Function<Predicate<T>, CompletableFuture<T>> await(Supplier<T> supplier) {
+    return condition -> CompletableFuture.supplyAsync(() -> {
+      T result;
+      while (!condition.test(result = supplier.get())) {
+        try {
+          Thread.sleep(100L);
+        } catch (InterruptedException e) {
+          Thread.currentThread().interrupt();
+        }
       }
-      timeUnit.sleep(1);
-    }
-    throw new TimeoutException("timed out waiting for condition to satisfy on " + t.toString());
+      return result;
+    }, ExecutorServiceHolder.INSTANCE);
   }
 }
