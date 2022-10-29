@@ -29,11 +29,15 @@ public class WaitUtil {
   }
 
   public static <T> Function<Predicate<T>, CompletableFuture<T>> await(Supplier<T> supplier) {
+    return await(supplier, 100L);
+  }
+
+  public static <T> Function<Predicate<T>, CompletableFuture<T>> await(Supplier<T> supplier, long periodMillis) {
     return condition -> CompletableFuture.supplyAsync(() -> {
       T result;
       while (!condition.test(result = supplier.get())) {
         try {
-          Thread.sleep(100L);
+          Thread.sleep(periodMillis);
         } catch (InterruptedException e) {
           Thread.currentThread().interrupt();
         }
