@@ -26,8 +26,6 @@ import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
@@ -35,7 +33,6 @@ import static org.eclipse.jkube.integrationtests.assertions.LabelAssertion.asser
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.notNullValue;
@@ -109,10 +106,8 @@ public class ServiceAssertion extends KubernetesClientAssertion<Service> {
     } else {
       host = String.format("%s:%s", clusterHost, port.getNodePort());
     }
-    final ExecutorService executor = Executors.newSingleThreadExecutor();
-    final Response response = getWithRetry(executor, String.format("http://%s/%s", host, String.join("/", path)))
+    final Response response = getWithRetry(String.format("http://%s/%s", host, String.join("/", path)))
       .get(KubernetesClientAssertion.DEFAULT_AWAIT_TIME_SECONDS, TimeUnit.SECONDS);
-    executor.shutdownNow();
     assertThat(response.body(), notNullValue());
     // replacing character `–` with `-` to avoid issue described in
     // https://github.com/jkubeio/jkube-integration-tests/issues/183
