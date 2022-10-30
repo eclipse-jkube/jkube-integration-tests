@@ -20,12 +20,16 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-public class WaitUtil {
-  private WaitUtil() { }
+public class AsyncUtil {
+  private AsyncUtil() { }
 
   // Initialization on demand
   private static class ExecutorServiceHolder {
     public static final ExecutorService INSTANCE = Executors.newCachedThreadPool();
+  }
+
+  public static ExecutorService executorService() {
+    return ExecutorServiceHolder.INSTANCE;
   }
 
   public static <T> Function<Predicate<T>, CompletableFuture<T>> await(Supplier<T> supplier) {
@@ -43,6 +47,6 @@ public class WaitUtil {
         }
       }
       return result;
-    }, ExecutorServiceHolder.INSTANCE);
+    }, executorService());
   }
 }

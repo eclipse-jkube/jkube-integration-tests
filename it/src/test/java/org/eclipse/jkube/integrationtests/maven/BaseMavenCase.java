@@ -34,6 +34,8 @@ import java.util.Properties;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
+import static org.eclipse.jkube.integrationtests.AsyncUtil.executorService;
+
 public abstract class BaseMavenCase implements Project {
 
   protected List<String> getProfiles() {
@@ -117,7 +119,7 @@ public abstract class BaseMavenCase implements Project {
         Thread.currentThread().interrupt();
         future.completeExceptionally(ex);
       }
-    });
+    }, executorService());
     future.whenCompleteAsync((result, throwable) -> {
       if (!asyncRun.isDone()) {
         asyncRun.cancel(true);
