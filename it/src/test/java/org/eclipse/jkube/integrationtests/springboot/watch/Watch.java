@@ -108,7 +108,7 @@ abstract class Watch  extends BaseMavenCase implements JKubeCase {
       assertInvocation(maven("package"));
       try {
         await(baos::toString).apply(log -> log.contains("Remote server has changed, triggering LiveReload"))
-          .get(2, TimeUnit.MINUTES);
+          .get(1, TimeUnit.MINUTES);
       } catch (TimeoutException ex) {
         // If this test is not run in an isolated Minikube environment, it might fail due to:
         // o.s.b.d.r.c.ClassPathChangeUploader      : A failure occurred when uploading to http://localhost:51337/.~~spring-boot!~/restart. Upload will be retried in 2 seconds

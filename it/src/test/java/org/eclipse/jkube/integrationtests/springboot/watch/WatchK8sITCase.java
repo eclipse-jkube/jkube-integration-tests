@@ -13,7 +13,7 @@
  */
 package org.eclipse.jkube.integrationtests.springboot.watch;
 
-import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.parallel.Isolated;
 
@@ -21,6 +21,8 @@ import static org.eclipse.jkube.integrationtests.Tags.KUBERNETES;
 
 @Tag(KUBERNETES)
 @Isolated
+@Disabled("Test won't pass on CI (Minikube)")
+// o.s.b.d.r.c.ClassPathChangeUploader      : A failure occurred when uploading to http://localhost:51337/.~~spring-boot!~/restart. Upload will be retried in 2 seconds
 public class WatchK8sITCase extends Watch {
   @Override
   String getPrefix() {
