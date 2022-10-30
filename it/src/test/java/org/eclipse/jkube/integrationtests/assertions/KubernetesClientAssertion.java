@@ -28,9 +28,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
 
+import static org.eclipse.jkube.integrationtests.AsyncUtil.await;
 import static org.eclipse.jkube.integrationtests.cli.CliUtils.runCommand;
 
 public class KubernetesClientAssertion<T extends KubernetesResource> {
@@ -51,22 +52,15 @@ public class KubernetesClientAssertion<T extends KubernetesResource> {
     return OkHttpClientHolder.INSTANCE;
   }
 
-  static CompletableFuture<Response> getWithRetry(ExecutorService executor, String url) {
-    final var response = new CompletableFuture<Response>();
-    executor.submit(() -> {
-      while (true) {
-        try {
-          response.complete(httpClient().newCall(new Request.Builder().get().url(url).build()).execute());
-          break;
-        } catch (IOException e) {
-          log.warn("Connection to {} failed, retrying", url);
-          Thread.sleep(3000L);
-          // IGNORE
-        }
+  static CompletableFuture<Response> getWithRetry(String url) {
+    return await(() -> {
+      try {
+        return httpClient().newCall(new Request.Builder().get().url(url).build()).execute();
+      } catch (IOException e) {
+        log.warn("Connection to {} failed, retrying", url);
+        return null;
       }
-      return null;
-    });
-    return response;
+    }, 3000L).apply(Objects::nonNull);
   }
 
   private final JKubeCase jKubeCase;
