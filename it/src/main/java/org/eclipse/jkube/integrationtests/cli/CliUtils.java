@@ -35,7 +35,7 @@ public class CliUtils {
         .redirectErrorStream(true)
         .command(processCommand)
         .start();
-    final Scanner scanner = new Scanner(process.getInputStream(), StandardCharsets.UTF_8.name())
+    final Scanner scanner = new Scanner(process.getInputStream(), StandardCharsets.UTF_8)
             .useDelimiter("\\A");
     final String output = scanner.hasNext() ? scanner.next() : "";
     final int exitCode = process.waitFor();
