@@ -32,7 +32,7 @@ jobs:
         uses: actions/setup-java@v3
         with:
           java-version: '11'
-          distribution: 'adopt'
+          distribution: 'temurin'
       - name: Install Integration Tests (Downloads dependencies)
         run: |
           ./mvnw -B -DskipTests clean install \
@@ -54,7 +54,7 @@ jobs:
         uses: actions/setup-java@v3
         with:
           java-version: '11'
-          distribution: 'adopt'
+          distribution: 'temurin'
       - name: Setup Minikube-Kubernetes
         uses: manusa/actions-setup-minikube@v2.7.1
         with:
@@ -109,7 +109,7 @@ jobs:
         uses: actions/setup-java@v3
         with:
           java-version: '11'
-          distribution: 'adopt'
+          distribution: 'temurin'
       - name: Setup OpenShift
         uses: manusa/actions-setup-openshift@v1.1.4
         with:

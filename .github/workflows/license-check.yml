@@ -28,6 +28,6 @@ jobs:
         uses: actions/setup-java@v3
         with:
           java-version: '11'
-          distribution: 'adopt'
+          distribution: 'temurin'
       - name: mvn license:check
         run: mvn -N license:check
