@@ -25,7 +25,6 @@ import static org.hamcrest.Matchers.not;
 
 public class KubernetesListAssertion {
 
-
   public static void assertListResource(Path path) {
     assertListResource(path.toAbsolutePath().toFile());
   }
