@@ -50,7 +50,7 @@
     <slf4j.version>1.7.36</slf4j.version>
     <spring-boot.version>2.7.4</spring-boot.version>
     <thorntail.version>2.7.0.Final</thorntail.version>
-    <vertx.version>4.2.7</vertx.version>
+    <vertx.version>4.3.4</vertx.version>
     <vertx.plugin.version>1.0.27</vertx.plugin.version>
     <wildfly.jar.plugin.version>2.0.1.Final</wildfly.jar.plugin.version>
     <version.org.jboss.spec.javax.ws.jboss-jaxrs-api_2.1_spec>2.0.2.Final</version.org.jboss.spec.javax.ws.jboss-jaxrs-api_2.1_spec>
