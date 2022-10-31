@@ -14,8 +14,8 @@
 package org.eclipse.jkube.integrationtests.quarkus.na7ive;
 
 import io.fabric8.kubernetes.api.model.Pod;
-import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClient;
+import io.fabric8.kubernetes.client.KubernetesClientBuilder;
 import org.apache.maven.shared.invoker.InvocationResult;
 import org.eclipse.jkube.integrationtests.JKubeCase;
 import org.eclipse.jkube.integrationtests.maven.BaseMavenCase;
@@ -62,7 +62,7 @@ class QuarkusNativeK8sITCase extends BaseMavenCase implements JKubeCase {
 
   @BeforeEach
   void setUp() {
-    k = new DefaultKubernetesClient();
+    k = new KubernetesClientBuilder().build();
   }
 
   @AfterEach
@@ -153,7 +153,9 @@ class QuarkusNativeK8sITCase extends BaseMavenCase implements JKubeCase {
 
   final Pod assertThatShouldApplyResources() throws Exception {
     final Pod pod = awaitPod(this).getKubernetesResource();
-    assertPod(pod).apply(this).logContains("quarkus-native 0.0.0-SNAPSHOT native (powered by Quarkus 2.8.3.Final) started in", 60);
+    assertPod(pod).apply(this)
+      .logContains("quarkus-native 0.0.0-SNAPSHOT native (powered by Quarkus ", 60)
+      .logContains(".Final) started in", 10);
     awaitService(this, pod.getMetadata().getNamespace())
       .assertIsNodePort()
       .assertPorts(hasSize(1))
