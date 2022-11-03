@@ -41,7 +41,7 @@
     <gradle.version>6.1.1</gradle.version>
     <hamcrest.version>2.0.0.0</hamcrest.version>
     <jkube.version>1.10-SNAPSHOT</jkube.version>
-    <junit.version>5.8.2</junit.version>
+    <junit.version>5.9.1</junit.version>
     <karaf.version>4.4.2</karaf.version>
     <license-maven-plugin.version>3.0</license-maven-plugin.version>
     <openliberty.version>22.0.0.7</openliberty.version>
