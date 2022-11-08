@@ -44,7 +44,7 @@
     <junit.version>5.9.1</junit.version>
     <karaf.version>4.4.2</karaf.version>
     <license-maven-plugin.version>3.0</license-maven-plugin.version>
-    <openliberty.version>22.0.0.7</openliberty.version>
+    <openliberty.version>22.0.0.11</openliberty.version>
     <openliberty.plugin.version>3.0.1</openliberty.plugin.version>
     <quarkus.version>2.13.3.Final</quarkus.version>
     <slf4j.version>2.0.3</slf4j.version>
