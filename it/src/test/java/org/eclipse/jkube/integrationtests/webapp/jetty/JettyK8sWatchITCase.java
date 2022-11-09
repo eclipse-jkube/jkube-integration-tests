@@ -16,6 +16,7 @@ package org.eclipse.jkube.integrationtests.webapp.jetty;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClientBuilder;
+import io.fabric8.kubernetes.client.dsl.PodResource;
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.shared.invoker.MavenInvocationException;
 import org.eclipse.jkube.integrationtests.JKubeCase;
@@ -33,8 +34,10 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import static org.eclipse.jkube.integrationtests.Locks.CLUSTER_RESOURCE_INTENSIVE;
 import static org.eclipse.jkube.integrationtests.Tags.KUBERNETES;
@@ -142,6 +145,27 @@ class JettyK8sWatchITCase extends BaseMavenCase implements JKubeCase {
     }
   }
 
+  @Test
+  @DisplayName("k8s:watch, with mode=copy, SHOULD hot deploy the application")
+  @ResourceLock(value = CLUSTER_RESOURCE_INTENSIVE, mode = READ_WRITE)
+  void k8sWatchCopy() throws Exception {
+    try (final ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+      // Given
+      mavenWatch = mavenAsync(
+        "k8s:watch", properties("jkube.watch.mode", "copy"), baos, null);
+      await(baos::toString).apply(log -> log.contains("Waiting ...")).get(2, TimeUnit.MINUTES);
+      // When
+      FileUtils.write(fileToChange, "<html><body><h2>Eclipse JKube Jetty v2</h2></body></html>", StandardCharsets.UTF_8);
+      assertInvocation(maven("package"));
+      // Then
+      await(baos::toString)
+        .apply(log -> log.contains("Files successfully copied to the container."))
+        .get(10, TimeUnit.SECONDS);
+      waitUntilApplicationRestartsInsidePod();
+      assertThatShouldApplyResources("<h2>Eclipse JKube Jetty v2</h2>");
+    }
+  }
+
   private Pod assertThatShouldApplyResources(String response) throws Exception {
     final Pod pod = awaitPod(this).getKubernetesResource();
     assertPod(pod).apply(this).logContains("Server:main: Started", 120);
@@ -150,5 +174,15 @@ class JettyK8sWatchITCase extends BaseMavenCase implements JKubeCase {
       .assertPort("http", 8080, true)
       .assertNodePortResponse("http", containsString(response));
     return pod;
+  }
+
+  private void waitUntilApplicationRestartsInsidePod() throws ExecutionException, InterruptedException, TimeoutException {
+    PodResource podResource = getKubernetesClient().pods().resource(originalPod);
+    await(podResource::getLog)
+      .apply(l -> l.contains("Stopped o.e.j.w.WebAppContext"))
+      .get(10, TimeUnit.SECONDS);
+    await(podResource::getLog)
+      .apply(l -> l.contains("ContextHandler:Scanner-0: Started o.e.j.w.WebAppContext"))
+      .get(10, TimeUnit.SECONDS);
   }
 }
