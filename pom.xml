@@ -35,7 +35,7 @@
     <apache.maven.maven-invoker.version>3.2.0</apache.maven.maven-invoker.version>
     <apache.commons-codec.version>1.15</apache.commons-codec.version>
     <camel.version>2.25.4</camel.version>
-    <com.fasterxml.jackson.core.version>2.13.2</com.fasterxml.jackson.core.version>
+    <com.fasterxml.jackson.core.version>2.14.0</com.fasterxml.jackson.core.version>
     <com.fasterxml.jackson.dataformat.yaml.version>2.13.2</com.fasterxml.jackson.dataformat.yaml.version>
     <fabric8.kubernetes-client.version>6.2.0</fabric8.kubernetes-client.version>
     <gradle.version>6.1.1</gradle.version>
