@@ -101,30 +101,6 @@
   </pluginRepositories>
   <dependencyManagement>
     <dependencies>
-      <!-- Dependencies only for debugging purposes -->
-      <dependency>
-        <groupId>org.eclipse.jkube</groupId>
-        <artifactId>kubernetes-maven-plugin</artifactId>
-        <version>${jkube.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>io.fabric8</groupId>
-            <artifactId>*</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>org.eclipse.jkube</groupId>
-        <artifactId>openshift-maven-plugin</artifactId>
-        <version>${jkube.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>io.fabric8</groupId>
-            <artifactId>*</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <!-- ***************************************  -->
       <dependency>
         <groupId>org.apache.maven.shared</groupId>
         <artifactId>maven-invoker</artifactId>
