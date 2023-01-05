@@ -15,13 +15,11 @@ package org.eclipse.jkube.integrationtests.dockerfile;
 
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.client.KubernetesClient;
-import io.fabric8.kubernetes.client.KubernetesClientBuilder;
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.shared.invoker.InvocationResult;
 import org.eclipse.jkube.integrationtests.JKubeCase;
-import org.eclipse.jkube.integrationtests.maven.BaseMavenCase;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
+import org.eclipse.jkube.integrationtests.jupiter.api.TempKubernetesTest;
+import org.eclipse.jkube.integrationtests.maven.MavenCase;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -62,26 +60,16 @@ import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 
 @Tag(KUBERNETES)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class SimpleK8sITCase extends BaseMavenCase implements JKubeCase {
+@TempKubernetesTest
+class SimpleK8sITCase implements JKubeCase, MavenCase {
 
   private static final String PROJECT_SIMPLE = "projects-to-be-tested/maven/dockerfile/simple";
 
-  private KubernetesClient k;
-
-  @BeforeEach
-  void setUp() {
-    k = new KubernetesClientBuilder().build();
-  }
-
-  @AfterEach
-  void tearDown() {
-    k.close();
-    k = null;
-  }
+  private static KubernetesClient kubernetesClient;
 
   @Override
   public KubernetesClient getKubernetesClient() {
-    return k;
+    return kubernetesClient;
   }
 
   @Override

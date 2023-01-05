@@ -14,7 +14,7 @@
 package org.eclipse.jkube.integrationtests.springboot.helmconfig;
 
 import org.apache.maven.shared.invoker.InvocationResult;
-import org.eclipse.jkube.integrationtests.maven.BaseMavenCase;
+import org.eclipse.jkube.integrationtests.maven.MavenCase;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -40,7 +40,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class HelmConfigITCase extends BaseMavenCase {
+class HelmConfigITCase implements MavenCase {
 
   private static final String PROJECT_HELM = "projects-to-be-tested/maven/spring/helm-config";
 

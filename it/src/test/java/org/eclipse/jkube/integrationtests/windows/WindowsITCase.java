@@ -19,7 +19,7 @@ import okhttp3.Response;
 import org.apache.maven.shared.invoker.InvocationResult;
 import org.apache.maven.shared.invoker.MavenInvocationException;
 import org.eclipse.jkube.integrationtests.jupiter.api.DockerRegistry;
-import org.eclipse.jkube.integrationtests.maven.BaseMavenCase;
+import org.eclipse.jkube.integrationtests.maven.MavenCase;
 import org.eclipse.jkube.integrationtests.maven.MavenInvocationResult;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
@@ -53,7 +53,7 @@ import static org.hamcrest.Matchers.not;
 @Tag(WINDOWS)
 @DockerRegistry
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class WindowsITCase extends BaseMavenCase {
+class WindowsITCase implements MavenCase {
 
   private static final String PROJECT_WINDOWS = "projects-to-be-tested\\maven\\windows";
 
@@ -169,9 +169,9 @@ class WindowsITCase extends BaseMavenCase {
   }
 
   @Override
-  protected MavenInvocationResult maven(String goal, Properties properties)
+  public MavenInvocationResult maven(String goal, Properties properties)
     throws IOException, InterruptedException, MavenInvocationException {
-    return super.maven(goal, properties, ir -> ir.setProfiles(Collections.singletonList("Windows")));
+    return maven(goal, properties, ir -> ir.setProfiles(Collections.singletonList("Windows")));
   }
 
   private static void assertHelm(File helmDirectory) {

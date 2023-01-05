@@ -15,12 +15,12 @@ package org.eclipse.jkube.integrationtests.webapp.jetty;
 
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.client.KubernetesClient;
-import io.fabric8.kubernetes.client.KubernetesClientBuilder;
 import io.fabric8.kubernetes.client.dsl.PodResource;
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.shared.invoker.MavenInvocationException;
 import org.eclipse.jkube.integrationtests.JKubeCase;
-import org.eclipse.jkube.integrationtests.maven.BaseMavenCase;
+import org.eclipse.jkube.integrationtests.jupiter.api.TempKubernetesTest;
+import org.eclipse.jkube.integrationtests.maven.MavenCase;
 import org.eclipse.jkube.integrationtests.maven.MavenInvocationResult;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -39,9 +39,9 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import static org.eclipse.jkube.integrationtests.AsyncUtil.await;
 import static org.eclipse.jkube.integrationtests.Locks.CLUSTER_RESOURCE_INTENSIVE;
 import static org.eclipse.jkube.integrationtests.Tags.KUBERNETES;
-import static org.eclipse.jkube.integrationtests.AsyncUtil.await;
 import static org.eclipse.jkube.integrationtests.assertions.InvocationResultAssertion.assertInvocation;
 import static org.eclipse.jkube.integrationtests.assertions.PodAssertion.assertPod;
 import static org.eclipse.jkube.integrationtests.assertions.PodAssertion.awaitPod;
@@ -54,11 +54,12 @@ import static org.hamcrest.Matchers.stringContainsInOrder;
 import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 
 @Tag(KUBERNETES)
-class JettyK8sWatchITCase extends BaseMavenCase implements JKubeCase {
+@TempKubernetesTest
+class JettyK8sWatchITCase implements JKubeCase, MavenCase {
 
   private static final String PROJECT_JETTY_WATCH = "projects-to-be-tested/maven/webapp/jetty-watch";
 
-  private KubernetesClient k;
+  private static KubernetesClient kubernetesClient;
   private File fileToChange;
   private String originalFileContent;
   private Pod originalPod;
@@ -66,7 +67,6 @@ class JettyK8sWatchITCase extends BaseMavenCase implements JKubeCase {
 
   @BeforeEach
   void setUp() throws Exception {
-    k = new KubernetesClientBuilder().build();
     fileToChange = new File(String.format("../%s/src/main/webapp/index.html", getProject()));
     originalFileContent = FileUtils.readFileToString(fileToChange, StandardCharsets.UTF_8);
     // Tests start with a fresh deployment to watch for
@@ -79,11 +79,9 @@ class JettyK8sWatchITCase extends BaseMavenCase implements JKubeCase {
     if (mavenWatch != null) {
       mavenWatch.cancel(true);
     }
-    k.resource(originalPod).withGracePeriod(0).delete();
+    kubernetesClient.resource(originalPod).withGracePeriod(0).delete();
     assertInvocation(maven("k8s:undeploy"));
     FileUtils.write(fileToChange, originalFileContent, StandardCharsets.UTF_8);
-    k.close();
-    k = null;
   }
 
   @Override
@@ -98,7 +96,7 @@ class JettyK8sWatchITCase extends BaseMavenCase implements JKubeCase {
 
   @Override
   public KubernetesClient getKubernetesClient() {
-    return k;
+    return kubernetesClient;
   }
 
   @Test
@@ -115,7 +113,7 @@ class JettyK8sWatchITCase extends BaseMavenCase implements JKubeCase {
       assertInvocation(maven("package"));
       await(baos::toString).apply(log -> log.contains("Updating Deployment")).get(10, TimeUnit.SECONDS);
       // Then
-      k.pods().resource(originalPod).waitUntilCondition(Objects::isNull, 30, TimeUnit.SECONDS);
+      kubernetesClient.pods().resource(originalPod).waitUntilCondition(Objects::isNull, 30, TimeUnit.SECONDS);
       assertThat(baos.toString(StandardCharsets.UTF_8), stringContainsInOrder(
         "Waiting ...",
         // Build

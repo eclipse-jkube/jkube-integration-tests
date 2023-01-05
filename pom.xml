@@ -129,6 +129,11 @@
         <scope>import</scope>
       </dependency>
       <dependency>
+        <groupId>io.fabric8</groupId>
+        <artifactId>kubernetes-httpclient-jetty</artifactId>
+        <version>${fabric8.kubernetes-client.version}</version>
+      </dependency>
+      <dependency>
         <groupId>io.quarkus.platform</groupId>
         <artifactId>quarkus-bom</artifactId>
         <version>${quarkus.version}</version>

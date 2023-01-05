@@ -15,10 +15,8 @@ package org.eclipse.jkube.integrationtests.assertions;
 
 import io.fabric8.kubernetes.api.model.KubernetesResource;
 import io.fabric8.kubernetes.client.KubernetesClient;
+import io.fabric8.kubernetes.client.http.HttpResponse;
 import io.fabric8.openshift.client.OpenShiftClient;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 import org.eclipse.jkube.integrationtests.JKubeCase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,8 +24,6 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.time.Duration;
-import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
@@ -37,29 +33,16 @@ import static org.eclipse.jkube.integrationtests.cli.CliUtils.runCommand;
 public class KubernetesClientAssertion<T extends KubernetesResource> {
 
   private static final Logger log = LoggerFactory.getLogger(KubernetesClientAssertion.class);
-  static final long DEFAULT_AWAIT_TIME_SECONDS = 45L;
-  static final Duration CONNECT_TIMEOUT = Duration.of(10L, ChronoUnit.SECONDS);
-  static final Duration READ_TIMEOUT = Duration.of(30L, ChronoUnit.SECONDS);
+  static final long DEFAULT_AWAIT_TIME_SECONDS = 50L;
 
-  private static class OkHttpClientHolder {
-    private static final OkHttpClient INSTANCE = new OkHttpClient.Builder()
-      .retryOnConnectionFailure(true)
-      .connectTimeout(CONNECT_TIMEOUT)
-      .readTimeout(READ_TIMEOUT)
-      .build();
-  }
-  private static OkHttpClient httpClient() {
-    return OkHttpClientHolder.INSTANCE;
-  }
-
-  static CompletableFuture<Response> getWithRetry(String url) {
+  CompletableFuture<HttpResponse<String>> getWithRetry(String url) {
     return await(() -> {
       try {
-        return httpClient().newCall(new Request.Builder().get().url(url).build()).execute();
-      } catch (IOException e) {
+        return jKubeCase.httpGet(url);
+      } catch (Exception e) {
         log.warn("Connection to {} failed, retrying", url);
-        return null;
       }
+      return null;
     }, 3000L).apply(Objects::nonNull);
   }
 

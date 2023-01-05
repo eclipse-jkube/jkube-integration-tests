@@ -55,24 +55,6 @@ import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 @TestMethodOrder(OrderAnnotation.class)
 class JettyK8sITCase extends Jetty {
 
-  private KubernetesClient k;
-
-  @BeforeEach
-  void setUp() {
-    k = new KubernetesClientBuilder().build();
-  }
-
-  @AfterEach
-  void tearDown() {
-    k.close();
-    k = null;
-  }
-
-  @Override
-  public KubernetesClient getKubernetesClient() {
-    return k;
-  }
-
   @Test
   @Order(1)
   @DisplayName("k8s:build, should create image")

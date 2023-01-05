@@ -14,8 +14,10 @@
 package org.eclipse.jkube.integrationtests.wildfly.jar;
 
 import io.fabric8.kubernetes.api.model.Pod;
+import io.fabric8.kubernetes.client.KubernetesClient;
 import org.eclipse.jkube.integrationtests.JKubeCase;
-import org.eclipse.jkube.integrationtests.maven.BaseMavenCase;
+import org.eclipse.jkube.integrationtests.jupiter.api.TempKubernetesTest;
+import org.eclipse.jkube.integrationtests.maven.MavenCase;
 
 import static org.eclipse.jkube.integrationtests.assertions.PodAssertion.assertPod;
 import static org.eclipse.jkube.integrationtests.assertions.PodAssertion.awaitPod;
@@ -23,9 +25,17 @@ import static org.eclipse.jkube.integrationtests.assertions.ServiceAssertion.awa
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 
-abstract class WildflyJar extends BaseMavenCase implements JKubeCase {
+@TempKubernetesTest
+abstract class WildflyJar implements JKubeCase, MavenCase {
 
   static final String PROJECT_WILDFLY_JAR = "projects-to-be-tested/maven/wildfly-jar/microprofile";
+
+  private static KubernetesClient kubernetesClient;
+
+  @Override
+  public KubernetesClient getKubernetesClient() {
+    return kubernetesClient;
+  }
 
   @Override
   public String getProject() {

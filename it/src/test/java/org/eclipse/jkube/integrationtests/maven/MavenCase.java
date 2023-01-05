@@ -36,46 +36,46 @@ import java.util.concurrent.ExecutionException;
 
 import static org.eclipse.jkube.integrationtests.AsyncUtil.executorService;
 
-public abstract class BaseMavenCase implements Project {
+public interface MavenCase extends Project {
 
-  protected List<String> getProfiles() {
+  default List<String> getProfiles() {
     return new ArrayList<>();
   }
 
-  protected Properties properties(Map<String, String> propertyMap) {
+  default Properties properties(Map<String, String> propertyMap) {
     final Properties ret = new Properties();
     ret.putAll(propertyMap);
     return ret;
   }
 
-  protected Properties properties(String key, String value) {
+  default Properties properties(String key, String value) {
     return properties(Collections.singletonMap(key, value));
   }
 
-  protected MavenInvocationResult maven(String goal)
+  default MavenInvocationResult maven(String goal)
     throws IOException, InterruptedException, MavenInvocationException {
 
     return maven(goal, new Properties());
   }
 
-  protected MavenInvocationResult maven(String goal, Properties properties)
+  default MavenInvocationResult maven(String goal, Properties properties)
     throws IOException, InterruptedException, MavenInvocationException {
 
     return maven(goal, properties, null, null);
   }
 
-  protected final MavenInvocationResult maven(
+  default MavenInvocationResult maven(
     String goal, Properties properties, MavenUtils.InvocationRequestCustomizer chainedCustomizer)
     throws IOException, InterruptedException, MavenInvocationException {
     return maven(goal, properties, null, chainedCustomizer);
   }
 
-  protected final MavenInvocationResult maven(String goal, Properties properties, OutputStream out)
+  default MavenInvocationResult maven(String goal, Properties properties, OutputStream out)
     throws IOException, InterruptedException, MavenInvocationException {
     return maven(goal, properties, out, null);
   }
 
-  protected final MavenInvocationResult maven(
+  default MavenInvocationResult maven(
     String goal, Properties properties, OutputStream out, MavenUtils.InvocationRequestCustomizer chainedCustomizer)
     throws IOException, InterruptedException, MavenInvocationException {
     try {
@@ -90,7 +90,7 @@ public abstract class BaseMavenCase implements Project {
     }
   }
 
-  protected final CompletableFuture<MavenInvocationResult> mavenAsync(
+  default CompletableFuture<MavenInvocationResult> mavenAsync(
     String goal, Properties properties, OutputStream out, MavenUtils.InvocationRequestCustomizer chainedCustomizer) {
     final CompletableFuture<MavenInvocationResult> future = new CompletableFuture<>();
     final var asyncRun = CompletableFuture.runAsync(() -> {

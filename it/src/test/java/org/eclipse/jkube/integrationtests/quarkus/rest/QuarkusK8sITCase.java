@@ -14,11 +14,7 @@
 package org.eclipse.jkube.integrationtests.quarkus.rest;
 
 import io.fabric8.kubernetes.api.model.Pod;
-import io.fabric8.kubernetes.client.KubernetesClient;
-import io.fabric8.kubernetes.client.KubernetesClientBuilder;
 import org.apache.maven.shared.invoker.InvocationResult;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Order;
@@ -50,24 +46,6 @@ import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 @Tag(KUBERNETES)
 @TestMethodOrder(OrderAnnotation.class)
 class QuarkusK8sITCase extends Quarkus {
-
-  private KubernetesClient k;
-
-  @BeforeEach
-  void setUp() {
-    k = new KubernetesClientBuilder().build();
-  }
-
-  @AfterEach
-  void tearDown() {
-    k.close();
-    k = null;
-  }
-
-  @Override
-  public KubernetesClient getKubernetesClient() {
-    return k;
-  }
 
   @Test
   @Order(1)

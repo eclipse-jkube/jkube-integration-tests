@@ -17,7 +17,6 @@ import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import org.eclipse.jkube.integrationtests.JKubeCase;
 import org.eclipse.jkube.integrationtests.jupiter.api.TempKubernetesTest;
-import org.eclipse.jkube.integrationtests.maven.BaseMavenCase;
 
 import java.io.File;
 
@@ -34,25 +33,17 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.not;
 
 @TempKubernetesTest
-abstract class ZeroConfig extends BaseMavenCase implements JKubeCase {
+abstract class ZeroConfig implements JKubeCase {
 
-  private static final String PROJECT_ZERO_CONFIG = "projects-to-be-tested/maven/spring/zero-config";
+  protected static final String MAVEN_APPLICATION = "spring-boot-zero-config";
+  protected static final String GRADLE_APPLICATION = "sb-zero-config";
+  protected static final String MAVEN_PROJECT_ZERO_CONFIG = "projects-to-be-tested/maven/spring/zero-config";
 
   private static KubernetesClient kubernetesClient;
 
   @Override
   public KubernetesClient getKubernetesClient() {
     return kubernetesClient;
-  }
-
-  @Override
-  public String getProject() {
-    return PROJECT_ZERO_CONFIG;
-  }
-
-  @Override
-  public String getApplication() {
-    return "spring-boot-zero-config";
   }
 
   final Pod assertThatShouldApplyResources() throws Exception {

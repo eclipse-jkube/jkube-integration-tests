@@ -14,7 +14,6 @@
 package org.eclipse.jkube.integrationtests.jupiter.api;
 
 import org.eclipse.jkube.integrationtests.jupiter.api.extension.GradleExtension;
-import org.eclipse.jkube.integrationtests.jupiter.api.extension.JKubeTestExtension;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.lang.annotation.Retention;
@@ -27,7 +26,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 @Target({ TYPE, METHOD, ANNOTATION_TYPE })
 @Retention(RUNTIME)
-@ExtendWith({JKubeTestExtension.class, GradleExtension.class})
+@ExtendWith({GradleExtension.class})
 public @interface GradleTest {
   String[] project();
 

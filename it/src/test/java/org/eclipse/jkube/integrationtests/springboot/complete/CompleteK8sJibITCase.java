@@ -13,16 +13,10 @@
  */
 package org.eclipse.jkube.integrationtests.springboot.complete;
 
-import io.fabric8.kubernetes.client.KubernetesClient;
-import io.fabric8.kubernetes.client.KubernetesClientBuilder;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 import org.apache.maven.shared.invoker.InvocationResult;
 import org.eclipse.jkube.integrationtests.jupiter.api.DockerRegistry;
 import org.eclipse.jkube.integrationtests.jupiter.api.DockerRegistryHost;
 import org.eclipse.jkube.integrationtests.maven.MavenInvocationResult;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
@@ -57,8 +51,6 @@ import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class CompleteK8sJibITCase extends Complete {
 
-  private KubernetesClient k;
-
   @DockerRegistryHost
   private String registry;
 
@@ -66,24 +58,12 @@ class CompleteK8sJibITCase extends Complete {
 
   @BeforeEach
   void setUp() {
-    k = new KubernetesClientBuilder().build();
     mvnProperties = new Properties();
     mvnProperties.setProperty("jkube.generator.name", registry + "/sb/sb-complete");
   }
 
-  @AfterEach
-  void tearDown() {
-    k.close();
-    k = null;
-  }
-
   @Override
-  public KubernetesClient getKubernetesClient() {
-    return k;
-  }
-
-  @Override
-  protected List<String> getProfiles() {
+  public List<String> getProfiles() {
     return Collections.singletonList("JIB");
   }
 
@@ -132,11 +112,8 @@ class CompleteK8sJibITCase extends Complete {
     // Then
     assertInvocation(invocationResult);
     assertThat(invocationResult.getStdOut(), containsString("JIB> [==============================] 100.0% complete"));
-    try (Response response = new OkHttpClient.Builder().build().newCall(new Request.Builder()
-      .get().url("http://" + registry + "/v2/sb/sb-complete/tags/list").build()).execute()) {
-      assertThat(response.body().string(),
-        containsString("{\"name\":\"sb/sb-complete\",\"tags\":[\"latest\"]}"));
-    }
+    assertThat(httpGet("http://" + registry + "/v2/sb/sb-complete/tags/list").body(),
+      containsString("{\"name\":\"sb/sb-complete\",\"tags\":[\"latest\"]}"));
   }
 
   @Test

@@ -34,10 +34,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 public class RegistryExtension implements BaseExtension, BeforeAllCallback, BeforeEachCallback, AfterAllCallback {
 
   private static final Logger log = LoggerFactory.getLogger(RegistryExtension.class);
-  @Override
-  public ExtensionContext.Namespace getNamespace() {
-    return ExtensionContext.Namespace.create(RegistryExtension.class);
-  }
 
   @Override
   public void beforeAll(ExtensionContext context) throws Exception {

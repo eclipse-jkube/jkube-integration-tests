@@ -25,10 +25,12 @@ import java.util.stream.Collectors;
 
 public interface BaseExtension {
 
-  ExtensionContext.Namespace getNamespace();
+  default ExtensionContext.Namespace getNamespace(ExtensionContext context) {
+    return ExtensionContext.Namespace.create(context.getRequiredTestClass());
+  }
 
   default ExtensionContext.Store getStore(ExtensionContext context) {
-    return context.getRoot().getStore(getNamespace());
+    return context.getRoot().getStore(getNamespace(context));
   }
 
   default Field[] extractFields(ExtensionContext context, Class<?> clazz, Predicate<Field>... predicates) {
@@ -37,7 +39,7 @@ public interface BaseExtension {
     do {
       fields.addAll(extractFields(testClass, clazz, predicates));
       testClass = testClass.getSuperclass();
-    } while(testClass != Object.class);
+    } while (testClass != Object.class);
     return fields.toArray(new Field[0]);
   }
 

@@ -14,16 +14,11 @@
 package org.eclipse.jkube.integrationtests.webapp.wildfly;
 
 
-import io.fabric8.kubernetes.client.KubernetesClient;
-import io.fabric8.kubernetes.client.KubernetesClientBuilder;
 import io.fabric8.openshift.api.model.ImageStream;
-import io.fabric8.openshift.client.OpenShiftClient;
 import org.apache.maven.shared.invoker.InvocationResult;
 import org.eclipse.jkube.integrationtests.OpenShiftCase;
 import org.eclipse.jkube.integrationtests.Tags;
 import org.eclipse.jkube.integrationtests.maven.MavenInvocationResult;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -54,7 +49,6 @@ import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 @Tag(Tags.OPEN_SHIFT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class WildFlyOcDockerModeITCase extends WildFly implements OpenShiftCase {
-  private OpenShiftClient oc;
 
   @Override
   public String getApplication() {
@@ -63,21 +57,9 @@ class WildFlyOcDockerModeITCase extends WildFly implements OpenShiftCase {
 
   private static final String DOCKER_MODE_PROFILE = "docker-mode";
   @Override
-  protected List<String> getProfiles() {
+  public List<String> getProfiles() {
     return Collections.singletonList(DOCKER_MODE_PROFILE);
   }
-
-  @BeforeEach
-  void setUp(){ oc = new KubernetesClientBuilder().build().adapt(OpenShiftClient.class); }
-
-  @AfterEach
-  void tearDown(){
-    oc.close();
-    oc=null;
-  }
-
-  @Override
-  public KubernetesClient getKubernetesClient() { return  oc; }
 
   @Test
   @Order(1)
@@ -87,7 +69,7 @@ class WildFlyOcDockerModeITCase extends WildFly implements OpenShiftCase {
    final InvocationResult invocationResult = maven("oc:build");
    //Then
     assertInvocation(invocationResult);
-    final ImageStream is = oc.imageStreams().withName(getApplication()).get();
+    final ImageStream is = getOpenShiftClient().imageStreams().withName(getApplication()).get();
     assertThat(is, notNullValue());
     assertThat(is.getStatus().getTags().iterator().next().getTag(),equalTo("latest"));
   }

@@ -14,12 +14,11 @@
 package org.eclipse.jkube.integrationtests.springboot.zeroconfig;
 
 import io.fabric8.kubernetes.api.model.Pod;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 import org.apache.maven.shared.invoker.InvocationResult;
+import org.eclipse.jkube.integrationtests.jupiter.api.Application;
 import org.eclipse.jkube.integrationtests.jupiter.api.DockerRegistry;
 import org.eclipse.jkube.integrationtests.jupiter.api.DockerRegistryHost;
+import org.eclipse.jkube.integrationtests.maven.MavenCase;
 import org.eclipse.jkube.integrationtests.maven.MavenInvocationResult;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
@@ -40,6 +39,7 @@ import static org.eclipse.jkube.integrationtests.assertions.InvocationResultAsse
 import static org.eclipse.jkube.integrationtests.assertions.JKubeAssertions.assertJKube;
 import static org.eclipse.jkube.integrationtests.assertions.KubernetesListAssertion.assertListResource;
 import static org.eclipse.jkube.integrationtests.assertions.YamlAssertion.yaml;
+import static org.eclipse.jkube.integrationtests.springboot.zeroconfig.ZeroConfig.MAVEN_APPLICATION;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.anEmptyMap;
@@ -53,12 +53,18 @@ import static org.hamcrest.Matchers.stringContainsInOrder;
 import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 
 @Tag(KUBERNETES)
+@Application(MAVEN_APPLICATION)
 @DockerRegistry
 @TestMethodOrder(OrderAnnotation.class)
-class ZeroConfigK8sITCase extends ZeroConfig {
+class ZeroConfigK8sITCase extends ZeroConfig implements MavenCase {
 
   @DockerRegistryHost
   private String registry;
+
+  @Override
+  public String getProject() {
+    return MAVEN_PROJECT_ZERO_CONFIG;
+  }
 
   @Test
   @Order(1)
@@ -81,11 +87,8 @@ class ZeroConfigK8sITCase extends ZeroConfig {
     final InvocationResult invocationResult = maven("k8s:push", properties);
     // Then
     assertInvocation(invocationResult);
-    try (Response response = new OkHttpClient.Builder().build().newCall(new Request.Builder()
-      .get().url("http://" + registry + "/v2/integration-tests/spring-boot-zero-config/tags/list").build()).execute()) {
-      assertThat(response.body().string(),
-        containsString("{\"name\":\"integration-tests/spring-boot-zero-config\",\"tags\":[\"latest\"]}"));
-    }
+    assertThat(httpGet("http://" + registry + "/v2/integration-tests/spring-boot-zero-config/tags/list").body(),
+      containsString("{\"name\":\"integration-tests/spring-boot-zero-config\",\"tags\":[\"latest\"]}"));
   }
 
   @Test

@@ -16,6 +16,8 @@ package org.eclipse.jkube.integrationtests.springboot.zeroconfig;
 import io.fabric8.openshift.api.model.ImageStream;
 import org.apache.maven.shared.invoker.InvocationResult;
 import org.eclipse.jkube.integrationtests.OpenShiftCase;
+import org.eclipse.jkube.integrationtests.jupiter.api.Application;
+import org.eclipse.jkube.integrationtests.maven.MavenCase;
 import org.eclipse.jkube.integrationtests.maven.MavenInvocationResult;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
@@ -33,6 +35,7 @@ import static org.eclipse.jkube.integrationtests.assertions.InvocationResultAsse
 import static org.eclipse.jkube.integrationtests.assertions.JKubeAssertions.assertJKube;
 import static org.eclipse.jkube.integrationtests.assertions.KubernetesListAssertion.assertListResource;
 import static org.eclipse.jkube.integrationtests.assertions.YamlAssertion.yaml;
+import static org.eclipse.jkube.integrationtests.springboot.zeroconfig.ZeroConfig.MAVEN_APPLICATION;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.anEmptyMap;
 import static org.hamcrest.Matchers.equalTo;
@@ -42,8 +45,14 @@ import static org.hamcrest.Matchers.stringContainsInOrder;
 import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 
 @Tag(OPEN_SHIFT)
+@Application(MAVEN_APPLICATION)
 @TestMethodOrder(OrderAnnotation.class)
-class ZeroConfigOcITCase extends ZeroConfig implements OpenShiftCase {
+class ZeroConfigOcITCase extends ZeroConfig implements MavenCase, OpenShiftCase {
+
+  @Override
+  public String getProject() {
+    return MAVEN_PROJECT_ZERO_CONFIG;
+  }
 
   @Test
   @Order(1)

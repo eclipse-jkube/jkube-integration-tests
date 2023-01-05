@@ -17,7 +17,6 @@ import io.fabric8.kubernetes.api.model.Service;
 import io.fabric8.kubernetes.api.model.ServicePort;
 import io.fabric8.openshift.api.model.Route;
 import io.fabric8.openshift.api.model.RouteBuilder;
-import okhttp3.Response;
 import org.eclipse.jkube.integrationtests.JKubeCase;
 import org.hamcrest.Matcher;
 
@@ -106,12 +105,12 @@ public class ServiceAssertion extends KubernetesClientAssertion<Service> {
     } else {
       host = String.format("%s:%s", clusterHost, port.getNodePort());
     }
-    final Response response = getWithRetry(String.format("http://%s/%s", host, String.join("/", path)))
+    final var response = getWithRetry(String.format("http://%s/%s", host, String.join("/", path)))
       .get(KubernetesClientAssertion.DEFAULT_AWAIT_TIME_SECONDS, TimeUnit.SECONDS);
     assertThat(response.body(), notNullValue());
     // replacing character `–` with `-` to avoid issue described in
     // https://github.com/jkubeio/jkube-integration-tests/issues/183
-    assertThat(response.body().string().replace("–", "-"), responseBodyMatcher);
+    assertThat(response.body().replace("–", "-"), responseBodyMatcher);
     return this;
   }
 
