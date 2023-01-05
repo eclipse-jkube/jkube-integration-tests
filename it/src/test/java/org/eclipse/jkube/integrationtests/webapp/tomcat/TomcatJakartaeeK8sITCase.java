@@ -13,6 +13,22 @@
  */
 package org.eclipse.jkube.integrationtests.webapp.tomcat;
 
+import io.fabric8.kubernetes.api.model.Pod;
+import io.fabric8.kubernetes.api.model.Service;
+import org.apache.maven.shared.invoker.InvocationResult;
+import org.eclipse.jkube.integrationtests.maven.MavenInvocationResult;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.parallel.ResourceLock;
+
+import java.io.File;
+import java.util.List;
+import java.util.Properties;
+
 import static org.eclipse.jkube.integrationtests.Locks.CLUSTER_RESOURCE_INTENSIVE;
 import static org.eclipse.jkube.integrationtests.Tags.KUBERNETES;
 import static org.eclipse.jkube.integrationtests.assertions.DockerAssertion.assertImageWasRecentlyBuilt;
@@ -29,27 +45,6 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.not;
 import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
-
-import java.io.File;
-import java.util.List;
-import java.util.Properties;
-
-import org.apache.maven.shared.invoker.InvocationResult;
-import org.eclipse.jkube.integrationtests.maven.MavenInvocationResult;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
-import org.junit.jupiter.api.parallel.ResourceLock;
-
-import io.fabric8.kubernetes.api.model.Pod;
-import io.fabric8.kubernetes.api.model.Service;
-import io.fabric8.kubernetes.client.KubernetesClient;
-import io.fabric8.kubernetes.client.KubernetesClientBuilder;
 
 /**
  * This test making sure that we support JakartaEE apps in Tomcat. By default,
@@ -69,24 +64,6 @@ class TomcatJakartaeeK8sITCase extends Tomcat {
   @Override
   public String getApplication() {
     return APPLICATION_NAME_TOMCAT_JAKARTAEE;
-  }
-
-  private KubernetesClient k;
-
-  @BeforeEach
-  void setUp() {
-    k = new KubernetesClientBuilder().build();
-  }
-
-  @AfterEach
-  void tearDown() {
-    k.close();
-    k = null;
-  }
-
-  @Override
-  public KubernetesClient getKubernetesClient() {
-    return k;
   }
 
   @Test

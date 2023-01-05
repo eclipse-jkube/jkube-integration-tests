@@ -17,7 +17,7 @@ import io.fabric8.kubernetes.client.KubernetesClient;
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.shared.invoker.InvocationResult;
 import org.eclipse.jkube.integrationtests.JKubeCase;
-import org.eclipse.jkube.integrationtests.maven.BaseMavenCase;
+import org.eclipse.jkube.integrationtests.maven.MavenCase;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -35,7 +35,7 @@ import static org.hamcrest.Matchers.not;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Tag(KUBERNETES)
-public class ContextDirAndCustomAssemblyITCase extends BaseMavenCase implements JKubeCase {
+class ContextDirAndCustomAssemblyITCase implements JKubeCase, MavenCase {
 
   private static final String PROJECT_CONTEXT_DIR_AND_CUSTOM_ASSEMBLY = "projects-to-be-tested/maven/dockerfile/context-dir-and-custom-assembly";
 

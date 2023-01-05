@@ -14,8 +14,10 @@
 package org.eclipse.jkube.integrationtests.vertx;
 
 import io.fabric8.kubernetes.api.model.Pod;
+import io.fabric8.kubernetes.client.KubernetesClient;
 import org.eclipse.jkube.integrationtests.JKubeCase;
-import org.eclipse.jkube.integrationtests.maven.BaseMavenCase;
+import org.eclipse.jkube.integrationtests.jupiter.api.TempKubernetesTest;
+import org.eclipse.jkube.integrationtests.maven.MavenCase;
 
 import static org.eclipse.jkube.integrationtests.assertions.PodAssertion.assertPod;
 import static org.eclipse.jkube.integrationtests.assertions.PodAssertion.awaitPod;
@@ -23,9 +25,17 @@ import static org.eclipse.jkube.integrationtests.assertions.ServiceAssertion.awa
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 
-abstract class Vertx extends BaseMavenCase implements JKubeCase {
+@TempKubernetesTest
+abstract class Vertx implements JKubeCase, MavenCase {
 
   static final String PROJECT_VERTX = "projects-to-be-tested/maven/vertx/simplest";
+
+  private static KubernetesClient kubernetesClient;
+
+  @Override
+  public KubernetesClient getKubernetesClient() {
+    return kubernetesClient;
+  }
 
   @Override
   public String getProject() {

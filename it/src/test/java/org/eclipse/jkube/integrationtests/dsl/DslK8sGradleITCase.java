@@ -14,9 +14,12 @@
 package org.eclipse.jkube.integrationtests.dsl;
 
 import io.fabric8.kubernetes.api.model.Pod;
+import io.fabric8.kubernetes.client.KubernetesClient;
 import org.eclipse.jkube.integrationtests.JKubeCase;
 import org.eclipse.jkube.integrationtests.gradle.JKubeGradleRunner;
+import org.eclipse.jkube.integrationtests.jupiter.api.Application;
 import org.eclipse.jkube.integrationtests.jupiter.api.GradleTest;
+import org.eclipse.jkube.integrationtests.jupiter.api.TempKubernetesTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -52,12 +55,19 @@ import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 @Tag(KUBERNETES)
 @GradleTest(
   project = "dsl")
+@Application("dsl")
+@TempKubernetesTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class DslK8sGradleITCase {
+class DslK8sGradleITCase implements JKubeCase {
 
   private static JKubeGradleRunner gradle;
 
-  private JKubeCase jKubeCase;
+  private static KubernetesClient kubernetesClient;
+
+  @Override
+  public KubernetesClient getKubernetesClient() {
+    return kubernetesClient;
+  }
 
   @Test
   @Order(1)
@@ -83,7 +93,7 @@ class DslK8sGradleITCase {
     // When
     gradle.tasks("k8sBuild").build();
     // Then
-    assertImageWasRecentlyBuilt("gradle", jKubeCase.getApplication());
+    assertImageWasRecentlyBuilt("gradle", getApplication());
   }
 
   @Test
@@ -94,14 +104,14 @@ class DslK8sGradleITCase {
     gradle.tasks("k8sHelm").build();
     // Then
     assertThat(gradle.getModulePath().resolve("build")
-        .resolve(jKubeCase.getApplication() + "-0.0.0-SNAPSHOT-helm.tar.gz").toFile(),
+        .resolve(getApplication() + "-0.0.0-SNAPSHOT-helm.tar.gz").toFile(),
       anExistingFile());
     final var helmDirectory = gradle.getModulePath().resolve("build").resolve("jkube")
-      .resolve("helm").resolve(jKubeCase.getApplication()).resolve("kubernetes");
+      .resolve("helm").resolve(getApplication()).resolve("kubernetes");
     assertThat(helmDirectory.resolve("Chart.yaml").toFile(), yaml(allOf(
       aMapWithSize(3),
       hasEntry("apiVersion", "v1"),
-      hasEntry("name", jKubeCase.getApplication()),
+      hasEntry("name", getApplication()),
       hasEntry("version", "0.0.0-SNAPSHOT")
     )));
     assertThat(helmDirectory.resolve("values.yaml").toFile(), yaml(anEmptyMap()));
@@ -120,13 +130,13 @@ class DslK8sGradleITCase {
     // When
     gradle.tasks("k8sApply").build();
     // Then
-    final Pod pod = awaitPod(jKubeCase)
+    final Pod pod = awaitPod(this)
       .logContains("May the 4th be with you", 40)
       .getKubernetesResource();
-    awaitService(jKubeCase, pod.getMetadata().getNamespace())
+    awaitService(this, pod.getMetadata().getNamespace())
       .assertPorts(hasSize(1))
       .assertPort("http", 8080, false);
-    awaitDeployment(jKubeCase, pod.getMetadata().getNamespace())
+    awaitDeployment(this, pod.getMetadata().getNamespace())
       .assertReplicas(equalTo(1))
       .assertContainers(hasSize(1))
       .assertContainers(hasItems(allOf(
@@ -158,7 +168,7 @@ class DslK8sGradleITCase {
     // When
     gradle.tasks("k8sUndeploy").build();
     // Then
-    assertJKube(jKubeCase)
+    assertJKube(this)
       .assertThatShouldDeleteAllAppliedResources()
       .assertDeploymentDeleted();
   }

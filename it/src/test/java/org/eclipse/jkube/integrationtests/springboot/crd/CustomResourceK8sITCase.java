@@ -13,18 +13,11 @@
  */
 package org.eclipse.jkube.integrationtests.springboot.crd;
 
-import io.fabric8.kubernetes.client.KubernetesClient;
-import io.fabric8.kubernetes.client.KubernetesClientBuilder;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 import org.apache.maven.shared.invoker.InvocationResult;
-import org.eclipse.jkube.integrationtests.RequireK8sVersionAtLeast;
+import org.eclipse.jkube.integrationtests.jupiter.api.RequireK8sVersionAtLeast;
 import org.eclipse.jkube.integrationtests.jupiter.api.DockerRegistry;
 import org.eclipse.jkube.integrationtests.jupiter.api.DockerRegistryHost;
 import org.eclipse.jkube.integrationtests.maven.MavenInvocationResult;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -62,26 +55,8 @@ import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class CustomResourceK8sITCase extends CustomResourceApp {
 
-  private KubernetesClient k;
-
   @DockerRegistryHost
   private String registry;
-
-  @BeforeEach
-  void setUp() {
-    k = new KubernetesClientBuilder().build();
-  }
-
-  @AfterEach
-  void tearDown() {
-    k.close();
-    k = null;
-  }
-
-  @Override
-  public KubernetesClient getKubernetesClient() {
-    return k;
-  }
 
   @Test
   @Order(1)
@@ -104,11 +79,8 @@ class CustomResourceK8sITCase extends CustomResourceApp {
     final InvocationResult invocationResult = maven("k8s:push", properties);
     // Then
     assertInvocation(invocationResult);
-    try (Response response = new OkHttpClient.Builder().build().newCall(new Request.Builder()
-        .get().url("http://" + registry + "/v2/integration-tests/spring-boot-crd/tags/list").build()).execute()) {
-      assertThat(response.body().string(),
-        containsString("{\"name\":\"integration-tests/spring-boot-crd\",\"tags\":[\"latest\"]}"));
-    }
+    assertThat(httpGet("http://" + registry + "/v2/integration-tests/spring-boot-crd/tags/list").body(),
+      containsString("{\"name\":\"integration-tests/spring-boot-crd\",\"tags\":[\"latest\"]}"));
   }
 
   @Test

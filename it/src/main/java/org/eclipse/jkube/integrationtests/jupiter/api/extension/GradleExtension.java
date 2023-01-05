@@ -36,11 +36,6 @@ public class GradleExtension implements BaseExtension, BeforeAllCallback, Before
   private volatile boolean cleanBuild = false;
 
   @Override
-  public ExtensionContext.Namespace getNamespace() {
-    return ExtensionContext.Namespace.create(GradleExtension.class);
-  }
-
-  @Override
   public synchronized void beforeAll(ExtensionContext context) throws Exception {
     final var annotation = context.getRequiredTestClass().getAnnotation(GradleTest.class);
     var rootPath = Path.of("").toAbsolutePath();

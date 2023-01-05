@@ -14,11 +14,8 @@
 package org.eclipse.jkube.integrationtests.springboot.zeroconfig;
 
 import io.fabric8.kubernetes.api.model.Pod;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
-import org.eclipse.jkube.integrationtests.JKubeCase;
 import org.eclipse.jkube.integrationtests.gradle.JKubeGradleRunner;
+import org.eclipse.jkube.integrationtests.jupiter.api.Application;
 import org.eclipse.jkube.integrationtests.jupiter.api.DockerRegistry;
 import org.eclipse.jkube.integrationtests.jupiter.api.DockerRegistryHost;
 import org.eclipse.jkube.integrationtests.jupiter.api.GradleTest;
@@ -39,6 +36,7 @@ import static org.eclipse.jkube.integrationtests.assertions.KubernetesListAssert
 import static org.eclipse.jkube.integrationtests.assertions.PodAssertion.awaitPod;
 import static org.eclipse.jkube.integrationtests.assertions.ServiceAssertion.awaitService;
 import static org.eclipse.jkube.integrationtests.assertions.YamlAssertion.yaml;
+import static org.eclipse.jkube.integrationtests.springboot.zeroconfig.ZeroConfig.GRADLE_APPLICATION;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.aMapWithSize;
 import static org.hamcrest.Matchers.allOf;
@@ -58,13 +56,12 @@ import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 @Tag(KUBERNETES)
 @GradleTest(
   project = "sb-zero-config")
+@Application(GRADLE_APPLICATION)
 @DockerRegistry(port = 5015)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class ZeroConfigK8sGradleITCase {
+class ZeroConfigK8sGradleITCase extends ZeroConfig {
 
   private static JKubeGradleRunner gradle;
-
-  private JKubeCase jKubeCase;
 
   @DockerRegistryHost
   private String registry;
@@ -92,7 +89,7 @@ class ZeroConfigK8sGradleITCase {
     // When
     gradle.tasks("k8sBuild").build();
     // Then
-    assertImageWasRecentlyBuilt("gradle", jKubeCase.getApplication());
+    assertImageWasRecentlyBuilt("gradle", getApplication());
   }
 
   @Test
@@ -102,11 +99,8 @@ class ZeroConfigK8sGradleITCase {
     // When
     gradle.tasks("-Pjkube.docker.push.registry=" + registry, "k8sPush").build();
     // Then
-    try (Response response = new OkHttpClient.Builder().build().newCall(new Request.Builder()
-      .get().url("http://" + registry + "/v2/gradle/" + jKubeCase.getApplication() + "/tags/list").build()).execute()) {
-      assertThat(response.body().string(),
-        containsString("{\"name\":\"gradle/" + jKubeCase.getApplication() + "\",\"tags\":[\"latest\"]}"));
-    }
+    assertThat(httpGet("http://" + registry + "/v2/gradle/" + getApplication() + "/tags/list").body(),
+      containsString("{\"name\":\"gradle/" + getApplication() + "\",\"tags\":[\"latest\"]}"));
   }
 
   @Test
@@ -117,14 +111,14 @@ class ZeroConfigK8sGradleITCase {
     gradle.tasks("k8sHelm").build();
     // Then
     assertThat(gradle.getModulePath().resolve("build")
-        .resolve(jKubeCase.getApplication() + "-0.0.0-SNAPSHOT-helm.tar.gz").toFile(),
+        .resolve(getApplication() + "-0.0.0-SNAPSHOT-helm.tar.gz").toFile(),
       anExistingFile());
     final var helmDirectory = gradle.getModulePath().resolve("build").resolve("jkube")
-      .resolve("helm").resolve(jKubeCase.getApplication()).resolve("kubernetes");
+      .resolve("helm").resolve(getApplication()).resolve("kubernetes");
     assertThat(helmDirectory.resolve("Chart.yaml").toFile(), yaml(allOf(
       aMapWithSize(3),
       hasEntry("apiVersion", "v1"),
-      hasEntry("name", jKubeCase.getApplication()),
+      hasEntry("name", getApplication()),
       hasEntry("version", "0.0.0-SNAPSHOT")
     )));
     assertThat(helmDirectory.resolve("values.yaml").toFile(), yaml(anEmptyMap()));
@@ -143,13 +137,13 @@ class ZeroConfigK8sGradleITCase {
     // When
     gradle.tasks("k8sApply").build();
     // Then
-    final Pod pod = awaitPod(jKubeCase)
+    final Pod pod = awaitPod(this)
       .logContains("Started ZeroConfigApplication in", 40)
       .getKubernetesResource();
-    awaitService(jKubeCase, pod.getMetadata().getNamespace())
+    awaitService(this, pod.getMetadata().getNamespace())
       .assertPorts(hasSize(1))
       .assertPort("http", 8080, false);
-    awaitDeployment(jKubeCase, pod.getMetadata().getNamespace())
+    awaitDeployment(this, pod.getMetadata().getNamespace())
       .assertReplicas(equalTo(1))
       .assertContainers(hasSize(1))
       .assertContainers(hasItems(allOf(
@@ -181,7 +175,7 @@ class ZeroConfigK8sGradleITCase {
     // When
     gradle.tasks("k8sUndeploy").build();
     // Then
-    assertJKube(jKubeCase)
+    assertJKube(this)
       .assertThatShouldDeleteAllAppliedResources()
       .assertDeploymentDeleted();
   }

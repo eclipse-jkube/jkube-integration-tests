@@ -20,7 +20,7 @@ import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.dsl.ServiceResource;
 import org.eclipse.jkube.integrationtests.JKubeCase;
 import org.eclipse.jkube.integrationtests.jupiter.api.TempKubernetesTest;
-import org.eclipse.jkube.integrationtests.maven.BaseMavenCase;
+import org.eclipse.jkube.integrationtests.maven.MavenCase;
 
 import java.util.concurrent.TimeUnit;
 
@@ -32,7 +32,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.stringContainsInOrder;
 
 @TempKubernetesTest
-abstract class ZeroConfig extends BaseMavenCase implements JKubeCase {
+abstract class ZeroConfig implements JKubeCase, MavenCase {
 
   static final String PROJECT_ZERO_CONFIG = "projects-to-be-tested/maven/webapp/zero-config";
 

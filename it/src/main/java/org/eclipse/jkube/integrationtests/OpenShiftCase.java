@@ -13,10 +13,16 @@
  */
 package org.eclipse.jkube.integrationtests;
 
+import io.fabric8.openshift.client.OpenShiftClient;
+
 public interface OpenShiftCase extends JKubeCase {
 
   String S2I_BUILD_SUFFIX = "-s2i";
   String OPENSHIFT_BUILD_LABEL = "openshift.io/build.name";
+
+  default OpenShiftClient getOpenShiftClient() {
+    return getKubernetesClient().adapt(OpenShiftClient.class);
+  }
 
   default void cleanUpCluster() {
     getOpenShiftClient().imageStreams().withName(getApplication()).delete();

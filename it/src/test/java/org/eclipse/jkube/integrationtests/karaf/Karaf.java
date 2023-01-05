@@ -14,8 +14,10 @@
 package org.eclipse.jkube.integrationtests.karaf;
 
 import io.fabric8.kubernetes.api.model.Pod;
+import io.fabric8.kubernetes.client.KubernetesClient;
 import org.eclipse.jkube.integrationtests.JKubeCase;
-import org.eclipse.jkube.integrationtests.maven.BaseMavenCase;
+import org.eclipse.jkube.integrationtests.jupiter.api.TempKubernetesTest;
+import org.eclipse.jkube.integrationtests.maven.MavenCase;
 import org.junit.jupiter.api.io.TempDir;
 
 import java.io.IOException;
@@ -31,13 +33,21 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.stringContainsInOrder;
 import static org.hamcrest.core.AllOf.allOf;
 
-abstract class Karaf extends BaseMavenCase implements JKubeCase {
+@TempKubernetesTest
+abstract class Karaf implements MavenCase, JKubeCase {
 
   private static final String PROJECT_KARAF = "projects-to-be-tested/maven/karaf/camel-log";
   private static final int LOG_TIMEOUT = 60;
 
+  private static KubernetesClient kubernetesClient;
+
   @TempDir
   Path tempDir;
+
+  @Override
+  public KubernetesClient getKubernetesClient() {
+    return kubernetesClient;
+  }
 
   @Override
   public String getProject() { return PROJECT_KARAF;}

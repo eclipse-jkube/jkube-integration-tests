@@ -14,7 +14,6 @@
 package org.eclipse.jkube.integrationtests.jupiter.api.extension;
 
 import io.fabric8.kubernetes.client.KubernetesClient;
-import io.fabric8.kubernetes.client.KubernetesClientBuilder;
 import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
@@ -26,24 +25,20 @@ import java.lang.reflect.Modifier;
  * @deprecated to be replaced with KubernetesClient KubernetesNamespacedTestExtension
  */
 @Deprecated
-public class TempKubernetesExtension implements BaseExtension, BeforeAllCallback, AfterAllCallback {
-
-  @Override
-  public ExtensionContext.Namespace getNamespace() {
-    return ExtensionContext.Namespace.create(TempKubernetesExtension.class);
-  }
+public class TempKubernetesExtension implements HasKubernetesClient, BeforeAllCallback, AfterAllCallback {
 
   @Override
   public void beforeAll(ExtensionContext context) throws Exception {
-    final var client = new KubernetesClientBuilder().build();
-    getStore(context).put(KubernetesClient.class, client);
     for (Field field : extractFields(context, KubernetesClient.class, f -> Modifier.isStatic(f.getModifiers()))) {
-      setFieldValue(field, null, client);
+      setFieldValue(field, null, getClient(context));
     }
 
   }
   @Override
   public void afterAll(ExtensionContext context) {
-    getStore(context).get(KubernetesClient.class, KubernetesClient.class).close();
+    // Note that the ThreadPoolExecutor in OkHttp's RealConnectionPool is shared amongst all the OkHttp client
+    // instances. This means that closing one OkHttp client instance effectively closes all the others.
+    // In order to be able to use this safely, we should transition to one of the other HttpClient implementations
+    getClient(context).close();
   }
 }

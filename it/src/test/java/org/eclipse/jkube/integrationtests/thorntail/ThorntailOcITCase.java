@@ -13,14 +13,9 @@
  */
 package org.eclipse.jkube.integrationtests.thorntail;
 
-import io.fabric8.kubernetes.client.KubernetesClient;
-import io.fabric8.kubernetes.client.KubernetesClientBuilder;
 import io.fabric8.openshift.api.model.ImageStream;
-import io.fabric8.openshift.client.OpenShiftClient;
 import org.apache.maven.shared.invoker.InvocationResult;
 import org.eclipse.jkube.integrationtests.OpenShiftCase;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Order;
@@ -50,26 +45,8 @@ import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 @TestMethodOrder(OrderAnnotation.class)
 class ThorntailOcITCase extends Thorntail implements OpenShiftCase {
 
-  private OpenShiftClient oc;
-
-  @BeforeEach
-  void setUp() {
-    oc = new KubernetesClientBuilder().build().adapt(OpenShiftClient.class);
-  }
-
-  @AfterEach
-  void tearDown() {
-    oc.close();
-    oc = null;
-  }
-
   @Override
-  public KubernetesClient getKubernetesClient() {
-    return oc;
-  }
-
-  @Override
-  protected List<String> getProfiles() {
+  public List<String> getProfiles() {
     return Collections.singletonList(OPEN_SHIFT);
   }
 
@@ -82,7 +59,7 @@ class ThorntailOcITCase extends Thorntail implements OpenShiftCase {
     final InvocationResult invocationResult = maven("oc:build");
     // Then
     assertInvocation(invocationResult);
-    final ImageStream is = oc.imageStreams().withName("thorntail-microprofile").get();
+    final ImageStream is = getOpenShiftClient().imageStreams().withName("thorntail-microprofile").get();
     assertThat(is, notNullValue());
     assertThat(is.getStatus().getTags().iterator().next().getTag(), equalTo("latest"));
   }

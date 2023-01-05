@@ -14,18 +14,30 @@
 package org.eclipse.jkube.integrationtests;
 
 import io.fabric8.kubernetes.client.KubernetesClient;
-import io.fabric8.openshift.client.OpenShiftClient;
+import io.fabric8.kubernetes.client.http.HttpResponse;
+import org.eclipse.jkube.integrationtests.jupiter.api.Application;
+
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 public interface JKubeCase {
 
   String JKUBE_VERSION_SYSTEM_PROPERTY = "jkubeVersion";
 
+  // TODO: Move to KubernetesCase interface
   KubernetesClient getKubernetesClient();
 
-  default OpenShiftClient getOpenShiftClient() {
-    return getKubernetesClient().adapt(OpenShiftClient.class);
+  default String getApplication() {
+    return getClass().getAnnotation(Application.class).value();
   }
 
-  String getApplication();
-
+  // TODO: Move to KubernetesCase interface
+  default HttpResponse<String> httpGet(String uri) throws InterruptedException, ExecutionException, TimeoutException {
+    return getKubernetesClient().getHttpClient().sendAsync(
+      getKubernetesClient().getHttpClient().newHttpRequestBuilder()
+      .uri(uri)
+      .build(), String.class)
+      .get(5, TimeUnit.SECONDS);
+  }
 }

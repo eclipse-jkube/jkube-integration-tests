@@ -11,14 +11,17 @@
  * Contributors:
  *   Red Hat, Inc. - initial API and implementation
  */
-package org.eclipse.jkube.integrationtests;
+package org.eclipse.jkube.integrationtests.jupiter.api;
 
+import org.eclipse.jkube.integrationtests.jupiter.api.extension.RequireK8sVersionAtLeastCondition;
+import org.eclipse.jkube.integrationtests.jupiter.api.extension.TempKubernetesExtension;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 @Retention(RetentionPolicy.RUNTIME)
+@ExtendWith(TempKubernetesExtension.class)
 @ExtendWith(RequireK8sVersionAtLeastCondition.class)
 public @interface RequireK8sVersionAtLeast {
   String majorVersion();

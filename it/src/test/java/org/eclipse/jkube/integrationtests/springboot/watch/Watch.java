@@ -15,10 +15,10 @@ package org.eclipse.jkube.integrationtests.springboot.watch;
 
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.client.KubernetesClient;
-import io.fabric8.kubernetes.client.KubernetesClientBuilder;
 import org.apache.commons.io.FileUtils;
 import org.eclipse.jkube.integrationtests.JKubeCase;
-import org.eclipse.jkube.integrationtests.maven.BaseMavenCase;
+import org.eclipse.jkube.integrationtests.jupiter.api.TempKubernetesTest;
+import org.eclipse.jkube.integrationtests.maven.MavenCase;
 import org.eclipse.jkube.integrationtests.maven.MavenInvocationResult;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,8 +33,8 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import static org.eclipse.jkube.integrationtests.Locks.CLUSTER_RESOURCE_INTENSIVE;
 import static org.eclipse.jkube.integrationtests.AsyncUtil.await;
+import static org.eclipse.jkube.integrationtests.Locks.CLUSTER_RESOURCE_INTENSIVE;
 import static org.eclipse.jkube.integrationtests.assertions.InvocationResultAssertion.assertInvocation;
 import static org.eclipse.jkube.integrationtests.assertions.PodAssertion.awaitPod;
 import static org.eclipse.jkube.integrationtests.assertions.ServiceAssertion.awaitService;
@@ -44,11 +44,12 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.stringContainsInOrder;
 import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 
-abstract class Watch  extends BaseMavenCase implements JKubeCase {
+@TempKubernetesTest
+abstract class Watch  implements JKubeCase, MavenCase {
 
   private static final String PROJECT_SPRING_BOOT_WATCH = "projects-to-be-tested/maven/spring/watch";
 
-  private KubernetesClient k;
+  private static KubernetesClient kubernetesClient;
   private File fileToChange;
   private String originalFileContent;
   private Pod originalPod;
@@ -56,7 +57,6 @@ abstract class Watch  extends BaseMavenCase implements JKubeCase {
 
   @BeforeEach
   void setUp() throws Exception {
-    k = new KubernetesClientBuilder().build();
     fileToChange = new File(String.format(
       "../%s/src/main/java/org/eclipse/jkube/integrationtests/springbootwatch/SpringBootWatchResource.java", getProject()));
     originalFileContent = FileUtils.readFileToString(fileToChange, StandardCharsets.UTF_8);
@@ -70,18 +70,16 @@ abstract class Watch  extends BaseMavenCase implements JKubeCase {
     if (mavenWatch != null) {
       mavenWatch.cancel(true);
     }
-    k.resource(originalPod).withGracePeriod(0).delete();
+    kubernetesClient.resource(originalPod).withGracePeriod(0).delete();
     assertInvocation(maven(String.format("%s:undeploy", getPrefix())));
     FileUtils.write(fileToChange, originalFileContent, StandardCharsets.UTF_8);
-    k.close();
-    k = null;
   }
 
   abstract String getPrefix();
 
   @Override
   public KubernetesClient getKubernetesClient() {
-    return k;
+    return kubernetesClient;
   }
 
   @Override

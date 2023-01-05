@@ -16,6 +16,7 @@ package org.eclipse.jkube.integrationtests.assertions;
 import io.fabric8.kubernetes.api.model.Container;
 import io.fabric8.openshift.api.model.DeploymentConfig;
 import org.eclipse.jkube.integrationtests.JKubeCase;
+import org.eclipse.jkube.integrationtests.OpenShiftCase;
 import org.hamcrest.Matcher;
 
 import java.util.Collection;
@@ -37,17 +38,17 @@ public class DeploymentConfigAssertion  extends KubernetesClientAssertion<Deploy
     return jKubeCase -> new DeploymentConfigAssertion(jKubeCase, deploymentConfig);
   }
 
-  public static DeploymentConfigAssertion awaitDeploymentConfig(JKubeCase jKubeCase, String namespace) {
-    final DeploymentConfig deploymentConfig = jKubeCase.getOpenShiftClient().deploymentConfigs()
+  public static <C extends JKubeCase & OpenShiftCase> DeploymentConfigAssertion awaitDeploymentConfig(C c, String namespace) {
+    final DeploymentConfig deploymentConfig = c.getOpenShiftClient().deploymentConfigs()
       .inNamespace(namespace)
-      .withName(jKubeCase.getApplication())
+      .withName(c.getApplication())
       .waitUntilCondition(Objects::nonNull, DEFAULT_AWAIT_TIME_SECONDS, TimeUnit.SECONDS);
     assertThat(deploymentConfig, notNullValue());
-    assertLabels(jKubeCase)
+    assertLabels(c)
       .assertStandardLabels(deploymentConfig.getMetadata()::getLabels)
       .assertStandardLabels(deploymentConfig.getSpec()::getSelector)
       .assertStandardLabels(deploymentConfig.getSpec().getTemplate().getMetadata()::getLabels);
-    return assertDeploymentConfig(deploymentConfig).apply(jKubeCase);
+    return assertDeploymentConfig(deploymentConfig).apply(c);
   }
 
   public DeploymentConfigAssertion assertReplicas(Matcher<Number> replicasMatcher) {
