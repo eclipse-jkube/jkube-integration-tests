@@ -15,14 +15,10 @@ package org.eclipse.jkube.integrationtests.webapp.zeroconfig;
 
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.Service;
-import io.fabric8.kubernetes.client.KubernetesClient;
-import io.fabric8.kubernetes.client.KubernetesClientBuilder;
 import io.fabric8.openshift.api.model.ImageStream;
-import io.fabric8.openshift.client.OpenShiftClient;
 import org.apache.maven.shared.invoker.InvocationResult;
+import org.eclipse.jkube.integrationtests.OpenShiftCase;
 import org.eclipse.jkube.integrationtests.maven.MavenInvocationResult;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Order;
@@ -34,7 +30,6 @@ import org.junit.jupiter.api.parallel.ResourceLock;
 import java.io.File;
 
 import static org.eclipse.jkube.integrationtests.Locks.CLUSTER_RESOURCE_INTENSIVE;
-import static org.eclipse.jkube.integrationtests.OpenShift.cleanUpCluster;
 import static org.eclipse.jkube.integrationtests.Tags.OPEN_SHIFT;
 import static org.eclipse.jkube.integrationtests.assertions.InvocationResultAssertion.assertInvocation;
 import static org.eclipse.jkube.integrationtests.assertions.JKubeAssertions.assertJKube;
@@ -51,25 +46,7 @@ import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 
 @Tag(OPEN_SHIFT)
 @TestMethodOrder(OrderAnnotation.class)
-class ZeroConfigOcITCase extends ZeroConfig {
-
-  private OpenShiftClient oc;
-
-  @BeforeEach
-  void setUp() {
-    oc = new KubernetesClientBuilder().build().adapt(OpenShiftClient.class);
-  }
-
-  @AfterEach
-  void tearDown() {
-    oc.close();
-    oc = null;
-  }
-
-  @Override
-  public KubernetesClient getKubernetesClient() {
-    return oc;
-  }
+class ZeroConfigOcITCase extends ZeroConfig implements OpenShiftCase {
 
   @Test
   @Order(1)
@@ -79,7 +56,7 @@ class ZeroConfigOcITCase extends ZeroConfig {
     final InvocationResult invocationResult = maven("oc:build");
     // Then
     assertInvocation(invocationResult);
-    final ImageStream is = oc.imageStreams().withName(getApplication()).get();
+    final ImageStream is = getOpenShiftClient().imageStreams().withName(getApplication()).get();
     assertThat(is, notNullValue());
     assertThat(is.getStatus().getTags().iterator().next().getTag(), equalTo("latest"));
   }
@@ -147,7 +124,7 @@ class ZeroConfigOcITCase extends ZeroConfig {
     assertInvocation(invocationResult);
     assertJKube(this)
       .assertThatShouldDeleteAllAppliedResources();
-    cleanUpCluster(oc, this);
+    cleanUpCluster();
   }
 
 }

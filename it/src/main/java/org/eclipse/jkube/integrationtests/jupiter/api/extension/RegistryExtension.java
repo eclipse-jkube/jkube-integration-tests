@@ -31,11 +31,11 @@ import java.lang.reflect.Field;
 import static org.eclipse.jkube.integrationtests.cli.CliUtils.isWindows;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-public class RegistryExtension extends BaseExtension implements BeforeAllCallback, BeforeEachCallback, AfterAllCallback {
+public class RegistryExtension implements BaseExtension, BeforeAllCallback, BeforeEachCallback, AfterAllCallback {
 
   private static final Logger log = LoggerFactory.getLogger(RegistryExtension.class);
   @Override
-  ExtensionContext.Namespace getNamespace() {
+  public ExtensionContext.Namespace getNamespace() {
     return ExtensionContext.Namespace.create(RegistryExtension.class);
   }
 
