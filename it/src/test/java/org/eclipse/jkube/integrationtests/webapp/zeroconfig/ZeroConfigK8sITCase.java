@@ -15,8 +15,8 @@ package org.eclipse.jkube.integrationtests.webapp.zeroconfig;
 
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.Service;
-import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClient;
+import io.fabric8.kubernetes.client.KubernetesClientBuilder;
 import org.apache.maven.shared.invoker.InvocationResult;
 import org.eclipse.jkube.integrationtests.maven.MavenInvocationResult;
 import org.junit.jupiter.api.AfterEach;
@@ -62,7 +62,7 @@ class ZeroConfigK8sITCase extends ZeroConfig {
 
   @BeforeEach
   void setUp() {
-    k = new DefaultKubernetesClient();
+    k = new KubernetesClientBuilder().build();
   }
 
   @AfterEach

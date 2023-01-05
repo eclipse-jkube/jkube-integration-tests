@@ -14,8 +14,8 @@
 package org.eclipse.jkube.integrationtests.webapp.wildfly;
 
 import io.fabric8.kubernetes.client.KubernetesClient;
+import io.fabric8.kubernetes.client.KubernetesClientBuilder;
 import io.fabric8.openshift.api.model.ImageStream;
-import io.fabric8.openshift.client.DefaultOpenShiftClient;
 import io.fabric8.openshift.client.OpenShiftClient;
 import org.apache.maven.shared.invoker.InvocationResult;
 import org.eclipse.jkube.integrationtests.maven.MavenInvocationResult;
@@ -53,7 +53,7 @@ class WildFlyOcITCase extends WildFly {
   private OpenShiftClient oc;
 
   @BeforeEach
-  void setUp() {oc = new DefaultOpenShiftClient().adapt(OpenShiftClient.class);}
+  void setUp() {oc = new KubernetesClientBuilder().build().adapt(OpenShiftClient.class);}
 
   @AfterEach
   void tearDown(){

@@ -14,8 +14,8 @@
 package org.eclipse.jkube.integrationtests.karaf;
 
 
-import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClient;
+import io.fabric8.kubernetes.client.KubernetesClientBuilder;
 import io.fabric8.openshift.api.model.ImageStream;
 import io.fabric8.openshift.client.OpenShiftClient;
 import org.apache.maven.shared.invoker.InvocationResult;
@@ -53,7 +53,7 @@ class KarafOcITCase extends Karaf {
   private OpenShiftClient oc;
 
   @BeforeEach
-  void setUp() {oc = new DefaultKubernetesClient().adapt(OpenShiftClient.class); }
+  void setUp() {oc = new KubernetesClientBuilder().build().adapt(OpenShiftClient.class); }
 
   @AfterEach
   void tearDown(){

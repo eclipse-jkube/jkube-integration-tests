@@ -13,8 +13,8 @@
  */
 package org.eclipse.jkube.integrationtests.springboot.crd;
 
-import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClient;
+import io.fabric8.kubernetes.client.KubernetesClientBuilder;
 import io.fabric8.openshift.api.model.ImageStream;
 import io.fabric8.openshift.client.OpenShiftClient;
 import org.apache.maven.shared.invoker.InvocationResult;
@@ -56,7 +56,7 @@ class CustomResourceOcITCase extends CustomResourceApp {
 
   @BeforeEach
   void setUp() {
-    oc = new DefaultKubernetesClient().adapt(OpenShiftClient.class);
+    oc = new KubernetesClientBuilder().build().adapt(OpenShiftClient.class);
   }
 
   @AfterEach

@@ -15,8 +15,8 @@ package org.eclipse.jkube.integrationtests.webapp.zeroconfig;
 
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.Service;
-import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClient;
+import io.fabric8.kubernetes.client.KubernetesClientBuilder;
 import io.fabric8.openshift.api.model.ImageStream;
 import io.fabric8.openshift.client.OpenShiftClient;
 import org.apache.maven.shared.invoker.InvocationResult;
@@ -57,7 +57,7 @@ class ZeroConfigOcITCase extends ZeroConfig {
 
   @BeforeEach
   void setUp() {
-    oc = new DefaultKubernetesClient().adapt(OpenShiftClient.class);
+    oc = new KubernetesClientBuilder().build().adapt(OpenShiftClient.class);
   }
 
   @AfterEach

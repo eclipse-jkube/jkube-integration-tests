@@ -13,7 +13,7 @@
  */
 package org.eclipse.jkube.integrationtests.jupiter.api.extension;
 
-import io.fabric8.kubernetes.client.DefaultKubernetesClient;
+import io.fabric8.kubernetes.client.KubernetesClientBuilder;
 import org.eclipse.jkube.integrationtests.DefaultJKubeCase;
 import org.eclipse.jkube.integrationtests.JKubeCase;
 import org.eclipse.jkube.integrationtests.jupiter.api.GradleTest;
@@ -42,7 +42,7 @@ public class JKubeTestExtension extends BaseExtension implements BeforeAllCallba
     } else {
       application = maven.value();
     }
-    final var jKubeCase = new DefaultJKubeCase(application, new DefaultKubernetesClient());
+    final var jKubeCase = new DefaultJKubeCase(application, new KubernetesClientBuilder().build());
     getStore(context).put("jKubeCase", jKubeCase);
     for (Field field : extractFields(context, JKubeCase.class, f -> Modifier.isStatic(f.getModifiers()))) {
       setFieldValue(field, null, jKubeCase);
