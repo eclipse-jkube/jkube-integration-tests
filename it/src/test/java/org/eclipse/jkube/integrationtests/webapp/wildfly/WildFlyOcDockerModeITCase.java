@@ -19,6 +19,7 @@ import io.fabric8.kubernetes.client.KubernetesClientBuilder;
 import io.fabric8.openshift.api.model.ImageStream;
 import io.fabric8.openshift.client.OpenShiftClient;
 import org.apache.maven.shared.invoker.InvocationResult;
+import org.eclipse.jkube.integrationtests.OpenShiftCase;
 import org.eclipse.jkube.integrationtests.Tags;
 import org.eclipse.jkube.integrationtests.maven.MavenInvocationResult;
 import org.junit.jupiter.api.AfterEach;
@@ -36,7 +37,6 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.eclipse.jkube.integrationtests.Locks.CLUSTER_RESOURCE_INTENSIVE;
-import static org.eclipse.jkube.integrationtests.OpenShift.cleanUpCluster;
 import static org.eclipse.jkube.integrationtests.assertions.InvocationResultAssertion.assertInvocation;
 import static org.eclipse.jkube.integrationtests.assertions.JKubeAssertions.assertJKube;
 import static org.eclipse.jkube.integrationtests.assertions.KubernetesListAssertion.assertListResource;
@@ -53,7 +53,7 @@ import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 
 @Tag(Tags.OPEN_SHIFT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class WildFlyOcDockerModeITCase extends WildFly  {
+class WildFlyOcDockerModeITCase extends WildFly implements OpenShiftCase {
   private OpenShiftClient oc;
 
   @Override
@@ -145,6 +145,6 @@ class WildFlyOcDockerModeITCase extends WildFly  {
     assertInvocation(invocationResult);
     assertJKube(this)
       .assertThatShouldDeleteAllAppliedResources();
-    cleanUpCluster(oc, this);
+    cleanUpCluster();
   }
 }

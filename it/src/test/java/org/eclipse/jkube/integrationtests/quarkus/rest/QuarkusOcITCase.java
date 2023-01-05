@@ -18,6 +18,7 @@ import io.fabric8.kubernetes.client.KubernetesClientBuilder;
 import io.fabric8.openshift.api.model.ImageStream;
 import io.fabric8.openshift.client.OpenShiftClient;
 import org.apache.maven.shared.invoker.InvocationResult;
+import org.eclipse.jkube.integrationtests.OpenShiftCase;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -31,7 +32,6 @@ import org.junit.jupiter.api.parallel.ResourceLock;
 import java.io.File;
 
 import static org.eclipse.jkube.integrationtests.Locks.CLUSTER_RESOURCE_INTENSIVE;
-import static org.eclipse.jkube.integrationtests.OpenShift.cleanUpCluster;
 import static org.eclipse.jkube.integrationtests.Tags.OPEN_SHIFT;
 import static org.eclipse.jkube.integrationtests.assertions.InvocationResultAssertion.assertInvocation;
 import static org.eclipse.jkube.integrationtests.assertions.JKubeAssertions.assertJKube;
@@ -46,7 +46,7 @@ import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 
 @Tag(OPEN_SHIFT)
 @TestMethodOrder(OrderAnnotation.class)
-class QuarkusOcITCase extends Quarkus {
+class QuarkusOcITCase extends Quarkus implements OpenShiftCase {
 
   private OpenShiftClient oc;
 
@@ -135,6 +135,6 @@ class QuarkusOcITCase extends Quarkus {
     assertInvocation(invocationResult);
     assertJKube(this)
       .assertThatShouldDeleteAllAppliedResources();
-    cleanUpCluster(oc, this);
+    cleanUpCluster();
   }
 }
