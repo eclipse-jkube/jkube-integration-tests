@@ -30,13 +30,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class GradleExtension extends BaseExtension implements BeforeAllCallback, BeforeEachCallback {
+public class GradleExtension implements BaseExtension, BeforeAllCallback, BeforeEachCallback {
 
 
   private volatile boolean cleanBuild = false;
 
   @Override
-  ExtensionContext.Namespace getNamespace() {
+  public ExtensionContext.Namespace getNamespace() {
     return ExtensionContext.Namespace.create(GradleExtension.class);
   }
 

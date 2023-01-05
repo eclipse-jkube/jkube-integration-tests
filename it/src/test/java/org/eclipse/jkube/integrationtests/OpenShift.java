@@ -15,13 +15,17 @@ package org.eclipse.jkube.integrationtests;
 
 import io.fabric8.openshift.client.OpenShiftClient;
 
-public class OpenShift {
+import static org.eclipse.jkube.integrationtests.OpenShiftCase.OPENSHIFT_BUILD_LABEL;
+import static org.eclipse.jkube.integrationtests.OpenShiftCase.S2I_BUILD_SUFFIX;
 
-  private static final String S2I_BUILD_SUFFIX = "-s2i";
-  private static final String OPENSHIFT_BUILD_LABEL = "openshift.io/build.name";
+public class OpenShift {
 
   private OpenShift() {}
 
+  /**
+   * @deprecated use {@link OpenShiftCase#cleanUpCluster()} instead
+   */
+  @Deprecated(forRemoval = true)
   public static void cleanUpCluster(OpenShiftClient oc, JKubeCase jKubeCase) {
     oc.imageStreams().withName(jKubeCase.getApplication()).delete();
     oc.builds().withLabel("buildconfig", jKubeCase.getApplication() + S2I_BUILD_SUFFIX).delete();

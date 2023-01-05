@@ -26,9 +26,9 @@ import org.junit.jupiter.api.extension.ExtensionContext;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
-public class JKubeTestExtension extends BaseExtension implements BeforeAllCallback, BeforeEachCallback, AfterAllCallback {
+public class JKubeTestExtension implements BaseExtension, BeforeAllCallback, BeforeEachCallback, AfterAllCallback {
   @Override
-  ExtensionContext.Namespace getNamespace() {
+  public ExtensionContext.Namespace getNamespace() {
     return ExtensionContext.Namespace.create(JKubeTestExtension.class);
   }
 
