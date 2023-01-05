@@ -14,8 +14,8 @@
 package org.eclipse.jkube.integrationtests.dockerfile;
 
 import io.fabric8.kubernetes.api.model.Pod;
-import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClient;
+import io.fabric8.kubernetes.client.KubernetesClientBuilder;
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.shared.invoker.InvocationResult;
 import org.eclipse.jkube.integrationtests.JKubeCase;
@@ -70,7 +70,7 @@ class SimpleK8sITCase extends BaseMavenCase implements JKubeCase {
 
   @BeforeEach
   void setUp() {
-    k = new DefaultKubernetesClient();
+    k = new KubernetesClientBuilder().build();
   }
 
   @AfterEach

@@ -14,8 +14,8 @@
 package org.eclipse.jkube.integrationtests.springboot.zeroconfig;
 
 import io.fabric8.kubernetes.api.model.Pod;
-import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClient;
+import io.fabric8.kubernetes.client.KubernetesClientBuilder;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -68,7 +68,7 @@ class ZeroConfigK8sITCase extends ZeroConfig {
 
   @BeforeEach
   void setUp() {
-    k = new DefaultKubernetesClient();
+    k = new KubernetesClientBuilder().build();
   }
 
   @AfterEach

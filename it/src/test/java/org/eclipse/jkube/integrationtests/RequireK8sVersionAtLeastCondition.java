@@ -13,8 +13,8 @@
  */
 package org.eclipse.jkube.integrationtests;
 
-import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClient;
+import io.fabric8.kubernetes.client.KubernetesClientBuilder;
 import io.fabric8.kubernetes.client.VersionInfo;
 import org.junit.jupiter.api.extension.ConditionEvaluationResult;
 import org.junit.jupiter.api.extension.ExecutionCondition;
@@ -46,7 +46,7 @@ public class RequireK8sVersionAtLeastCondition implements ExecutionCondition {
   }
 
   public static boolean kubernetesVersionAtLeast(String majorVersion, String minorVersion) {
-    try (KubernetesClient client = new DefaultKubernetesClient()) {
+    try (KubernetesClient client = new KubernetesClientBuilder().build()) {
       VersionInfo versionInfo = client.getVersion();
       String clusterMajorVersion = versionInfo.getMajor().replaceAll(NON_NUMERIC_CHARACTERS, EMPTY);
       String clusterMinorVersion = versionInfo.getMinor().replaceAll(NON_NUMERIC_CHARACTERS, EMPTY);

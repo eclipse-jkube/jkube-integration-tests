@@ -14,8 +14,8 @@
 package org.eclipse.jkube.integrationtests.vertx;
 
 import io.fabric8.kubernetes.api.model.Pod;
-import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClient;
+import io.fabric8.kubernetes.client.KubernetesClientBuilder;
 import org.apache.maven.shared.invoker.InvocationResult;
 import org.eclipse.jkube.integrationtests.maven.MavenInvocationResult;
 import org.junit.jupiter.api.AfterEach;
@@ -57,7 +57,7 @@ class VertxK8sITCase extends Vertx {
 
   @BeforeEach
   void setUp() {
-    k = new DefaultKubernetesClient();
+    k = new KubernetesClientBuilder().build();
   }
 
   @AfterEach
