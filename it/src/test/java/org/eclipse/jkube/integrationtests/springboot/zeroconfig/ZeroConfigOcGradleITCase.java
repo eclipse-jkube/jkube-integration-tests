@@ -18,7 +18,7 @@ import io.fabric8.openshift.api.model.ImageStream;
 import org.eclipse.jkube.integrationtests.OpenShiftCase;
 import org.eclipse.jkube.integrationtests.gradle.JKubeGradleRunner;
 import org.eclipse.jkube.integrationtests.jupiter.api.Application;
-import org.eclipse.jkube.integrationtests.jupiter.api.GradleTest;
+import org.eclipse.jkube.integrationtests.jupiter.api.Gradle;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -54,13 +54,12 @@ import static org.hamcrest.io.FileMatchers.anExistingFile;
 import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 
 @Tag(OPEN_SHIFT)
-@GradleTest(
-  project = "sb-zero-config")
 @Application(GRADLE_APPLICATION)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class ZeroConfigOcGradleITCase extends ZeroConfig implements OpenShiftCase {
 
-  private static JKubeGradleRunner gradle;
+  @Gradle(project = "sb-zero-config")
+  private JKubeGradleRunner gradle;
 
   @Test
   @Order(1)

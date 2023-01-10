@@ -18,7 +18,7 @@ import org.eclipse.jkube.integrationtests.gradle.JKubeGradleRunner;
 import org.eclipse.jkube.integrationtests.jupiter.api.Application;
 import org.eclipse.jkube.integrationtests.jupiter.api.DockerRegistry;
 import org.eclipse.jkube.integrationtests.jupiter.api.DockerRegistryHost;
-import org.eclipse.jkube.integrationtests.jupiter.api.GradleTest;
+import org.eclipse.jkube.integrationtests.jupiter.api.Gradle;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -54,14 +54,13 @@ import static org.hamcrest.io.FileMatchers.anExistingFile;
 import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 
 @Tag(KUBERNETES)
-@GradleTest(
-  project = "sb-zero-config")
 @Application(GRADLE_APPLICATION)
 @DockerRegistry(port = 5015)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class ZeroConfigK8sGradleITCase extends ZeroConfig {
 
-  private static JKubeGradleRunner gradle;
+  @Gradle(project = "sb-zero-config")
+  private JKubeGradleRunner gradle;
 
   @DockerRegistryHost
   private String registry;
