@@ -20,7 +20,7 @@ import org.eclipse.jkube.integrationtests.JKubeCase;
 import org.eclipse.jkube.integrationtests.OpenShiftCase;
 import org.eclipse.jkube.integrationtests.gradle.JKubeGradleRunner;
 import org.eclipse.jkube.integrationtests.jupiter.api.Application;
-import org.eclipse.jkube.integrationtests.jupiter.api.GradleTest;
+import org.eclipse.jkube.integrationtests.jupiter.api.Gradle;
 import org.eclipse.jkube.integrationtests.jupiter.api.TempKubernetesTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
@@ -56,14 +56,13 @@ import static org.hamcrest.io.FileMatchers.anExistingFile;
 import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 
 @Tag(OPEN_SHIFT)
-@GradleTest(
-  project = "dsl")
 @Application("dsl")
 @TempKubernetesTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class DslOcGradleITCase implements JKubeCase, OpenShiftCase {
 
-  private static JKubeGradleRunner gradle;
+  @Gradle(project = "dsl")
+  private JKubeGradleRunner gradle;
 
   private static KubernetesClient kubernetesClient;
 
