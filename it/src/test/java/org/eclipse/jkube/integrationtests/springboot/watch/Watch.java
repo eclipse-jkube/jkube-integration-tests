@@ -13,11 +13,11 @@
  */
 package org.eclipse.jkube.integrationtests.springboot.watch;
 
+import io.fabric8.junit.jupiter.api.KubernetesTest;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import org.apache.commons.io.FileUtils;
 import org.eclipse.jkube.integrationtests.JKubeCase;
-import org.eclipse.jkube.integrationtests.jupiter.api.TempKubernetesTest;
 import org.eclipse.jkube.integrationtests.maven.MavenCase;
 import org.eclipse.jkube.integrationtests.maven.MavenInvocationResult;
 import org.junit.jupiter.api.AfterEach;
@@ -44,7 +44,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.stringContainsInOrder;
 import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 
-@TempKubernetesTest
+@KubernetesTest(createEphemeralNamespace = false)
 abstract class Watch  implements JKubeCase, MavenCase {
 
   private static final String PROJECT_SPRING_BOOT_WATCH = "projects-to-be-tested/maven/spring/watch";

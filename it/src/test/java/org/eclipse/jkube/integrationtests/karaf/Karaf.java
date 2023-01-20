@@ -13,10 +13,10 @@
  */
 package org.eclipse.jkube.integrationtests.karaf;
 
+import io.fabric8.junit.jupiter.api.KubernetesTest;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import org.eclipse.jkube.integrationtests.JKubeCase;
-import org.eclipse.jkube.integrationtests.jupiter.api.TempKubernetesTest;
 import org.eclipse.jkube.integrationtests.maven.MavenCase;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -33,7 +33,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.stringContainsInOrder;
 import static org.hamcrest.core.AllOf.allOf;
 
-@TempKubernetesTest
+@KubernetesTest(createEphemeralNamespace = false)
 abstract class Karaf implements MavenCase, JKubeCase {
 
   private static final String PROJECT_KARAF = "projects-to-be-tested/maven/karaf/camel-log";

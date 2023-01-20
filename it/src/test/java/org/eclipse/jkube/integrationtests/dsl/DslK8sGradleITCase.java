@@ -13,13 +13,13 @@
  */
 package org.eclipse.jkube.integrationtests.dsl;
 
+import io.fabric8.junit.jupiter.api.KubernetesTest;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import org.eclipse.jkube.integrationtests.JKubeCase;
 import org.eclipse.jkube.integrationtests.gradle.JKubeGradleRunner;
 import org.eclipse.jkube.integrationtests.jupiter.api.Application;
 import org.eclipse.jkube.integrationtests.jupiter.api.Gradle;
-import org.eclipse.jkube.integrationtests.jupiter.api.TempKubernetesTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -54,7 +54,7 @@ import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 
 @Tag(KUBERNETES)
 @Application("dsl")
-@TempKubernetesTest
+@KubernetesTest(createEphemeralNamespace = false)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class DslK8sGradleITCase implements JKubeCase {
 

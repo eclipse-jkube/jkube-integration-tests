@@ -13,11 +13,11 @@
  */
 package org.eclipse.jkube.integrationtests.springboot.complete;
 
+import io.fabric8.junit.jupiter.api.KubernetesTest;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import org.eclipse.jkube.integrationtests.JKubeCase;
 import org.eclipse.jkube.integrationtests.assertions.ServiceAssertion;
-import org.eclipse.jkube.integrationtests.jupiter.api.TempKubernetesTest;
 import org.eclipse.jkube.integrationtests.maven.MavenCase;
 
 import static org.eclipse.jkube.integrationtests.assertions.PodAssertion.assertPod;
@@ -25,7 +25,7 @@ import static org.eclipse.jkube.integrationtests.assertions.PodAssertion.awaitPo
 import static org.eclipse.jkube.integrationtests.assertions.ServiceAssertion.awaitService;
 import static org.hamcrest.Matchers.hasSize;
 
-@TempKubernetesTest
+@KubernetesTest(createEphemeralNamespace = false)
 abstract class Complete implements JKubeCase, MavenCase {
 
   private static final String PROJECT_COMPLETE = "projects-to-be-tested/maven/spring/complete";

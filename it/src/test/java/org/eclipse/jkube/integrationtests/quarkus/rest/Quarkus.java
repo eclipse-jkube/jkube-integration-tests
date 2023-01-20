@@ -13,10 +13,10 @@
  */
 package org.eclipse.jkube.integrationtests.quarkus.rest;
 
+import io.fabric8.junit.jupiter.api.KubernetesTest;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import org.eclipse.jkube.integrationtests.JKubeCase;
-import org.eclipse.jkube.integrationtests.jupiter.api.TempKubernetesTest;
 import org.eclipse.jkube.integrationtests.maven.MavenCase;
 
 import java.io.File;
@@ -34,7 +34,7 @@ import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.not;
 
-@TempKubernetesTest
+@KubernetesTest(createEphemeralNamespace = false)
 abstract class Quarkus implements JKubeCase, MavenCase {
 
   private static final String PROJECT_QUARKUS_REST = "projects-to-be-tested/maven/quarkus/rest";

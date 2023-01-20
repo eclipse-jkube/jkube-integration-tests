@@ -13,6 +13,7 @@
  */
 package org.eclipse.jkube.integrationtests.webapp.tomcat;
 
+import io.fabric8.junit.jupiter.api.KubernetesTest;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.Service;
 import io.fabric8.kubernetes.api.model.ServiceBuilder;
@@ -20,7 +21,6 @@ import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.dsl.ServiceResource;
 import org.eclipse.jkube.integrationtests.JKubeCase;
 import org.eclipse.jkube.integrationtests.assertions.DeploymentAssertion;
-import org.eclipse.jkube.integrationtests.jupiter.api.TempKubernetesTest;
 import org.eclipse.jkube.integrationtests.maven.MavenCase;
 
 import java.util.concurrent.TimeUnit;
@@ -29,16 +29,16 @@ import static org.eclipse.jkube.integrationtests.assertions.PodAssertion.assertP
 import static org.eclipse.jkube.integrationtests.assertions.PodAssertion.awaitPod;
 import static org.eclipse.jkube.integrationtests.assertions.ServiceAssertion.awaitService;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.stringContainsInOrder;
 
-@TempKubernetesTest
+@KubernetesTest(createEphemeralNamespace = false)
 abstract class Tomcat implements JKubeCase, MavenCase {
 
   static final String PROJECT_TOMCAT_JAKARTAEE = "projects-to-be-tested/maven/webapp/tomcat-jakartaee";

@@ -13,13 +13,13 @@
  */
 package org.eclipse.jkube.integrationtests.webapp.jetty;
 
+import io.fabric8.junit.jupiter.api.KubernetesTest;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.dsl.PodResource;
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.shared.invoker.MavenInvocationException;
 import org.eclipse.jkube.integrationtests.JKubeCase;
-import org.eclipse.jkube.integrationtests.jupiter.api.TempKubernetesTest;
 import org.eclipse.jkube.integrationtests.maven.MavenCase;
 import org.eclipse.jkube.integrationtests.maven.MavenInvocationResult;
 import org.junit.jupiter.api.AfterEach;
@@ -54,7 +54,7 @@ import static org.hamcrest.Matchers.stringContainsInOrder;
 import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 
 @Tag(KUBERNETES)
-@TempKubernetesTest
+@KubernetesTest(createEphemeralNamespace = false)
 class JettyK8sWatchITCase implements JKubeCase, MavenCase {
 
   private static final String PROJECT_JETTY_WATCH = "projects-to-be-tested/maven/webapp/jetty-watch";

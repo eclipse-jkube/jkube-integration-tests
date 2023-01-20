@@ -13,10 +13,10 @@
  */
 package org.eclipse.jkube.integrationtests.springboot.zeroconfig;
 
+import io.fabric8.junit.jupiter.api.KubernetesTest;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import org.eclipse.jkube.integrationtests.JKubeCase;
-import org.eclipse.jkube.integrationtests.jupiter.api.TempKubernetesTest;
 
 import java.io.File;
 
@@ -32,7 +32,7 @@ import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.not;
 
-@TempKubernetesTest
+@KubernetesTest(createEphemeralNamespace = false)
 abstract class ZeroConfig implements JKubeCase {
 
   protected static final String MAVEN_APPLICATION = "spring-boot-zero-config";
