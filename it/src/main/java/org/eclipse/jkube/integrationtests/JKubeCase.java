@@ -16,11 +16,13 @@ package org.eclipse.jkube.integrationtests;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.http.HttpResponse;
 import org.eclipse.jkube.integrationtests.jupiter.api.Application;
+import org.eclipse.jkube.integrationtests.jupiter.api.Report;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+@Report
 public interface JKubeCase {
 
   String JKUBE_VERSION_SYSTEM_PROPERTY = "jkubeVersion";

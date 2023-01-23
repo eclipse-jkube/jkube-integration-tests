@@ -11,7 +11,7 @@
  * Contributors:
  *   Red Hat, Inc. - initial API and implementation
  */
-package org.eclipse.jkube.integrationtests;
+package org.eclipse.jkube.integrationtests.jupiter.api.extension;
 
 import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
@@ -63,13 +63,13 @@ public class ReportExtension implements BeforeAllCallback, AfterEachCallback, Cl
       writeToReport(String.format("[X] Some tests did not pass (Failed tests %s/%s)",
         failedTestCount.get(), testCount.get()));
     } else {
-      writeToReport(String.format("[\u2713] All tests (%s) passed successfully!!!", testCount.get()));
+      writeToReport(String.format("[✓] All tests (%s) passed successfully!!!", testCount.get()));
     }
   }
 
   private void reportTestResult(ExtensionContext context) throws IOException {
     writeToReport(String.format("[%s] %s - %s - %s",
-      context.getExecutionException().isPresent() ? "X" : "\u2713",
+      context.getExecutionException().isPresent() ? "X" : "✓",
       context.getTestClass().map(Class::getSimpleName).orElse("ERROR"),
       context.getTestMethod().map(Method::getName).orElse("ERROR"),
       context.getDisplayName()
