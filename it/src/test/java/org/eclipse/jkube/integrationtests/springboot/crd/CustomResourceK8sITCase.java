@@ -13,8 +13,8 @@
  */
 package org.eclipse.jkube.integrationtests.springboot.crd;
 
+import io.fabric8.junit.jupiter.api.RequireK8sVersionAtLeast;
 import org.apache.maven.shared.invoker.InvocationResult;
-import org.eclipse.jkube.integrationtests.jupiter.api.RequireK8sVersionAtLeast;
 import org.eclipse.jkube.integrationtests.jupiter.api.DockerRegistry;
 import org.eclipse.jkube.integrationtests.jupiter.api.DockerRegistryHost;
 import org.eclipse.jkube.integrationtests.maven.MavenInvocationResult;
@@ -51,7 +51,7 @@ import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 
 @Tag(KUBERNETES)
 @DockerRegistry(port = 5010)
-@RequireK8sVersionAtLeast(majorVersion = "1", minorVersion = "16")
+@RequireK8sVersionAtLeast(majorVersion = 1, minorVersion = 16)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class CustomResourceK8sITCase extends CustomResourceApp {
 

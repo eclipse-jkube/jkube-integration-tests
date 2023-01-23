@@ -13,10 +13,10 @@
  */
 package org.eclipse.jkube.integrationtests.springboot.crd;
 
+import io.fabric8.junit.jupiter.api.RequireK8sVersionAtLeast;
 import io.fabric8.openshift.api.model.ImageStream;
 import org.apache.maven.shared.invoker.InvocationResult;
 import org.eclipse.jkube.integrationtests.OpenShiftCase;
-import org.eclipse.jkube.integrationtests.jupiter.api.RequireK8sVersionAtLeast;
 import org.eclipse.jkube.integrationtests.maven.MavenInvocationResult;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
@@ -44,7 +44,7 @@ import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 
 @Tag(OPEN_SHIFT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-@RequireK8sVersionAtLeast(majorVersion = "1", minorVersion = "16")
+@RequireK8sVersionAtLeast(majorVersion = 1, minorVersion = 16)
 class CustomResourceOcITCase extends CustomResourceApp implements OpenShiftCase {
 
   @Test
