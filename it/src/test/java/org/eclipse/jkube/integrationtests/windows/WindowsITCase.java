@@ -19,6 +19,7 @@ import okhttp3.Response;
 import org.apache.maven.shared.invoker.InvocationResult;
 import org.apache.maven.shared.invoker.MavenInvocationException;
 import org.eclipse.jkube.integrationtests.jupiter.api.DockerRegistry;
+import org.eclipse.jkube.integrationtests.jupiter.api.Report;
 import org.eclipse.jkube.integrationtests.maven.MavenCase;
 import org.eclipse.jkube.integrationtests.maven.MavenInvocationResult;
 import org.junit.jupiter.api.DisplayName;
@@ -52,6 +53,7 @@ import static org.hamcrest.Matchers.not;
 
 @Tag(WINDOWS)
 @DockerRegistry
+@Report
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class WindowsITCase implements MavenCase {
 
