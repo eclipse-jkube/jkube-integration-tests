@@ -93,7 +93,7 @@ class ZeroConfigOcITCase extends ZeroConfig implements MavenCase, OpenShiftCase 
     final InvocationResult invocationResult = maven("oc:helm");
     // Then
     assertInvocation(invocationResult);
-    assertThat( new File(String.format("../%s/target/%s-0.0.0-SNAPSHOT-helmshift.tar.gz", getProject(), getApplication()))
+    assertThat( new File(String.format("../%s/target/jkube/helm/%s/openshift/%s-0.0.0-SNAPSHOT.tar.gz", getProject(), getApplication(), getApplication()))
       .exists(), equalTo(true));
     final File helmDirectory = new File(
       String.format("../%s/target/jkube/helm/%s/openshift", getProject(), getApplication()));

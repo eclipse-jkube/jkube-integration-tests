@@ -145,10 +145,10 @@ class WindowsITCase implements MavenCase {
     final InvocationResult invocationResult = maven("k8s:helm");
     // Then
     assertInvocation(invocationResult);
-    assertThat( new File(String.format("..\\%s\\target\\windows-0.0.0-SNAPSHOT-helm.tar.gz", getProject()))
-      .exists(), equalTo(true));
     final File helmDirectory = new File(
       String.format("..\\%s\\target\\jkube\\helm\\windows\\kubernetes", getProject()));
+    assertThat(new File(helmDirectory, "windows-0.0.0-SNAPSHOT.tar.gz")
+      .exists(), equalTo(true));
     assertHelm(helmDirectory);
     assertThat(new File(helmDirectory, "templates\\windows-deployment.yaml"), yaml(not(anEmptyMap())));
   }
@@ -161,10 +161,10 @@ class WindowsITCase implements MavenCase {
     final InvocationResult invocationResult = maven("oc:helm");
     // Then
     assertInvocation(invocationResult);
-    assertThat( new File(String.format("..\\%s\\target\\windows-0.0.0-SNAPSHOT-helmshift.tar.gz", getProject()))
-      .exists(), equalTo(true));
     final File helmDirectory = new File(
       String.format("..\\%s\\target\\jkube\\helm\\windows\\openshift", getProject()));
+    assertThat(new File(helmDirectory, "windows-0.0.0-SNAPSHOT.tar.gz")
+      .exists(), equalTo(true));
     assertHelm(helmDirectory);
     assertThat(new File(helmDirectory, "templates\\windows-deploymentconfig.yaml"), yaml(not(anEmptyMap())));
     assertThat(new File(helmDirectory, "templates\\windows-route.yaml"), yaml(not(anEmptyMap())));
