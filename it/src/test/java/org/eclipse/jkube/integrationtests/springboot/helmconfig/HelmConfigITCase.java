@@ -80,7 +80,7 @@ class HelmConfigITCase implements MavenCase {
     final InvocationResult invocationResult = maven("k8s:helm");
     // Then
     assertInvocation(invocationResult);
-    assertThat(new File(String.format("../%s/target/This is the chart name-1.0-KUBERNETES-helm.tar", getProject()))
+    assertThat(new File(String.format("../%s/target/jkube/helm/This is the chart name/kubernetes/This is the chart name-1.0-KUBERNETES.tar", getProject()))
       .exists(), equalTo(true));
     final File helmDirectory = new File(
       String.format("../%s/target/jkube/helm/This is the chart name/kubernetes", getProject()));
@@ -117,7 +117,7 @@ class HelmConfigITCase implements MavenCase {
     final InvocationResult invocationResult = maven("oc:helm");
     // Then
     assertInvocation(invocationResult);
-    assertThat(new File(String.format("../%s/target/different-name-for-oc-0.1-OC-helmshift.zip", getProject()))
+    assertThat(new File(String.format("../%s/target/jkube/helm/different-name-for-oc/openshift/different-name-for-oc-0.1-OC.zip", getProject()))
       .exists(), equalTo(true));
     final File helmDirectory = new File(
       String.format("../%s/target/jkube/helm/different-name-for-oc/openshift", getProject()));

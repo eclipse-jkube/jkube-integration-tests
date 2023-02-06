@@ -109,11 +109,10 @@ class ZeroConfigK8sGradleITCase extends ZeroConfig {
     // When
     gradle.tasks("k8sHelm").build();
     // Then
-    assertThat(gradle.getModulePath().resolve("build")
-        .resolve(getApplication() + "-0.0.0-SNAPSHOT-helm.tar.gz").toFile(),
-      anExistingFile());
     final var helmDirectory = gradle.getModulePath().resolve("build").resolve("jkube")
       .resolve("helm").resolve(getApplication()).resolve("kubernetes");
+    assertThat(helmDirectory.resolve(getApplication() + "-0.0.0-SNAPSHOT.tar.gz").toFile(),
+      anExistingFile());
     assertThat(helmDirectory.resolve("Chart.yaml").toFile(), yaml(allOf(
       aMapWithSize(3),
       hasEntry("apiVersion", "v1"),

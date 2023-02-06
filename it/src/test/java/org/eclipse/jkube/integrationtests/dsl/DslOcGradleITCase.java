@@ -110,11 +110,10 @@ class DslOcGradleITCase implements JKubeCase, OpenShiftCase {
     // When
     gradle.tasks("ocHelm").build();
     // Then
-    assertThat(gradle.getModulePath().resolve("build")
-        .resolve(getApplication() + "-0.0.0-SNAPSHOT-helmshift.tar.gz").toFile(),
-      anExistingFile());
     final var helmDirectory = gradle.getModulePath().resolve("build").resolve("jkube")
       .resolve("helm").resolve(getApplication()).resolve("openshift");
+    assertThat(helmDirectory.resolve(getApplication() + "-0.0.0-SNAPSHOT.tar.gz").toFile(),
+      anExistingFile());
     assertThat(helmDirectory.resolve("Chart.yaml").toFile(), yaml(allOf(
       aMapWithSize(3),
       hasEntry("apiVersion", "v1"),

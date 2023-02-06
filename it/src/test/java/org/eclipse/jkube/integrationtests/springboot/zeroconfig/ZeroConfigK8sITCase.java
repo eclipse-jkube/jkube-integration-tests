@@ -115,7 +115,7 @@ class ZeroConfigK8sITCase extends ZeroConfig implements MavenCase {
     final InvocationResult invocationResult = maven("k8s:helm");
     // Then
     assertInvocation(invocationResult);
-    assertThat( new File(String.format("../%s/target/%s-0.0.0-SNAPSHOT-helm.tar.gz", getProject(), getApplication()))
+    assertThat( new File(String.format("../%s/target/jkube/helm/%s/kubernetes/%s-0.0.0-SNAPSHOT.tar.gz", getProject(), getApplication(), getApplication()))
       .exists(), equalTo(true));
     final File helmDirectory = new File(
       String.format("../%s/target/jkube/helm/%s/kubernetes", getProject(), getApplication()));
