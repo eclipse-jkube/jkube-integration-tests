@@ -53,7 +53,7 @@ jobs:
           java-version: '11'
           distribution: 'temurin'
       - name: Cache configuration
-        uses: actions/cache@efacb0248bc628516687ca7c7e66dd076a46db1f
+        uses: actions/cache@81b728193625a15a55fcce4c6eb6187358533785
         with:
           path: |
             ~/.m2/repository
@@ -89,7 +89,7 @@ jobs:
           java-version: '11'
           distribution: 'temurin'
       - name: Cache configuration
-        uses: actions/cache@efacb0248bc628516687ca7c7e66dd076a46db1f
+        uses: actions/cache@81b728193625a15a55fcce4c6eb6187358533785
         with:
           path: |
             ~/.m2/repository
@@ -165,7 +165,7 @@ jobs:
           java-version: '11'
           distribution: 'temurin'
       - name: Cache configuration
-        uses: actions/cache@efacb0248bc628516687ca7c7e66dd076a46db1f
+        uses: actions/cache@81b728193625a15a55fcce4c6eb6187358533785
         with:
           path: |
             ~/.m2/repository
@@ -268,7 +268,7 @@ jobs:
           java-version: '11'
           distribution: 'temurin'
       - name: Cache configuration
-        uses: actions/cache@efacb0248bc628516687ca7c7e66dd076a46db1f
+        uses: actions/cache@81b728193625a15a55fcce4c6eb6187358533785
         with:
           path: |
             ~/.m2/repository
