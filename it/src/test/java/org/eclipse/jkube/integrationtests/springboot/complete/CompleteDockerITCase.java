@@ -60,22 +60,12 @@ class CompleteDockerITCase extends Complete {
 
   @Override
   public String getApplication() {
-    return "docker-spring-boot-complete";
+    return "spring-boot-complete-docker";
   }
 
   @Override
   public List<String> getProfiles() {
     return Collections.singletonList(DOCKER_ASSEMBLY_PROFILE);
-  }
-
-  @Test
-  @DisplayName("package, required to create the specific artifact")
-  @Order(0)
-  void packageProject() throws Exception {
-    // When
-    final InvocationResult invocationResult = maven("package");
-    // Then
-    assertInvocation(invocationResult);
   }
 
   @Test
@@ -89,7 +79,7 @@ class CompleteDockerITCase extends Complete {
     assertImageWasRecentlyBuilt("integration-tests", getApplication());
     assertImageWasRecentlyBuilt("integration-tests", getApplication(), "1337");
     final File dockerDirectory = new File(
-      String.format("../%s/target/docker/integration-tests/docker-spring-boot-complete", getProject()));
+      String.format("../%s/target/docker/integration-tests/spring-boot-complete-docker", getProject()));
     assertThat(dockerDirectory.exists(), equalTo(true));
     assertThat(new File(dockerDirectory, "tmp/docker-build.tar.gz").exists(), equalTo(true));
     final String dockerFileContent = String.join("\n",
@@ -100,7 +90,7 @@ class CompleteDockerITCase extends Complete {
     assertThat(dockerFileContent, containsString("EXPOSE 8082 8778 9779"));
     assertThat(dockerFileContent, matchesPattern(Pattern.compile("[\\s\\S]*COPY [^\\s]*? /deployments/\n" +
       "[\\s\\S]*")));
-    assertThat(dockerFileContent, containsString("ENTRYPOINT [\"java\",\"-jar\",\"/deployments/docker-spring-boot-complete-0.0.0-SNAPSHOT.jar\"]"));
+    assertThat(dockerFileContent, containsString("ENTRYPOINT [\"java\",\"-jar\",\"/deployments/spring-boot-complete-0.0.0-SNAPSHOT.jar\"]"));
     assertThat(dockerFileContent, containsString("USER 1000"));
     final List<String> imageFiles = listImageFiles(String.format("%s/%s", "integration-tests", getApplication()),
       "/deployments");
@@ -109,7 +99,7 @@ class CompleteDockerITCase extends Complete {
     assertThat(imageFiles, not(hasItem("/deployments/static/ignored-file.txt")));
     assertThat(imageFiles, hasItem("/deployments/static/static-file.txt"));
     assertThat(imageFiles, not(hasItem("/deployments/will-be-included-if-no-assemblies-defined.txt")));
-    assertThat(imageFiles, hasItem("/deployments/docker-spring-boot-complete-0.0.0-SNAPSHOT.jar"));
+    assertThat(imageFiles, hasItem("/deployments/spring-boot-complete-0.0.0-SNAPSHOT.jar"));
     assertThat(new File(dockerDirectory, "build/Dockerfile").exists(), equalTo(true));
   }
 
@@ -127,8 +117,8 @@ class CompleteDockerITCase extends Complete {
     assertThat(metaInfDirectory.exists(), equalTo(true));
     assertListResource(new File(metaInfDirectory, "jkube-docker/kubernetes.yml"));
     assertThat(new File(metaInfDirectory, "jkube-docker/kubernetes/password-secret.yml").exists(), equalTo(false));
-    assertThat(new File(metaInfDirectory, "jkube-docker/kubernetes/docker-spring-boot-complete-deployment.yml"), yaml(not(anEmptyMap())));
-    assertThat(new File(metaInfDirectory, "jkube-docker/kubernetes/docker-spring-boot-complete-service.yml"), yaml(not(anEmptyMap())));
+    assertThat(new File(metaInfDirectory, "jkube-docker/kubernetes/spring-boot-complete-docker-deployment.yml"), yaml(not(anEmptyMap())));
+    assertThat(new File(metaInfDirectory, "jkube-docker/kubernetes/spring-boot-complete-docker-service.yml"), yaml(not(anEmptyMap())));
   }
 
   @Test
@@ -149,8 +139,8 @@ class CompleteDockerITCase extends Complete {
       .assertReplicas(equalTo(1))
       .assertContainers(hasSize(1))
       .assertContainers(hasItems(allOf(
-        hasProperty("image", equalTo("integration-tests/docker-spring-boot-complete:latest")),
-        hasProperty("name", equalTo("integration-tests-docker-spring-boot-complete")),
+        hasProperty("image", equalTo("integration-tests/spring-boot-complete-docker:latest")),
+        hasProperty("name", equalTo("integration-tests-spring-boot-complete")),
         hasProperty("ports", hasSize(3)),
         hasProperty("ports", hasItems(allOf(
           hasProperty("name", equalTo("us-cli")),

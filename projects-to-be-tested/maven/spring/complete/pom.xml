@@ -26,13 +26,12 @@
     <relativePath>../../../../pom.xml</relativePath>
   </parent>
 
-  <artifactId>${finalArtifactId}</artifactId>
+  <artifactId>spring-boot-complete</artifactId>
   <name>${global.name} :: Spring Boot :: Complete</name>
   <description>
     Spring Boot with Everything
   </description>
   <properties>
-    <finalArtifactId>spring-boot-complete</finalArtifactId>
     <java.version>11</java.version>
     <jkube.environment>default</jkube.environment>
   </properties>
@@ -68,11 +67,14 @@
     <profile>
       <id>Docker-Assembly</id>
       <properties>
-        <finalArtifactId>docker-spring-boot-complete</finalArtifactId>
         <jkube.environment>docker</jkube.environment>
         <jkube.targetDir>${project.build.outputDirectory}/META-INF/jkube-docker</jkube.targetDir>
         <jkube.kubernetesManifest>${project.build.outputDirectory}/META-INF/jkube-docker/kubernetes.yml</jkube.kubernetesManifest>
         <jkube.generator.from>adoptopenjdk/openjdk11:jdk-11.0.6_10-alpine-slim</jkube.generator.from>
+        <jkube.enricher.jkube-controller.name>spring-boot-complete-docker</jkube.enricher.jkube-controller.name>
+        <jkube.enricher.jkube-project-label.app>spring-boot-complete-docker</jkube.enricher.jkube-project-label.app>
+        <jkube.enricher.jkube-service.name>spring-boot-complete-docker</jkube.enricher.jkube-service.name>
+        <jkube.enricher.jkube-service.type>NodePort</jkube.enricher.jkube-service.type>
       </properties>
       <build>
       <plugins>
@@ -82,7 +84,7 @@
           <configuration>
             <images>
               <image>
-                <name>integration-tests/${project.artifactId}</name>
+                <name>integration-tests/${project.artifactId}-docker</name>
                 <build>
                   <cleanup>remove</cleanup>
                   <compression>gzip</compression>
@@ -140,7 +142,6 @@
     <profile>
       <id>JIB</id>
       <properties>
-        <finalArtifactId>jib-spring-boot-complete</finalArtifactId>
         <jkube.build.strategy>jib</jkube.build.strategy>
         <jkube.targetDir>${project.build.outputDirectory}/META-INF/jkube-jib</jkube.targetDir>
         <jkube.kubernetesManifest>${project.build.outputDirectory}/META-INF/jkube-jib/kubernetes.yml</jkube.kubernetesManifest>
