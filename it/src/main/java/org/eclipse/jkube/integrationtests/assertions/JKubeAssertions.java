@@ -45,7 +45,7 @@ public class JKubeAssertions {
       .filter(Predicate.not(p -> p.getMetadata().getName().endsWith("-build")))
       .findAny();
     final UnaryOperator<Pod> refreshPod = pod ->
-      jKubeCase.getKubernetesClient().pods().withName(pod.getMetadata().getName()).fromServer().get();
+      jKubeCase.getKubernetesClient().pods().withName(pod.getMetadata().getName()).get();
     try {
       await(() -> matchingPod.map(refreshPod))
         .apply(p -> p.isEmpty() || p.get().getMetadata().getDeletionTimestamp() != null)

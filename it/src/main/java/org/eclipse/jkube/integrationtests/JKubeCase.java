@@ -14,6 +14,7 @@
 package org.eclipse.jkube.integrationtests;
 
 import io.fabric8.kubernetes.client.KubernetesClient;
+import io.fabric8.kubernetes.client.RequestConfigBuilder;
 import io.fabric8.kubernetes.client.http.HttpResponse;
 import org.eclipse.jkube.integrationtests.jupiter.api.Application;
 import org.eclipse.jkube.integrationtests.jupiter.api.Report;
@@ -36,8 +37,12 @@ public interface JKubeCase {
 
   // TODO: Move to KubernetesCase interface
   default HttpResponse<String> httpGet(String uri) throws InterruptedException, ExecutionException, TimeoutException {
-    return getKubernetesClient().getHttpClient().sendAsync(
-      getKubernetesClient().getHttpClient().newHttpRequestBuilder()
+    final var requestConfig = new RequestConfigBuilder()
+      .withRequestRetryBackoffLimit(0)
+      .build();
+    final var client = getKubernetesClient().getHttpClient().newBuilder().tag(requestConfig).build();
+    return client.sendAsync(
+      client.newHttpRequestBuilder()
       .uri(uri)
       .build(), String.class)
       .get(5, TimeUnit.SECONDS);
