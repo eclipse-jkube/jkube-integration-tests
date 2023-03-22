@@ -46,6 +46,10 @@
     </dependency>
     <dependency>
       <groupId>io.fabric8</groupId>
+      <artifactId>kubernetes-junit-jupiter</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.fabric8</groupId>
       <artifactId>openshift-client</artifactId>
       <exclusions>
         <exclusion>
@@ -83,11 +87,6 @@
     <dependency>
       <groupId>org.apache.maven.shared</groupId>
       <artifactId>maven-invoker</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>io.fabric8</groupId>
-      <artifactId>kubernetes-junit-jupiter</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

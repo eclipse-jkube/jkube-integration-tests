@@ -13,6 +13,7 @@
  */
 package org.eclipse.jkube.integrationtests.jupiter.api.extension;
 
+import io.fabric8.junit.jupiter.BaseExtension;
 import org.eclipse.jkube.integrationtests.cli.CliUtils;
 import org.eclipse.jkube.integrationtests.gradle.JKubeGradleRunner;
 import org.eclipse.jkube.integrationtests.jupiter.api.Gradle;

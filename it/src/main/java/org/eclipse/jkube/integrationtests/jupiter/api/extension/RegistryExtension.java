@@ -13,6 +13,9 @@
  */
 package org.eclipse.jkube.integrationtests.jupiter.api.extension;
 
+import io.fabric8.junit.jupiter.HasKubernetesClient;
+import io.fabric8.kubernetes.api.model.IntOrString;
+import io.fabric8.kubernetes.api.model.ServiceBuilder;
 import org.eclipse.jkube.integrationtests.cli.CliUtils;
 import org.eclipse.jkube.integrationtests.jupiter.api.DockerRegistry;
 import org.eclipse.jkube.integrationtests.jupiter.api.DockerRegistryHost;
@@ -31,7 +34,7 @@ import java.lang.reflect.Field;
 import static org.eclipse.jkube.integrationtests.cli.CliUtils.isWindows;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-public class RegistryExtension implements BaseExtension, BeforeAllCallback, BeforeEachCallback, AfterAllCallback {
+public class RegistryExtension implements HasKubernetesClient, BeforeAllCallback, BeforeEachCallback, AfterAllCallback {
 
   private static final Logger log = LoggerFactory.getLogger(RegistryExtension.class);
 
