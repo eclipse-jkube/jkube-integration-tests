@@ -14,6 +14,7 @@
 package org.eclipse.jkube.integrationtests.assertions;
 
 import io.fabric8.kubernetes.api.model.Pod;
+import io.fabric8.kubernetes.client.utils.Serialization;
 import org.eclipse.jkube.integrationtests.JKubeCase;
 
 import java.util.concurrent.ExecutionException;
@@ -58,11 +59,13 @@ public class JKubeAssertions {
   }
 
   public JKubeAssertions assertServiceDeleted() {
+    final var svcResource = jKubeCase.getKubernetesClient().services().withName(jKubeCase.getApplication());
     try {
-      jKubeCase.getKubernetesClient().services().withName(jKubeCase.getApplication())
+      svcResource
         .waitUntilCondition(d -> d == null || d.getMetadata().getDeletionTimestamp() != null, DEFAULT_TIMEOUT_SECONDS, TimeUnit.SECONDS);
     } catch (Exception e) {
-      throw new AssertionError("Deployment is still present when it should have been deleted", e);
+      throw new AssertionError("Service is still present when it should have been deleted:\n" +
+        Serialization.asYaml(svcResource.get()), e);
     }
     return this;
   }
