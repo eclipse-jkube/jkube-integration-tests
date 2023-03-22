@@ -14,6 +14,9 @@
 package org.eclipse.jkube.integrationtests.assertions;
 
 import org.apache.maven.shared.invoker.InvocationResult;
+import org.eclipse.jkube.integrationtests.maven.MavenInvocationResult;
+
+import java.util.Arrays;
 
 public class InvocationResultAssertion {
 
@@ -25,6 +28,10 @@ public class InvocationResultAssertion {
         .append("but was <").append(invocationResult.getExitCode()).append(">");
       if (invocationResult.getExecutionException() != null) {
         message.append("\n").append(invocationResult.getExecutionException().getMessage());
+      }
+      if (invocationResult instanceof MavenInvocationResult){
+        Arrays.stream(((MavenInvocationResult) invocationResult).getStdOut().split("\r?\n"))
+          .forEach(line -> message.append("\n  > ").append(line));
       }
       throw new AssertionError(message.toString());
     }
