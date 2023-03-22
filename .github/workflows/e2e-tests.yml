@@ -101,7 +101,7 @@ jobs:
           minikube version: v1.25.2
           kubernetes version: ${{ matrix.kubernetes }}
           github token: ${{ secrets.GITHUB_TOKEN }}
-          start args: --force
+          start args: '--force --insecure-registry "0.0.0.0/0"'
       - name: Harden Runner
         uses: step-security/harden-runner@8e0b4153524c217e5dce81df0986478e95a7004a
         with:
@@ -139,7 +139,8 @@ jobs:
             us-east4-docker.pkg.dev:443
       - name: Install and Run Integration Tests
         run: |
-          JKUBE_VERSION=$(./mvnw -q -f 'jkube/pom.xml' -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec) \
+          eval $(minikube docker-env)                                                                                                          \
+          && JKUBE_VERSION=$(./mvnw -q -f 'jkube/pom.xml' -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec)   \
           && ./mvnw -B -PKubernetes,${{ matrix.suite }} clean verify -Djkube.version="$JKUBE_VERSION"
       - name: Save reports as artifact
         if: always()

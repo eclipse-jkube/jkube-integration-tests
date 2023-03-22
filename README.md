@@ -2,6 +2,16 @@
 
 This project hosts Integration test suites for https://github.com/eclipse/jkube.
 
+## Running locally
+
+### Minikube
+
+To be able to run the full suite in Minikube, you need to enable insecure registries (k8s:push tests).
+
+```shell
+minikube start --insecure-registry "0.0.0.0/0"
+```
+
 ## Test Structure
 
 In order to be able to run the tests in a CI environment without hogging the resources

@@ -19,7 +19,6 @@ import io.fabric8.kubernetes.api.model.ServiceBuilder;
 import org.eclipse.jkube.integrationtests.cli.CliUtils;
 import org.eclipse.jkube.integrationtests.jupiter.api.DockerRegistry;
 import org.eclipse.jkube.integrationtests.jupiter.api.DockerRegistryHost;
-import org.hamcrest.Matchers;
 import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
@@ -30,9 +29,12 @@ import org.junit.platform.commons.logging.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.util.UUID;
+import java.util.stream.Stream;
 
 import static org.eclipse.jkube.integrationtests.cli.CliUtils.isWindows;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.notNullValue;
 
 public class RegistryExtension implements HasKubernetesClient, BeforeAllCallback, BeforeEachCallback, AfterAllCallback {
 
@@ -43,22 +45,23 @@ public class RegistryExtension implements HasKubernetesClient, BeforeAllCallback
     final var annotation = context.getRequiredTestClass().getAnnotation(DockerRegistry.class);
     CliUtils.runCommand("docker rm -f " + getName(annotation));
     log.debug(() -> "Starting Docker Registry Extension");
-    final CliUtils.CliResult dockerRegistry;
+    final RegistryInfo dockerRegistry;
     if (isWindows()) {
       dockerRegistry = startWindowsDockerRegistry(annotation);
     } else {
-      dockerRegistry = startRegularDockerRegistry(annotation);
+      dockerRegistry = startKubernetesDockerRegistry(context);
     }
-    assertThat(dockerRegistry.getOutput(), dockerRegistry.getExitCode(), Matchers.equalTo(0));
+    assertThat(dockerRegistry.assertionContext, dockerRegistry.host, notNullValue());
+    getStore(context).put(RegistryInfo.class, dockerRegistry);
     log.debug(() -> "Docker Registry started successfully");
   }
 
   @Override
   public void beforeEach(ExtensionContext context) throws Exception {
-    final var annotation = context.getRequiredTestClass().getAnnotation(DockerRegistry.class);
+    final var registryInfo = getStore(context).get(RegistryInfo.class, RegistryInfo.class);
     for (Field f : context.getRequiredTestClass().getDeclaredFields()) {
       if (f.isAnnotationPresent(DockerRegistryHost.class) && f.getType() == String.class) {
-        setFieldValue(f, context.getRequiredTestInstance(), getDockerHost() + ":" + annotation.port());
+        setFieldValue(f, context.getRequiredTestInstance(), registryInfo.host + ":" + registryInfo.port);
       }
     }
   }
@@ -67,22 +70,45 @@ public class RegistryExtension implements HasKubernetesClient, BeforeAllCallback
   public void afterAll(ExtensionContext context) throws Exception {
     log.debug(() -> "Closing Docker Registry");
     CliUtils.runCommand("docker stop " + getName(context.getRequiredTestClass().getAnnotation(DockerRegistry.class)));
+    if (!isWindows()) {
+      final var registryInfo = getStore(context).get(RegistryInfo.class, RegistryInfo.class);
+      final var client = getClient(context);
+      Stream.of(
+        client.pods().withName(registryInfo.name),
+        client.services().withName(registryInfo.name)
+      ).forEach(r -> r.withGracePeriod(0L).delete());
+    }
   }
 
-  private static CliUtils.CliResult startRegularDockerRegistry(DockerRegistry dockerRegistry) throws IOException, InterruptedException {
-    log.debug(() -> "Starting standard Docker Registry");
-    return CliUtils.runCommand("docker run --rm -d -p " + dockerRegistry.port() +":5000 --name " +
-      getName(dockerRegistry) + " registry:2");
+  private RegistryInfo startKubernetesDockerRegistry(ExtensionContext context) throws IOException, InterruptedException {
+    final var name = "registry" + UUID.randomUUID().toString().replace("-", "");
+    final var client = getClient(context);
+    final var ip = CliUtils.runCommand("minikube ip").getOutput().trim();
+    final var dockerRegistry = client.run().withName(name).withImage("registry:2")
+      .withNewRunConfig()
+      .addToLabels("app", "docker-registry").addToLabels("group", "jkube-it").done();
+    final var service = client.services().resource(new ServiceBuilder()
+      .withNewMetadata().withName(name)
+      .addToLabels("app", "docker-registry").addToLabels("group", "jkube-it").endMetadata()
+      .withNewSpec().withType("NodePort").withSelector(dockerRegistry.getMetadata().getLabels())
+      .addNewPort().withName("http").withPort(5000).withTargetPort(new IntOrString(5000)).endPort().endSpec()
+      .build())
+      .serverSideApply(); // Unsupported in K8s 1.12
+    return new RegistryInfo(name, ip, service.getSpec().getPorts().get(0).getNodePort(), null);
   }
 
-  private static CliUtils.CliResult startWindowsDockerRegistry(DockerRegistry dockerRegistry) throws IOException, InterruptedException {
+  private static RegistryInfo startWindowsDockerRegistry(DockerRegistry dockerRegistry) throws IOException, InterruptedException {
     log.debug(() -> "Starting Windows specific Docker Registry");
     final var registry = new File("C:\\registry");
     if (!registry.exists() && !registry.mkdirs()) {
       throw new IllegalStateException("Directory C:\\registry cannot be created");
     }
-    return CliUtils.runCommand("docker run --rm -d -p " + dockerRegistry.port() +":5000 --name " +
+    final var result = CliUtils.runCommand("docker run --rm -d -p " + dockerRegistry.port() +":5000 --name " +
       getName(dockerRegistry) + " -v C:\\registry:C:\\registry marcnuri/docker-registry-windows:ltsc2022");
+    if (result.getExitCode() != 0) {
+      return new RegistryInfo(null, null, -1, result.getOutput());
+    }
+    return new RegistryInfo("windows-docker-registry", getDockerHost(), dockerRegistry.port(), result.getOutput());
   }
 
   private static String getName(DockerRegistry dockerRegistry) {
@@ -96,6 +122,20 @@ public class RegistryExtension implements HasKubernetesClient, BeforeAllCallback
     } else {
       return dockerHost.replaceAll("^tcp://", "")
         .replaceAll(":\\d+$", "");
+    }
+  }
+
+  private static final class RegistryInfo {
+    private final String name;
+    private final String host;
+    private final int port;
+    private final String assertionContext;
+
+    public RegistryInfo(String name, String host, int port, String assertionContext) {
+      this.name = name;
+      this.host = host;
+      this.port = port;
+      this.assertionContext = assertionContext;
     }
   }
 }
