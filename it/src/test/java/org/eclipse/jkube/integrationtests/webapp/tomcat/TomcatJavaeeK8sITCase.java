@@ -183,6 +183,7 @@ class TomcatJavaeeK8sITCase extends Tomcat {
     // Given
     final Service service = serviceSpecTypeToNodePort();
     // Then
+    // n.b. only the first request will fail with 500, subsequent requests will return 404
     awaitService(this, service.getMetadata().getNamespace())
       .assertNodePortResponse("http", containsString("java.lang.NoClassDefFoundError"), "hello-world?name=World");
   }
