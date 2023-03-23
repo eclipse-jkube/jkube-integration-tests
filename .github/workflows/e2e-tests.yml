@@ -149,82 +149,6 @@ jobs:
           name: Test reports (Minikube ${{ matrix.kubernetes }}-${{ matrix.suite }})
           path: ./it/target/jkube-test-report.txt
 
-  minikube-legacy:
-    name: K8S
-    needs: build-jkube
-    runs-on: ubuntu-20.04
-    strategy:
-      fail-fast: false
-      matrix:
-        suite: ['quarkus','quarkus-native','springboot','webapp','other','dockerfile']
-    steps:
-      - name: Checkout
-        uses: actions/checkout@24cb9080177205b6e8c946b17badbe402adc938f
-      - name: Setup Java 11
-        uses: actions/setup-java@5ffc13f4174014e2d4d4572b3d74c3fa61aeb2c2
-        with:
-          java-version: '11'
-          distribution: 'temurin'
-      - name: Cache configuration
-        uses: actions/cache@88522ab9f39a2ea568f7027eddc7d8d8bc9d59c8
-        with:
-          path: |
-            ~/.m2/repository
-            ./jkube
-          key: cache-it-${{ github.run_id }}
-      - name: Setup Minikube-Kubernetes
-        uses: manusa/actions-setup-minikube@1e9b544a8e64993bad1693f0aebeb108b459edd0
-        with:
-          minikube version: v1.25.2
-          kubernetes version: v1.12.10
-          github token: ${{ secrets.GITHUB_TOKEN }}
-          start args: --force
-      - name: Harden Runner
-        uses: step-security/harden-runner@8e0b4153524c217e5dce81df0986478e95a7004a
-        with:
-          egress-policy: block
-          allowed-endpoints: >
-            api.github.com:443
-            auth.docker.io:443
-            azure.archive.ubuntu.com:80
-            cdn03.quay.io:443
-            gcr.io:443
-            github.com:443
-            jcenter.bintray.com:443
-            k8s.gcr.io:443
-            maven.repository.redhat.com:443
-            md-hdd-51w5snc21ccf.z49.blob.storage.azure.net:443
-            md-hdd-bfh3mwcdlxsh.z21.blob.storage.azure.net:443
-            md-hdd-dxgvrxd2cnjf.z22.blob.storage.azure.net:443
-            objects.githubusercontent.com:443
-            packages.microsoft.com:443
-            plugins-artifacts.gradle.org:443
-            plugins.gradle.org:443
-            ppa.launchpadcontent.net:443
-            ppa.launchpad.net:80
-            production.cloudflare.docker.com:443
-            quay.io:443
-            registry-1.docker.io:443
-            registry.access.redhat.com:443
-            registry.k8s.io:443
-            repo1.maven.org:443
-            repo.maven.apache.org:443
-            repository.jboss.org:443
-            storage.googleapis.com:443
-            us-south1-docker.pkg.dev:443
-            us-west2-docker.pkg.dev:443
-            us-east4-docker.pkg.dev:443
-      - name: Install and Run Integration Tests
-        run: |
-          JKUBE_VERSION=$(./mvnw -q -f 'jkube/pom.xml' -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec) \
-          && ./mvnw -B -PKubernetes,${{ matrix.suite }} clean verify -Djkube.version="$JKUBE_VERSION"
-      - name: Save reports as artifact
-        if: always()
-        uses: actions/upload-artifact@65d862660abb392b8c4a3d1195a2108db131dd05
-        with:
-          name: Test reports (Minikube ${{ matrix.kubernetes }}-${{ matrix.suite }})
-          path: ./it/target/jkube-test-report.txt
-
   openshift:
     name: OpenShift
     needs: build-jkube
@@ -235,7 +159,7 @@ jobs:
         openshift: [v3.11.0,v3.10.0]
         suite: ['quarkus','springboot','webapp','other']
     steps:
-#     This seems to cause problems with OpenShift Setup Action 
+#     This seems to cause problems with OpenShift Setup Action
 #     - name: Harden Runner
 #       uses: step-security/harden-runner@8e0b4153524c217e5dce81df0986478e95a7004a
 #       with:
@@ -276,7 +200,7 @@ jobs:
             ./jkube
           key: cache-it-${{ github.run_id }}
       - name: Check Docker Status
-        run: systemctl status docker.service    
+        run: systemctl status docker.service
       - name: Setup OpenShift
         uses: manusa/actions-setup-openshift@4fbc3dc0710ea1f9ff4c7e1e6196dafac8e78a28
         with:
