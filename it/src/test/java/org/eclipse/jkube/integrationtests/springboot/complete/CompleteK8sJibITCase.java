@@ -37,7 +37,7 @@ import static org.eclipse.jkube.integrationtests.assertions.InvocationResultAsse
 import static org.eclipse.jkube.integrationtests.assertions.JKubeAssertions.assertJKube;
 import static org.eclipse.jkube.integrationtests.assertions.KubernetesListAssertion.assertListResource;
 import static org.eclipse.jkube.integrationtests.assertions.YamlAssertion.yaml;
-import static org.eclipse.jkube.integrationtests.docker.DockerUtils.loadTar;
+import static org.eclipse.jkube.integrationtests.docker.DockerUtils.pull;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.anEmptyMap;
 import static org.hamcrest.Matchers.containsString;
@@ -123,8 +123,7 @@ class CompleteK8sJibITCase extends Complete {
   void k8sApply() throws Exception {
     // Given
     // No easy way to share a local registry within Minikube and test runner host (for every environment)
-    loadTar(new File(String.format(
-      "../%s/target/docker/localhost/5005/sb/sb-complete/tmp/docker-build.tar", getProject())));
+    pull(registry + "/sb/sb-complete:latest");
     // When
     final InvocationResult invocationResult = maven("k8s:apply", mvnProperties);
     // Then
