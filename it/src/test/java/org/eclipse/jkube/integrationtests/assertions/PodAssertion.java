@@ -20,6 +20,7 @@ import io.fabric8.kubernetes.client.readiness.Readiness;
 import io.fabric8.kubernetes.client.utils.Serialization;
 import org.eclipse.jkube.integrationtests.JKubeCase;
 
+import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -72,6 +73,11 @@ public class PodAssertion extends KubernetesClientAssertion<Pod> {
 
   private static Pod awaitPod(KubernetesClient kc,String appId) throws Exception {
     try {
+      // Wait for Pod to be created
+      kc.pods().withLabel("app", appId)
+        .informOnCondition(p -> !p.isEmpty())
+        .get(DEFAULT_AWAIT_TIME_SECONDS, TimeUnit.SECONDS);
+      // Wait for Pod to be ready
       kc.pods().withLabel("app", appId)
         .informOnCondition(p -> p.stream().anyMatch(Readiness::isPodReady))
         .get(DEFAULT_AWAIT_TIME_SECONDS, TimeUnit.SECONDS);
