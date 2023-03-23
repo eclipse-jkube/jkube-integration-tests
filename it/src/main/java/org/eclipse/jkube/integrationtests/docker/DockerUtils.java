@@ -56,6 +56,15 @@ public class DockerUtils {
     return Arrays.asList(result.getOutput().replace("\r", "").split("\n"));
   }
 
+  public static void pull(String image) throws IOException, InterruptedException {
+    final CliResult result = CliUtils.runCommand(String.format(
+      "docker pull %s", image
+    ));
+    if (result.getExitCode() != 0) {
+      throw new IOException(String.format("Docker image was not pulled: %s", result.getOutput()));
+    }
+  }
+
   public static void loadTar(File dockerBuildTar) throws IOException, InterruptedException {
     final CliResult result = CliUtils.runCommand(String.format(
       "docker load -i %s", dockerBuildTar.getAbsolutePath()
