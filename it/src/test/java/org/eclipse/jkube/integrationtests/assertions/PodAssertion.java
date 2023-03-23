@@ -17,9 +17,7 @@ import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.dsl.PodResource;
 import io.fabric8.kubernetes.client.readiness.Readiness;
-import io.fabric8.openshift.api.model.DeploymentConfig;
-import io.fabric8.openshift.api.model.DeploymentConfigBuilder;
-import io.fabric8.openshift.client.OpenShiftClient;
+import io.fabric8.kubernetes.client.utils.Serialization;
 import org.eclipse.jkube.integrationtests.JKubeCase;
 
 import java.util.concurrent.ExecutionException;
@@ -45,11 +43,7 @@ public class PodAssertion extends KubernetesClientAssertion<Pod> {
   }
 
   public static PodAssertion awaitPod(JKubeCase jKubeCase) throws Exception {
-    Pod pod = awaitPod(jKubeCase.getKubernetesClient(), jKubeCase.getApplication());
-    if (pod == null) {
-      printDiagnosis(jKubeCase);
-      pod = retryDeployment(jKubeCase);
-    }
+    final var pod = awaitPod(jKubeCase.getKubernetesClient(), jKubeCase.getApplication());
     assertThat(pod, notNullValue());
     assertThat(pod.getMetadata().getName(), startsWith(jKubeCase.getApplication()));
     assertLabels(jKubeCase).assertStandardLabels(pod.getMetadata()::getLabels);
@@ -77,34 +71,18 @@ public class PodAssertion extends KubernetesClientAssertion<Pod> {
   }
 
   private static Pod awaitPod(KubernetesClient kc,String appId) throws Exception {
-    return kc.pods().withLabel("app", appId)
-      .informOnCondition(p -> p.stream().anyMatch(Readiness::isPodReady))
-      .get(DEFAULT_AWAIT_TIME_SECONDS, TimeUnit.SECONDS).stream()
-      .filter(Readiness::isPodReady)
-      .findFirst()
-      .orElse(null);
-  }
-
-  private static Pod retryDeployment(JKubeCase jKubeCase) throws Exception {
-    if (jKubeCase.getKubernetesClient().supports(DeploymentConfig.class)) {
-      System.err.println("\n\n===========================\nDeleting unusable PODs");
-      jKubeCase.getKubernetesClient().pods().list().getItems().stream()
-        .filter(pod-> pod.getMetadata().getName().startsWith(jKubeCase.getApplication()))
-        .forEach(pod ->  {
-          System.err.printf("\nDeleting POD %s\n", pod.getMetadata().getName());
-          jKubeCase.getKubernetesClient().resource(pod).delete();
-        });
-      final OpenShiftClient oc = jKubeCase.getKubernetesClient().adapt(OpenShiftClient.class);
-      System.err.println("\n\n===========================\nRedeploying!");
-      oc.deploymentConfigs().withName(jKubeCase.getApplication()).edit(dc ->
-        new DeploymentConfigBuilder(dc).editSpec().editStrategy()
-          .withType("Recreate")
-          .endStrategy().endSpec().build());
-      oc.deploymentConfigs().withName(jKubeCase.getApplication()).deployLatest();
-      final Pod retriedPod = awaitPod(jKubeCase.getKubernetesClient(), jKubeCase.getApplication());
-      printDiagnosis(jKubeCase);
-      return retriedPod;
+    try {
+      kc.pods().withLabel("app", appId)
+        .informOnCondition(p -> p.stream().anyMatch(Readiness::isPodReady))
+        .get(DEFAULT_AWAIT_TIME_SECONDS, TimeUnit.SECONDS);
+    } catch (TimeoutException ex) {
+      // NO OP
     }
-    return null;
+    final var pod = kc.pods().withLabel("app", appId).list().getItems().stream().findFirst().orElse(null);
+    if (pod != null && Readiness.isPodReady(pod)) {
+      return pod;
+    }
+    throw new AssertionError(String.format("Error awaiting Pod '%s'\n%s",
+      appId, pod != null ? Serialization.asYaml(pod) : "No Pod found"));
   }
 }
