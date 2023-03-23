@@ -116,6 +116,7 @@ class TomcatJavaeeK8sITCase extends Tomcat {
 
   @Test
   @Order(3)
+  @ResourceLock(value = CLUSTER_RESOURCE_INTENSIVE, mode = READ_WRITE)
   @DisplayName("The JavaEE servlet, exposed as a NodePort Service, should return a string and contain `Hello World`")
   void testJavaeeNodePortResponse() throws Exception {
     // Given
@@ -178,6 +179,7 @@ class TomcatJavaeeK8sITCase extends Tomcat {
 
   @Test
   @Order(6)
+  @ResourceLock(value = CLUSTER_RESOURCE_INTENSIVE, mode = READ_WRITE)
   @DisplayName("JavaEE Service as NodePort response should return 500 and java.lang.NoClassDefFoundError message")
   void testJavaEENodePortResponseError() throws Exception {
     // Given

@@ -103,7 +103,6 @@ class TomcatJakartaeeK8sITCase extends Tomcat {
   @Order(2)
   @ResourceLock(value = CLUSTER_RESOURCE_INTENSIVE, mode = READ_WRITE)
   @DisplayName("k8s:apply, should deploy pod and service")
-  @SuppressWarnings("unchecked")
   void k8sApply() throws Exception {
     // When
     final InvocationResult invocationResult = maven("k8s:apply");
@@ -173,13 +172,13 @@ class TomcatJakartaeeK8sITCase extends Tomcat {
   @Order(5)
   @ResourceLock(value = CLUSTER_RESOURCE_INTENSIVE, mode = READ_WRITE)
   @DisplayName("k8s:apply, should deploy pod and service with new image")
-  @SuppressWarnings("unchecked")
   void k8sApplyWithNewDeployment() throws Exception {
     k8sApply();
   }
 
   @Test
   @Order(6)
+  @ResourceLock(value = CLUSTER_RESOURCE_INTENSIVE, mode = READ_WRITE)
   @DisplayName("JakartaEE Service as NodePort response should return String")
   void testJakartaEENodePortResponse() throws Exception {
     // Given
