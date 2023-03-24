@@ -75,11 +75,12 @@ public class PodAssertion extends KubernetesClientAssertion<Pod> {
     try {
       // Wait for Pod to be created
       kc.pods().withLabel("app", appId)
-        .informOnCondition(p -> !p.isEmpty())
+        .informOnCondition(pl -> !pl.isEmpty())
         .get(DEFAULT_AWAIT_TIME_SECONDS, TimeUnit.SECONDS);
       // Wait for Pod to be ready
       kc.pods().withLabel("app", appId)
-        .informOnCondition(p -> p.stream().anyMatch(Readiness::isPodReady))
+        .informOnCondition(pl -> pl.stream()
+          .anyMatch(p -> p.getMetadata().getDeletionTimestamp() == null && Readiness.isPodReady(p)))
         .get(DEFAULT_AWAIT_TIME_SECONDS, TimeUnit.SECONDS);
     } catch (TimeoutException ex) {
       // NO OP
