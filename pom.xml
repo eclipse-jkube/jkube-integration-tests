@@ -273,19 +273,32 @@
         <groupId>com.mycila</groupId>
         <artifactId>license-maven-plugin</artifactId>
         <configuration>
-          <aggregate>true</aggregate>
-          <header>header.txt</header>
+          <useDefaultExcludes>true</useDefaultExcludes>
           <properties>
             <owner>Red Hat, Inc.</owner>
           </properties>
-          <excludes>
-            <exclude>.editorconfig</exclude>
-            <exclude>**/.gitkeep</exclude>
-            <exclude>.mvn/wrapper/**/*</exclude>
-            <exclude>mvnw</exclude>
-            <exclude>mvnw.cmd</exclude>
-            <exclude>projects-to-be-tested/maven/spring/complete/src/main/**/*.txt</exclude>
-          </excludes>
+          <mapping>
+            <gradle>JAVADOC_STYLE</gradle>
+          </mapping>
+          <licenseSets>
+            <licenseSet>
+              <header>header.txt</header>
+              <excludes>
+                <exclude>.editorconfig</exclude>
+                <exclude>**/org.ops4j.pax.logging.cfg</exclude>
+                <exclude>**/DockerfileSpecial</exclude>
+                <exclude>**/*.timestamp</exclude>
+                <exclude>**/*.bin</exclude>
+                <exclude>**/.gitkeep</exclude>
+                <exclude>.mvn/wrapper/**/*</exclude>
+                <exclude>**/.gradle/**/*</exclude>
+                <exclude>projects-to-be-tested/gradle/*/build/**/*</exclude>
+                <exclude>mvnw</exclude>
+                <exclude>mvnw.cmd</exclude>
+                <exclude>projects-to-be-tested/maven/spring/complete/src/main/**/*.txt</exclude>
+              </excludes>
+            </licenseSet>
+          </licenseSets>
         </configuration>
       </plugin>
     </plugins>
