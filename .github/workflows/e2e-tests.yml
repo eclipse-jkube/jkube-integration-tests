@@ -277,7 +277,7 @@ jobs:
       - name: Check Docker Status
         run: systemctl status docker.service    
       - name: Setup OpenShift
-        uses: manusa/actions-setup-openshift@4fbc3dc0710ea1f9ff4c7e1e6196dafac8e78a28
+        uses: manusa/actions-setup-openshift@e59fe3caa18d7cde81e2ce4797e6549a13f7648c
         with:
           oc version: ${{ matrix.openshift }}
           github token: ${{ secrets.GITHUB_TOKEN }}
