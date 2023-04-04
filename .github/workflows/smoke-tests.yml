@@ -25,8 +25,8 @@ permissions:
   contents: read
 
 jobs:
-  build-jkube:
-    name: Build JKube
+  download-dependencies:
+    name: Download IT dependencies
     runs-on: ubuntu-latest
     steps:
       - name: Harden Runner
@@ -71,14 +71,14 @@ jobs:
         with:
           java-version: '11'
           distribution: 'temurin'
-      - name: Install Integration Tests (Downloads dependencies)
+      - name: Download IT dependencies
         run: |
           ./mvnw -B -DskipTests clean install \
           && ./mvnw -B -DskipTests clean  -P'quarkus','quarkus-native','springboot','webapp','other','dockerfile'
 
   minikube:
     name: K8S
-    needs: build-jkube
+    needs: download-dependencies
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -147,12 +147,12 @@ jobs:
 
   openshift:
     name: OpenShift
-    needs: build-jkube
-    runs-on: ubuntu-18.04
+    needs: download-dependencies
+    runs-on: ubuntu-20.04
     strategy:
       fail-fast: false
       matrix:
-        openshift: [v3.9.0,v3.11.0]
+        openshift: [v3.11.0,v3.10.0]
         suite: ['quarkus','springboot','webapp','other']
     steps:
 #     This seems to cause problems with OpenShift Setup Action
