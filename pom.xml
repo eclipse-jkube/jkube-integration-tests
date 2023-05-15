@@ -40,7 +40,7 @@
     <fabric8.kubernetes-client.version>6.6.2</fabric8.kubernetes-client.version>
     <gradle.version>6.1.1</gradle.version>
     <hamcrest.version>2.0.0.0</hamcrest.version>
-    <jkube.version>1.12-SNAPSHOT</jkube.version>
+    <jkube.version>1.13-SNAPSHOT</jkube.version>
     <junit.version>5.9.1</junit.version>
     <karaf.version>4.4.2</karaf.version>
     <license-maven-plugin.version>4.2</license-maven-plugin.version>
