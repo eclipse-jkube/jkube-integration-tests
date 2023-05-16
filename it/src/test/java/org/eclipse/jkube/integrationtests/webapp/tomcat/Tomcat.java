@@ -83,8 +83,8 @@ abstract class Tomcat implements JKubeCase, MavenCase {
 
   final void assertLogWithMigrationNotice(String log) {
     assertThat(log, stringContainsInOrder(
-      "Deploying web application archive [/usr/local/tomcat/webapps/ROOT.war]",
       "Performing migration from source [/usr/local/tomcat/webapps-javaee/ROOT.war] to destination",
+      "Deploying web application archive [/usr/local/tomcat/webapps/ROOT.war]",
       "Deployment of web application archive [/usr/local/tomcat/webapps/ROOT.war] has finished",
       "org.apache.catalina.startup.Catalina.start Server startup in", "seconds"));
   }
