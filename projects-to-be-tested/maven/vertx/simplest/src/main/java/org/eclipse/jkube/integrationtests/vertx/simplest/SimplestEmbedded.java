@@ -28,18 +28,18 @@ public class SimplestEmbedded extends AbstractVerticle {
   private static final Logger LOG = Logger.getLogger(SimplestEmbedded.class.getName());
   @Override
   public void start(Promise<Void> startFuture) {
+    startFuture.future().andThen(h -> LOG.info("Vert.x test application is ready"));
     Vertx.vertx().createHttpServer()
       .requestHandler(SimplestEmbedded::requestHandler)
       .listen(8080, listenerHandler(startFuture));
   }
 
-  private static Handler<AsyncResult<HttpServer>> listenerHandler(Promise<Void> verticleStart) {
+  private static Handler<AsyncResult<HttpServer>> listenerHandler(Promise<Void> startFuture) {
     return http -> {
       if (http.succeeded()) {
-        verticleStart.complete();
-        LOG.info("Vert.x test application is ready");
+        startFuture.complete();
       } else {
-        verticleStart.fail(http.cause());
+        startFuture.fail(http.cause());
       }
     };
   }
