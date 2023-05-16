@@ -67,10 +67,10 @@ abstract class OpenLiberty implements JKubeCase, MavenCase {
   final void assertLog(String log) {
     assertThat(log,
       stringContainsInOrder(
-        "The defaultServer server started",
         "Monitoring dropins for applications",
         "Web application available (default_host)",
-        String.format("Application %s started in", getApplication())
+        String.format("Application %s started in", getApplication()),
+        "The defaultServer server started"
       ));
   }
 }
