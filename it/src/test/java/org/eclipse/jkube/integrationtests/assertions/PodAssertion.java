@@ -17,10 +17,8 @@ import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.dsl.PodResource;
 import io.fabric8.kubernetes.client.readiness.Readiness;
-import io.fabric8.kubernetes.client.utils.Serialization;
 import org.eclipse.jkube.integrationtests.JKubeCase;
 
-import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -90,6 +88,6 @@ public class PodAssertion extends KubernetesClientAssertion<Pod> {
       return pod;
     }
     throw new AssertionError(String.format("Error awaiting Pod '%s'\n%s",
-      appId, pod != null ? Serialization.asYaml(pod) : "No Pod found"));
+      appId, pod != null ? kc.getKubernetesSerialization().asYaml(pod) : "No Pod found"));
   }
 }
