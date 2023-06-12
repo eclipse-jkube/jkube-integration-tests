@@ -35,7 +35,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Harden Runner
-        uses: step-security/harden-runner@beefd8c500e5f70ce4fc69e314d454dcf8822f4b
+        uses: step-security/harden-runner@215c5ca5ec7b0ee8425ee2e531db206868f0b83b
         with:
           disable-sudo: true
           egress-policy: block
@@ -103,7 +103,7 @@ jobs:
           github token: ${{ secrets.GITHUB_TOKEN }}
           start args: --force
       - name: Harden Runner
-        uses: step-security/harden-runner@beefd8c500e5f70ce4fc69e314d454dcf8822f4b
+        uses: step-security/harden-runner@215c5ca5ec7b0ee8425ee2e531db206868f0b83b
         with:
           egress-policy: block
           allowed-endpoints: >
@@ -179,7 +179,7 @@ jobs:
           github token: ${{ secrets.GITHUB_TOKEN }}
           start args: --force
       - name: Harden Runner
-        uses: step-security/harden-runner@beefd8c500e5f70ce4fc69e314d454dcf8822f4b
+        uses: step-security/harden-runner@215c5ca5ec7b0ee8425ee2e531db206868f0b83b
         with:
           egress-policy: block
           allowed-endpoints: >
@@ -236,7 +236,7 @@ jobs:
     steps:
 #     This seems to cause problems with OpenShift Setup Action 
 #     - name: Harden Runner
-#       uses: step-security/harden-runner@beefd8c500e5f70ce4fc69e314d454dcf8822f4b
+#       uses: step-security/harden-runner@215c5ca5ec7b0ee8425ee2e531db206868f0b83b
 #       with:
 #         egress-policy: audit
       - name: Free up Space
