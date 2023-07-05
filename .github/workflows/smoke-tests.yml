@@ -30,7 +30,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Harden Runner
-        uses: step-security/harden-runner@eba91136efc2e47cf9832255264a9dcd1fb9defb
+        uses: step-security/harden-runner@75ac55456f91a43ec55fa9768ebac0fde49ef6fc
         with:
           egress-policy: block
           allowed-endpoints: >
@@ -101,7 +101,7 @@ jobs:
           github token: ${{ secrets.GITHUB_TOKEN }}
           start args: --force
       - name: Harden Runner
-        uses: step-security/harden-runner@eba91136efc2e47cf9832255264a9dcd1fb9defb
+        uses: step-security/harden-runner@75ac55456f91a43ec55fa9768ebac0fde49ef6fc
         with:
           egress-policy: block
           allowed-endpoints: >
@@ -157,7 +157,7 @@ jobs:
     steps:
 #     This seems to cause problems with OpenShift Setup Action
 #     - name: Harden Runner
-#       uses: step-security/harden-runner@eba91136efc2e47cf9832255264a9dcd1fb9defb
+#       uses: step-security/harden-runner@75ac55456f91a43ec55fa9768ebac0fde49ef6fc
 #       with:
 #         egress-policy: audit
       - name: Free up Space
