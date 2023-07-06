@@ -14,8 +14,6 @@
 package org.eclipse.jkube.integrationtests.jupiter.api.extension;
 
 import io.fabric8.junit.jupiter.HasKubernetesClient;
-import io.fabric8.kubernetes.api.model.IntOrString;
-import io.fabric8.kubernetes.api.model.ServiceBuilder;
 import org.eclipse.jkube.integrationtests.cli.CliUtils;
 import org.eclipse.jkube.integrationtests.jupiter.api.DockerRegistry;
 import org.eclipse.jkube.integrationtests.jupiter.api.DockerRegistryHost;
@@ -37,6 +35,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 public class RegistryExtension implements HasKubernetesClient, BeforeAllCallback, BeforeEachCallback, AfterAllCallback {
 
   private static final Logger log = LoggerFactory.getLogger(RegistryExtension.class);
+
+  private static final String DOCKER_REGISTRY_AMD64_LINUX_IMAGE = "registry:2.8.2@sha256:0f7e785a49386d7e98c502151f9b01dc5578aa4f13078a346b2c5cf50433f663";
 
   @Override
   public void beforeAll(ExtensionContext context) throws Exception {
@@ -72,7 +72,7 @@ public class RegistryExtension implements HasKubernetesClient, BeforeAllCallback
   private static CliUtils.CliResult startRegularDockerRegistry(DockerRegistry dockerRegistry) throws IOException, InterruptedException {
     log.debug(() -> "Starting standard Docker Registry");
     return CliUtils.runCommand("docker run --rm -d -p " + dockerRegistry.port() +":5000 --name " +
-      getName(dockerRegistry) + " registry:2");
+      getName(dockerRegistry) + " " + DOCKER_REGISTRY_AMD64_LINUX_IMAGE);
   }
 
   private static CliUtils.CliResult startWindowsDockerRegistry(DockerRegistry dockerRegistry) throws IOException, InterruptedException {
