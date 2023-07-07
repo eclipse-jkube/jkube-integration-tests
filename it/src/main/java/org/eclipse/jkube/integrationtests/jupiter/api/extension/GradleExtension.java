@@ -26,6 +26,8 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -53,7 +55,7 @@ public class GradleExtension implements BaseExtension, BeforeAllCallback, Before
     }
   }
 
-  private JKubeGradleRunner getJKubeGradleRunner(ExtensionContext context) throws IOException, InterruptedException {
+  private JKubeGradleRunner getJKubeGradleRunner(ExtensionContext context) throws URISyntaxException {
     synchronized (context.getRoot()) {
       var singletonJKubeGradleRunner = getStore(context).get(JKubeGradleRunner.class, JKubeGradleRunner.class);
       if (singletonJKubeGradleRunner != null) {
@@ -70,7 +72,8 @@ public class GradleExtension implements BaseExtension, BeforeAllCallback, Before
       }
       var projectPath = rootPath.resolve("projects-to-be-tested").resolve("gradle");
       var gradleRunner = GradleRunner.create()
-        .withGradleInstallation(getGradleInstallation())
+        .withGradleDistribution(new URI("https://services.gradle.org/distributions/gradle-7.6-bin.zip"))
+//        .withGradleInstallation(getGradleInstallation())
         .withProjectDir(projectPath.toFile());
       if (annotation.forwardOutput()) {
         gradleRunner.forwardOutput();
