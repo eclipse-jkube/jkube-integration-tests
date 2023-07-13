@@ -33,6 +33,18 @@ e.g. Spring Boot tests when running in an Open Shift cluster `mvn verify -POpenS
 command prior to anything else so that all `target` directories get deleted,
 else other profiles will get triggered.
 
+### Running a specific test
+
+In addition to selecting a test group, you can run a specific test, or a set of tests, by providing
+the `it.test` [Maven Failsafe Plugin](https://maven.apache.org/surefire/maven-failsafe-plugin/examples/single-test.html)
+configuration property.
+
+For example, to run just the Vert.x tests you can run:
+
+```shell
+mvn verify -PKubernetes,other -Dit.test="*Vertx*"
+```
+
 ## Gradle
 
 The Gradle tests run using the local Gradle installation. This approach was selected due to issues when running the
