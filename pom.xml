@@ -146,11 +146,6 @@
         <version>${vertx.version}</version>
       </dependency>
       <dependency>
-        <groupId>io.thorntail</groupId>
-        <artifactId>microprofile-openapi</artifactId>
-        <version>${thorntail.version}</version>
-      </dependency>
-      <dependency>
         <groupId>org.gradle</groupId>
         <artifactId>gradle-test-kit</artifactId>
         <version>${gradle.version}</version>

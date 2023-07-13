@@ -40,6 +40,7 @@
     <dependency>
       <groupId>io.thorntail</groupId>
       <artifactId>microprofile-openapi</artifactId>
+      <version>${thorntail.version}</version>
     </dependency>
   </dependencies>
 
