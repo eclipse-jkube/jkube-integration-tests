@@ -41,6 +41,7 @@
       <dependency>
           <groupId>org.jboss.spec.javax.ws.rs</groupId>
           <artifactId>jboss-jaxrs-api_2.1_spec</artifactId>
+          <version>${version.org.jboss.spec.javax.ws.jboss-jaxrs-api_2.1_spec}</version>
       </dependency>
   </dependencies>
 
