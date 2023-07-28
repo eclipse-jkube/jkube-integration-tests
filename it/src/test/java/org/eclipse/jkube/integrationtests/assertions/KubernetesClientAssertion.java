@@ -33,7 +33,7 @@ import static org.eclipse.jkube.integrationtests.cli.CliUtils.runCommand;
 public class KubernetesClientAssertion<T extends KubernetesResource> {
 
   private static final Logger log = LoggerFactory.getLogger(KubernetesClientAssertion.class);
-  static final long DEFAULT_AWAIT_TIME_SECONDS = 60L;
+  static final long DEFAULT_AWAIT_TIME_SECONDS = 80L;
 
   CompletableFuture<HttpResponse<String>> getWithRetry(String url) {
     return await(() -> {
