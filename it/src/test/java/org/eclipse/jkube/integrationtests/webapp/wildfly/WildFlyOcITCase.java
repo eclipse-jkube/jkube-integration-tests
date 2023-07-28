@@ -48,6 +48,7 @@ class WildFlyOcITCase extends WildFly implements OpenShiftCase {
 
   @Test
   @Order(1)
+  @ResourceLock(value = CLUSTER_RESOURCE_INTENSIVE, mode = READ_WRITE)
   @DisplayName("oc:build, should create image")
   void ocBuild() throws Exception{
     //When
