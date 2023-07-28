@@ -89,7 +89,7 @@ class KarafOcITCase extends Karaf implements OpenShiftCase {
   @Test
   @Order(3)
   @DisplayName("oc:log, should retrieve log")
-  void ocLog() throws Exception{
+  void ocLog() throws Exception {
     //When
     final MavenInvocationResult invocationResult = maven("oc:log", properties("jkube.log.follow", "false"));
     //Then
