@@ -122,23 +122,6 @@
         <version>${apache.commons-codec.version}</version>
       </dependency>
       <dependency>
-        <groupId>io.fabric8</groupId>
-        <artifactId>kubernetes-client-bom</artifactId>
-        <version>${fabric8.kubernetes-client.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-      <dependency>
-        <groupId>io.fabric8</groupId>
-        <artifactId>kubernetes-httpclient-jetty</artifactId>
-        <version>${fabric8.kubernetes-client.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>io.vertx</groupId>
-        <artifactId>vertx-core</artifactId>
-        <version>${vertx.version}</version>
-      </dependency>
-      <dependency>
         <groupId>org.gradle</groupId>
         <artifactId>gradle-test-kit</artifactId>
         <version>${gradle.version}</version>

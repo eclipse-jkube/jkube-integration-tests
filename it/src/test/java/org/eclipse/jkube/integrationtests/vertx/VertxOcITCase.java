@@ -34,11 +34,12 @@ import static org.eclipse.jkube.integrationtests.assertions.JKubeAssertions.asse
 import static org.eclipse.jkube.integrationtests.assertions.KubernetesListAssertion.assertListResource;
 import static org.eclipse.jkube.integrationtests.assertions.YamlAssertion.yaml;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.anEmptyMap;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.stringContainsInOrder;
 import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 
 @Tag(OPEN_SHIFT)
@@ -96,9 +97,9 @@ class VertxOcITCase extends Vertx implements OpenShiftCase {
     final MavenInvocationResult invocationResult = maven("oc:log", properties("jkube.log.follow", "false"));
     // Then
     assertInvocation(invocationResult);
-    assertThat(invocationResult.getStdOut(), stringContainsInOrder(
-      "Vert.x test application is ready",
-      "Succeeded in deploying verticle"
+    assertThat(invocationResult.getStdOut(), allOf(
+      containsString("Vert.x test application is ready"),
+      containsString("Succeeded in deploying verticle")
     ));
   }
 

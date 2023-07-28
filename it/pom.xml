@@ -47,10 +47,12 @@
     <dependency>
       <groupId>io.fabric8</groupId>
       <artifactId>kubernetes-junit-jupiter</artifactId>
+      <version>${fabric8.kubernetes-client.version}</version>
     </dependency>
     <dependency>
       <groupId>io.fabric8</groupId>
       <artifactId>openshift-client</artifactId>
+      <version>${fabric8.kubernetes-client.version}</version>
       <exclusions>
         <exclusion>
           <groupId>io.fabric8</groupId>
@@ -61,6 +63,7 @@
     <dependency>
       <groupId>io.fabric8</groupId>
       <artifactId>kubernetes-httpclient-jetty</artifactId>
+      <version>${fabric8.kubernetes-client.version}</version>
     </dependency>
     <dependency>
       <groupId>org.gradle</groupId>
