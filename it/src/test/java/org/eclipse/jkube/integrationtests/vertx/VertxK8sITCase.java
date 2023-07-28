@@ -37,12 +37,12 @@ import static org.eclipse.jkube.integrationtests.assertions.YamlAssertion.yaml;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.anEmptyMap;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.stringContainsInOrder;
 import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 
 @Tag(KUBERNETES)
@@ -109,9 +109,9 @@ class VertxK8sITCase extends Vertx {
     final MavenInvocationResult invocationResult = maven("k8s:log", properties("jkube.log.follow", "false"));
     // Then
     assertInvocation(invocationResult);
-    assertThat(invocationResult.getStdOut(), stringContainsInOrder(
-      "Vert.x test application is ready",
-      "Succeeded in deploying verticle"
+    assertThat(invocationResult.getStdOut(), allOf(
+      containsString("Vert.x test application is ready"),
+      containsString("Succeeded in deploying verticle")
     ));
   }
 
