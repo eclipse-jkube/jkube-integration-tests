@@ -16,6 +16,7 @@ package org.eclipse.jkube.integrationtests.assertions;
 import io.fabric8.kubernetes.api.model.KubernetesResource;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.http.HttpResponse;
+import io.fabric8.openshift.api.model.Route;
 import io.fabric8.openshift.client.OpenShiftClient;
 import org.eclipse.jkube.integrationtests.JKubeCase;
 import org.slf4j.Logger;
@@ -71,7 +72,7 @@ public class KubernetesClientAssertion<T extends KubernetesResource> {
   }
 
   public boolean isOpenShiftClient() {
-    return getKubernetesClient().isAdaptable(OpenShiftClient.class);
+    return getKubernetesClient().adapt(OpenShiftClient.class).supports(Route.class);
   }
 
   public String getApplication() {

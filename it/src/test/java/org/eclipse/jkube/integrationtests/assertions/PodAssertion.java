@@ -17,6 +17,8 @@ import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.dsl.PodResource;
 import io.fabric8.kubernetes.client.readiness.Readiness;
+import io.fabric8.openshift.api.model.DeploymentConfig;
+import io.fabric8.openshift.client.OpenShiftClient;
 import org.eclipse.jkube.integrationtests.JKubeCase;
 
 import java.util.concurrent.ExecutionException;
@@ -69,7 +71,7 @@ public class PodAssertion extends KubernetesClientAssertion<Pod> {
       .withName(getKubernetesResource().getMetadata().getName());
   }
 
-  private static Pod awaitPod(KubernetesClient kc,String appId) throws Exception {
+  private static Pod awaitPod(KubernetesClient kc, String appId) throws Exception {
     try {
       // Wait for Pod to be created
       kc.pods().withLabel("app", appId)
@@ -87,7 +89,20 @@ public class PodAssertion extends KubernetesClientAssertion<Pod> {
     if (pod != null && Readiness.isPodReady(pod)) {
       return pod;
     }
-    throw new AssertionError(String.format("Error awaiting Pod '%s'\n%s",
-      appId, pod != null ? kc.getKubernetesSerialization().asYaml(pod) : "No Pod found"));
+    // Get debug information
+    final String info;
+    if (pod != null) {
+      info = kc.getKubernetesSerialization().asYaml(pod);
+    } else if (kc.adapt(OpenShiftClient.class).supports(DeploymentConfig.class) &&
+      kc.adapt(OpenShiftClient.class).deploymentConfigs().withName(appId).get() != null) {
+      info = "DeploymentConfig status:\n" +
+        kc.getKubernetesSerialization().asYaml(kc.adapt(OpenShiftClient.class).deploymentConfigs().withName(appId).get().getStatus());
+    } else if (kc.apps().deployments().withName(appId).get() != null) {
+      info = "Deployment status:\n" +
+        kc.getKubernetesSerialization().asYaml(kc.apps().deployments().withName(appId).get().getStatus());
+    } else {
+      info = "No Pod found";
+    }
+    throw new AssertionError(String.format("Error awaiting Pod '%s'\n%s", appId, info));
   }
 }
