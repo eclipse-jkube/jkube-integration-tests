@@ -35,6 +35,7 @@ import static org.eclipse.jkube.integrationtests.assertions.InvocationResultAsse
 import static org.eclipse.jkube.integrationtests.assertions.JKubeAssertions.assertJKube;
 import static org.eclipse.jkube.integrationtests.assertions.KubernetesListAssertion.assertListResource;
 import static org.eclipse.jkube.integrationtests.assertions.YamlAssertion.yaml;
+import static org.eclipse.jkube.integrationtests.docker.DockerUtils.getImageHistory;
 import static org.eclipse.jkube.integrationtests.docker.DockerUtils.listImageFiles;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
@@ -66,14 +67,22 @@ class CompleteK8sITCase extends Complete {
     // Then
     assertInvocation(invocationResult);
     assertImageWasRecentlyBuilt("integration-tests", getApplication());
-    final File dockerDirectory = new File(
-      String.format("../%s/target/docker/integration-tests/spring-boot-complete/", getProject()));
     final List<String> imageFiles = listImageFiles(String.format("%s/%s", "integration-tests", getApplication()),
       "/deployments");
     assertThat(imageFiles, not(hasItem("/deployments/assembly-test")));
     assertThat(imageFiles, not(hasItem("/deployments/static")));
     assertThat(imageFiles, hasItem("/deployments/will-be-included-if-no-assemblies-defined.txt"));
-    assertThat(imageFiles, hasItem("/deployments/spring-boot-complete-0.0.0-SNAPSHOT.jar"));
+    assertThat(imageFiles, hasItem("/deployments/BOOT-INF"));
+    assertThat(imageFiles, hasItem("/deployments/BOOT-INF/lib"));
+    assertThat(imageFiles, hasItem("/deployments/BOOT-INF/classes"));
+    assertThat(imageFiles, hasItem("/deployments/BOOT-INF/classpath.idx"));
+    assertThat(imageFiles, hasItem("/deployments/BOOT-INF/layers.idx"));
+    assertThat(imageFiles, hasItem("/deployments/org/springframework/boot/loader/JarLauncher.class"));
+    final List<String> imageHistory = getImageHistory(String.format("%s/%s", "integration-tests", getApplication()));
+    long dirCopyLayers = imageHistory.stream()
+      .filter(l -> l.contains("COPY dir:"))
+      .count();
+    assertThat(dirCopyLayers, equalTo(4L));
   }
 
   @Test

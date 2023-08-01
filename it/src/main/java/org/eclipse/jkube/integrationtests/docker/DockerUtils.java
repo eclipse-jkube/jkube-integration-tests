@@ -65,6 +65,11 @@ public class DockerUtils {
     }
   }
 
+  public static List<String> getImageHistory(String imageName) throws IOException, InterruptedException {
+    final CliResult result = CliUtils.runCommand(String.format("docker history %s", imageName));
+    return Arrays.asList(result.getOutput().replace("\r", "").split("\n"));
+  }
+
   public static void loadTar(File dockerBuildTar) throws IOException, InterruptedException {
     final CliResult result = CliUtils.runCommand(String.format(
       "docker load -i %s", dockerBuildTar.getAbsolutePath()
