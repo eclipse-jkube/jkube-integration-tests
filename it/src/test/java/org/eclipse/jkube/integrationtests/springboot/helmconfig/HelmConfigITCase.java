@@ -13,7 +13,12 @@
  */
 package org.eclipse.jkube.integrationtests.springboot.helmconfig;
 
+import io.fabric8.junit.jupiter.api.KubernetesTest;
+import io.fabric8.kubernetes.client.KubernetesClient;
 import org.apache.maven.shared.invoker.InvocationResult;
+import org.eclipse.jkube.integrationtests.JKubeCase;
+import org.eclipse.jkube.integrationtests.jupiter.api.DockerRegistry;
+import org.eclipse.jkube.integrationtests.jupiter.api.DockerRegistryHost;
 import org.eclipse.jkube.integrationtests.maven.MavenCase;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
@@ -23,6 +28,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
 import java.io.File;
+import java.util.Properties;
 
 import static org.eclipse.jkube.integrationtests.Tags.KUBERNETES;
 import static org.eclipse.jkube.integrationtests.Tags.OPEN_SHIFT;
@@ -34,16 +40,28 @@ import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.anEmptyMap;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class HelmConfigITCase implements MavenCase {
+@DockerRegistry(port = 5080)
+@KubernetesTest(createEphemeralNamespace = false)
+class HelmConfigITCase implements JKubeCase, MavenCase {
 
   private static final String PROJECT_HELM = "projects-to-be-tested/maven/spring/helm-config";
 
+  private static KubernetesClient kubernetesClient;
+
+  @DockerRegistryHost
+  private String registry;
+
+  @Override
+  public KubernetesClient getKubernetesClient() {
+    return kubernetesClient;
+  }
   @Override
   public String getProject() {
     return PROJECT_HELM;
@@ -143,5 +161,49 @@ class HelmConfigITCase implements MavenCase {
     assertThat(new File(helmDirectory, "templates/spring-boot-helm-config-deploymentconfig.yaml"), yaml(not(anEmptyMap())));
     assertThat(new File(helmDirectory, "templates/spring-boot-helm-config-route.yaml"), yaml(not(anEmptyMap())));
     assertThat(new File(helmDirectory, "templates/spring-boot-helm-config-service.yaml"), yaml(not(anEmptyMap())));
+  }
+
+  @Test
+  @Order(3)
+  @Tag(KUBERNETES)
+  @DisplayName("k8s:helm-push, should push the charts")
+  void k8sHelmPush() throws Exception {
+    // Given
+    final Properties properties = properties(
+      "jkube.helm.chart", "the-chart-name",
+      "jkube.helm.stableRepository.type", "OCI",
+      "jkube.helm.stableRepository.name", "docker",
+      "jkube.helm.stableRepository.url", "oci://" + registry,
+      "jkube.helm.stableRepository.username", "ignored",
+      "jkube.helm.stableRepository.password", "ignored"
+    );
+    // When
+    final InvocationResult invocationResult = maven("k8s:helm-push", properties);
+    // Then
+    assertInvocation(invocationResult);
+    assertThat(httpGet("http://" + registry + "/v2/the-chart-name/tags/list").body(),
+      containsString("{\"name\":\"the-chart-name\",\"tags\":[\"1.0-KUBERNETES\"]}"));
+  }
+
+  @Test
+  @Order(3)
+  @Tag(OPEN_SHIFT)
+  @DisplayName("oc:helm-push, should push the charts")
+  void ocHelmPush() throws Exception {
+    // Given
+    final Properties properties = properties(
+      "jkube.helm.chart", "the-chart-name",
+      "jkube.helm.stableRepository.type", "OCI",
+      "jkube.helm.stableRepository.name", "docker",
+      "jkube.helm.stableRepository.url", "oci://" + registry,
+      "jkube.helm.stableRepository.username", "ignored",
+      "jkube.helm.stableRepository.password", "ignored"
+    );
+    // When
+    final InvocationResult invocationResult = maven("oc:helm-push", properties);
+    // Then
+    assertInvocation(invocationResult);
+    assertThat(httpGet("http://" + registry + "/v2/the-chart-name/tags/list").body(),
+      containsString("{\"name\":\"the-chart-name\",\"tags\":[\"0.1-OC\"]}"));
   }
 }
