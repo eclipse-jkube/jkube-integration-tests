@@ -27,6 +27,7 @@ import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -50,6 +51,17 @@ public interface MavenCase extends Project {
 
   default Properties properties(String key, String value) {
     return properties(Collections.singletonMap(key, value));
+  }
+
+  default Properties properties(String... keyValuePairs) {
+    if (keyValuePairs.length % 2 != 0) {
+      throw new IllegalArgumentException("Properties must be even number of arguments");
+    }
+    final Map<String, String> map = new HashMap<>();
+    for (int i = 0; i < keyValuePairs.length; i += 2) {
+      map.put(keyValuePairs[i], keyValuePairs[i + 1]);
+    }
+    return properties(map);
   }
 
   default MavenInvocationResult maven(String goal)
