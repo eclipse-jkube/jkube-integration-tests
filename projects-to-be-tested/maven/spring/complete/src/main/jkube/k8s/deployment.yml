@@ -23,7 +23,7 @@ spec:
             revision: '0.1.0'
       containers:
         - command: ["java"]
-          args: ["-jar", "/deployments/spring-boot-complete-0.0.0-SNAPSHOT.jar"]
+          args: ["org.springframework.boot.loader.JarLauncher"]
           volumeMounts:
             - name: jkube
               mountPath: /app/

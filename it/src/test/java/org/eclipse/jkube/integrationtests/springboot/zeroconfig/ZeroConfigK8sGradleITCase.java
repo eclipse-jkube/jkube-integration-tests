@@ -27,6 +27,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.parallel.ResourceLock;
 
+import java.util.List;
+
 import static org.eclipse.jkube.integrationtests.Locks.CLUSTER_RESOURCE_INTENSIVE;
 import static org.eclipse.jkube.integrationtests.Tags.KUBERNETES;
 import static org.eclipse.jkube.integrationtests.assertions.DeploymentAssertion.awaitDeployment;
@@ -36,6 +38,8 @@ import static org.eclipse.jkube.integrationtests.assertions.KubernetesListAssert
 import static org.eclipse.jkube.integrationtests.assertions.PodAssertion.awaitPod;
 import static org.eclipse.jkube.integrationtests.assertions.ServiceAssertion.awaitService;
 import static org.eclipse.jkube.integrationtests.assertions.YamlAssertion.yaml;
+import static org.eclipse.jkube.integrationtests.docker.DockerUtils.getImageHistory;
+import static org.eclipse.jkube.integrationtests.docker.DockerUtils.listImageFiles;
 import static org.eclipse.jkube.integrationtests.springboot.zeroconfig.ZeroConfig.GRADLE_APPLICATION;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.aMapWithSize;
@@ -44,6 +48,7 @@ import static org.hamcrest.Matchers.anEmptyMap;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasEntry;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.hasSize;
@@ -89,6 +94,19 @@ class ZeroConfigK8sGradleITCase extends ZeroConfig {
     gradle.tasks("k8sBuild").build();
     // Then
     assertImageWasRecentlyBuilt("gradle", getApplication());
+    final List<String> imageFiles = listImageFiles(String.format("%s/%s", "gradle", getApplication()),
+      "/deployments");
+    assertThat(imageFiles, hasItem("/deployments/BOOT-INF"));
+    assertThat(imageFiles, hasItem("/deployments/BOOT-INF/lib"));
+    assertThat(imageFiles, hasItem("/deployments/BOOT-INF/classes"));
+    assertThat(imageFiles, hasItem("/deployments/BOOT-INF/classpath.idx"));
+    assertThat(imageFiles, hasItem("/deployments/BOOT-INF/layers.idx"));
+    assertThat(imageFiles, hasItem("/deployments/org/springframework/boot/loader/JarLauncher.class"));
+    final List<String> imageHistory = getImageHistory(String.format("%s/%s", "gradle", getApplication()));
+    long dirCopyLayers = imageHistory.stream()
+      .filter(l -> l.contains("COPY dir:"))
+      .count();
+    assertThat(dirCopyLayers, equalTo(3L));
   }
 
   @Test
