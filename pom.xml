@@ -38,7 +38,9 @@
     <com.fasterxml.jackson.core.version>2.15.2</com.fasterxml.jackson.core.version>
     <com.fasterxml.jackson.dataformat.yaml.version>2.15.2</com.fasterxml.jackson.dataformat.yaml.version>
     <fabric8.kubernetes-client.version>6.8.0</fabric8.kubernetes-client.version>
-    <gradle.version>6.1.1</gradle.version>
+    <guava.version>32.1.2-jre</guava.version> <!-- Required by Gradle Test Toolkit (testkit) -->
+    <gradle.version>8.2.1</gradle.version>
+    <gradle-api-maven-plugin-version>0.0.2</gradle-api-maven-plugin-version>
     <hamcrest.version>2.0.0.0</hamcrest.version>
     <jkube.version>1.14-SNAPSHOT</jkube.version>
     <junit.version>5.9.1</junit.version>
@@ -122,16 +124,6 @@
         <version>${apache.commons-codec.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.gradle</groupId>
-        <artifactId>gradle-test-kit</artifactId>
-        <version>${gradle.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.gradle</groupId>
-        <artifactId>gradle-tooling-api</artifactId>
-        <version>${gradle.version}</version>
-      </dependency>
-      <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-simple</artifactId>
         <version>${slf4j.version}</version>
@@ -174,6 +166,11 @@
           <groupId>com.mycila</groupId>
           <artifactId>license-maven-plugin</artifactId>
           <version>${license-maven-plugin.version}</version>
+        </plugin>
+        <plugin>
+          <groupId>com.marcnuri.plugins</groupId>
+          <artifactId>gradle-api-maven-plugin</artifactId>
+          <version>${gradle-api-maven-plugin-version}</version>
         </plugin>
         <plugin>
           <groupId>io.reactiverse</groupId>
@@ -261,6 +258,11 @@
             </licenseSet>
           </licenseSets>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>com.marcnuri.plugins</groupId>
+        <artifactId>gradle-api-maven-plugin</artifactId>
+        <extensions>true</extensions>
       </plugin>
     </plugins>
   </build>
