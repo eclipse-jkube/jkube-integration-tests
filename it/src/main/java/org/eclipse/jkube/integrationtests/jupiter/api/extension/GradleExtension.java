@@ -34,6 +34,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
 
+import static org.eclipse.jkube.integrationtests.JKubeCase.GRADLE_VERSION_SYSTEM_PROPERTY;
+
 public class GradleExtension implements BaseExtension, BeforeAllCallback, BeforeEachCallback {
 
   private volatile boolean cleanBuild = false;
@@ -72,8 +74,7 @@ public class GradleExtension implements BaseExtension, BeforeAllCallback, Before
       }
       var projectPath = rootPath.resolve("projects-to-be-tested").resolve("gradle");
       var gradleRunner = GradleRunner.create()
-        .withGradleDistribution(new URI("https://services.gradle.org/distributions/gradle-7.6-bin.zip"))
-//        .withGradleInstallation(getGradleInstallation())
+        .withGradleDistribution(new URI("https://services.gradle.org/distributions/gradle-" + System.getProperty(GRADLE_VERSION_SYSTEM_PROPERTY) + "-bin.zip"))
         .withProjectDir(projectPath.toFile());
       if (annotation.forwardOutput()) {
         gradleRunner.forwardOutput();

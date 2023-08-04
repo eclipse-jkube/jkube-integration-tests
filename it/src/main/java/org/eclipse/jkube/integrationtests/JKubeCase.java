@@ -27,6 +27,7 @@ import java.util.concurrent.TimeoutException;
 public interface JKubeCase {
 
   String JKUBE_VERSION_SYSTEM_PROPERTY = "jkubeVersion";
+  String GRADLE_VERSION_SYSTEM_PROPERTY = "gradleVersion";
 
   // TODO: Move to KubernetesCase interface
   KubernetesClient getKubernetesClient();
