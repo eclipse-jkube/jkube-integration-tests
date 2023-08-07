@@ -31,7 +31,7 @@
     <global.name>JKube :: Integration Tests</global.name>
     <apache.maven.maven-compiler-plugin.version>3.10.1</apache.maven.maven-compiler-plugin.version>
     <apache.maven.maven-war-plugin.version>3.3.2</apache.maven.maven-war-plugin.version>
-    <apache.maven-failsafe-plugin.version>3.0.0-M7</apache.maven-failsafe-plugin.version>
+    <apache.maven-failsafe-plugin.version>3.1.2</apache.maven-failsafe-plugin.version>
     <apache.maven.maven-invoker.version>3.2.0</apache.maven.maven-invoker.version>
     <apache.commons-codec.version>1.15</apache.commons-codec.version>
     <camel.version>2.25.4</camel.version>
