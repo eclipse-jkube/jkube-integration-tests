@@ -33,7 +33,7 @@
     <apache.maven.maven-war-plugin.version>3.3.2</apache.maven.maven-war-plugin.version>
     <apache.maven-failsafe-plugin.version>3.1.2</apache.maven-failsafe-plugin.version>
     <apache.maven.maven-invoker.version>3.2.0</apache.maven.maven-invoker.version>
-    <apache.commons-codec.version>1.15</apache.commons-codec.version>
+    <apache.commons-codec.version>1.16.0</apache.commons-codec.version>
     <camel.version>2.25.4</camel.version>
     <com.fasterxml.jackson.core.version>2.15.2</com.fasterxml.jackson.core.version>
     <com.fasterxml.jackson.dataformat.yaml.version>2.15.2</com.fasterxml.jackson.dataformat.yaml.version>
