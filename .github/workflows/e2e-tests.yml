@@ -27,7 +27,7 @@ permissions:
 
 env:
   JKUBE_REPOSITORY: https://github.com/rohanKanojia/jkube.git
-  JKUBE_REVISION: pr/issue2138
+  JKUBE_REVISION: pr/spring-build-image-exec
 
 jobs:
   build-jkube:
