@@ -42,7 +42,7 @@
     <gradle.version>8.2.1</gradle.version>
     <gradle-api-maven-plugin-version>0.0.2</gradle-api-maven-plugin-version>
     <hamcrest.version>2.0.0.0</hamcrest.version>
-    <jkube.version>1.14-SNAPSHOT</jkube.version>
+    <jkube.version>1.15-SNAPSHOT</jkube.version>
     <junit.version>5.10.0</junit.version>
     <karaf.version>4.4.4</karaf.version>
     <license-maven-plugin.version>4.2</license-maven-plugin.version>
