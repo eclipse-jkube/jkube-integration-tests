@@ -40,7 +40,7 @@
     <fabric8.kubernetes-client.version>6.8.1</fabric8.kubernetes-client.version>
     <guava.version>32.1.2-jre</guava.version> <!-- Required by Gradle Test Toolkit (testkit) -->
     <gradle.version>8.2.1</gradle.version>
-    <gradle-api-maven-plugin-version>0.0.2</gradle-api-maven-plugin-version>
+    <gradle-api-maven-plugin-version>0.0.3</gradle-api-maven-plugin-version>
     <hamcrest.version>2.0.0.0</hamcrest.version>
     <jkube.version>1.15-SNAPSHOT</jkube.version>
     <junit.version>5.10.0</junit.version>
