@@ -13,7 +13,19 @@
  */
 package org.eclipse.jkube.integrationtests;
 
+import io.fabric8.kubernetes.client.utils.KubernetesResourceUtil;
+import io.fabric8.openshift.api.model.Build;
+import io.fabric8.openshift.api.model.BuildConfig;
 import io.fabric8.openshift.client.OpenShiftClient;
+
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 
 public interface OpenShiftCase extends JKubeCase {
 
@@ -31,5 +43,26 @@ public interface OpenShiftCase extends JKubeCase {
     getOpenShiftClient().pods().withLabel(OPENSHIFT_BUILD_LABEL).list().getItems().stream()
       .filter(p -> p.getMetadata().getLabels().get(OPENSHIFT_BUILD_LABEL).startsWith(getApplication() + S2I_BUILD_SUFFIX))
       .forEach(p -> getOpenShiftClient().resource(p).delete());
+  }
+
+  default void assertOpenShiftDockerBuildCompletedWithLogs(String... logs) {
+    List<BuildConfig> buildConfigDockerList = getOpenShiftClient().buildConfigs()
+      .withLabel("app", getApplication())
+      .list()
+      .getItems().stream()
+      .filter(bc -> bc.getSpec().getStrategy().getType().equals("Docker"))
+      .sorted(Comparator.comparing(KubernetesResourceUtil::getAge))
+      .collect(Collectors.toList());
+    assertThat(buildConfigDockerList.size(), greaterThanOrEqualTo(1));
+    List<Build> dockerBuild = getOpenShiftClient().builds()
+      .withLabel("openshift.io/build-config.name", buildConfigDockerList.get(0).getMetadata().getName())
+      .list()
+      .getItems().stream()
+      .filter(b -> b.getStatus().getPhase().equals("Complete"))
+      .sorted(Comparator.comparing(KubernetesResourceUtil::getAge))
+      .collect(Collectors.toList());
+    assertThat(dockerBuild.size(), greaterThanOrEqualTo(1));
+    String dockerBuildLog = getOpenShiftClient().builds().withName(dockerBuild.get(0).getMetadata().getName()).getLog();
+    Arrays.stream(logs).forEach(l -> assertThat(dockerBuildLog, containsString(l)));
   }
 }
