@@ -185,9 +185,10 @@
       </build>
     </profile>
     <profile>
-      <id>OpenShift</id>
+      <id>OpenShift-Docker</id>
       <properties>
         <jkube.environment>oc</jkube.environment>
+        <jkube.build.strategy>docker</jkube.build.strategy>
       </properties>
       <build>
         <plugins>
@@ -195,14 +196,14 @@
             <groupId>org.eclipse.jkube</groupId>
             <artifactId>openshift-maven-plugin</artifactId>
             <configuration>
+              <resources>
+                <labels>
+                  <all>
+                    <jkube.spring-boot.example>complete</jkube.spring-boot.example>
+                  </all>
+                </labels>
+              </resources>
               <enricher>
-                <resources>
-                  <labels>
-                    <all>
-                      <jkube.spring-boot.example>complete</jkube.spring-boot.example>
-                    </all>
-                  </labels>
-                </resources>
                 <config>
                   <jkube-service>
                     <type>NodePort</type>
