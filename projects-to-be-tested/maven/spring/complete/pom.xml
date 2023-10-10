@@ -214,6 +214,53 @@
         </plugins>
       </build>
     </profile>
+    <profile>
+      <id>OpenShift-Docker-Spring-Layers-Disabled</id>
+      <properties>
+        <jkube.build.strategy>docker</jkube.build.strategy>
+      </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-maven-plugin</artifactId>
+            <version>${spring-boot.version}</version>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>repackage</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <layers>
+                <enabled>false</enabled>
+              </layers>
+            </configuration>
+          </plugin>
+          <plugin>
+            <groupId>org.eclipse.jkube</groupId>
+            <artifactId>openshift-maven-plugin</artifactId>
+            <configuration>
+              <enricher>
+                <config>
+                  <jkube-service>
+                    <type>NodePort</type>
+                  </jkube-service>
+                </config>
+              </enricher>
+              <resources>
+                <labels>
+                  <all>
+                    <jkube.spring-boot.example>complete</jkube.spring-boot.example>
+                  </all>
+                </labels>
+              </resources>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
   </profiles>
 
 </project>
