@@ -50,7 +50,6 @@ class QuarkusOcITCase extends Quarkus implements OpenShiftCase {
   @ResourceLock(value = CLUSTER_RESOURCE_INTENSIVE, mode = READ_WRITE)
   @DisplayName("oc:build, should create image")
   void ocBuild() throws Exception {
-    getOpenShiftClient().imageStreams().delete();
     // When
     final InvocationResult invocationResult = maven("oc:build");
     // Then
