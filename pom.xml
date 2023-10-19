@@ -321,6 +321,7 @@
       <id>quarkus</id>
       <modules>
         <module>projects-to-be-tested/maven/quarkus/rest</module>
+        <module>projects-to-be-tested/maven/quarkus/rest-trace-logging-enabled</module>
       </modules>
       <activation>
         <file>

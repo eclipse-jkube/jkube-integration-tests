@@ -59,7 +59,7 @@ abstract class Quarkus implements JKubeCase, MavenCase {
   final Pod assertThatShouldApplyResources() throws Exception {
     final Pod pod = awaitPod(this).getKubernetesResource();
     assertPod(pod).apply(this)
-      .logContains("quarkus-rest 0.0.0-SNAPSHOT on JVM (powered by Quarkus ", 60)
+      .logContains(getApplication() + " 0.0.0-SNAPSHOT on JVM (powered by Quarkus ", 60)
       .logContains(".Final) started in", 10);
     awaitService(this, pod.getMetadata().getNamespace())
       .assertIsNodePort()
