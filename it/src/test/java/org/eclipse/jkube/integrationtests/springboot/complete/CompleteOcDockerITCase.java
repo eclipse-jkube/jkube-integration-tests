@@ -70,8 +70,7 @@ class CompleteOcDockerITCase extends Complete implements OpenShiftCase {
       "COPY /dependencies/deployments /deployments/",
       "COPY /spring-boot-loader/deployments /deployments/",
       "COPY /application/deployments /deployments",
-      "WORKDIR /deployment",
-      "ENTRYPOINT [\"java\",\"org.springframework.boot.loader.JarLauncher\"]");
+      "WORKDIR /deployment");
   }
 
   @Test
