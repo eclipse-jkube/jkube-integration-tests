@@ -132,7 +132,7 @@ class ZeroConfigK8sGradleITCase extends ZeroConfig {
     assertThat(helmDirectory.resolve(getApplication() + "-0.0.0-SNAPSHOT.tar.gz").toFile(),
       anExistingFile());
     assertThat(helmDirectory.resolve("Chart.yaml").toFile(), yaml(allOf(
-      aMapWithSize(3),
+      aMapWithSize(4),
       hasEntry("apiVersion", "v1"),
       hasEntry("name", getApplication()),
       hasEntry("version", "0.0.0-SNAPSHOT")

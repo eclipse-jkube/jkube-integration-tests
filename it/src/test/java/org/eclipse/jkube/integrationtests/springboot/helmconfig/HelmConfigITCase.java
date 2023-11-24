@@ -103,7 +103,7 @@ class HelmConfigITCase implements JKubeCase, MavenCase {
     final File helmDirectory = new File(
       String.format("../%s/target/jkube/helm/This is the chart name/kubernetes", getProject()));
     assertThat(new File(helmDirectory, "Chart.yaml"), yaml(allOf(
-      aMapWithSize(9),
+      aMapWithSize(10),
       hasEntry("apiVersion", "v1"),
       hasEntry("name", "This is the chart name"),
       hasEntry("version", "1.0-KUBERNETES"),
@@ -140,7 +140,7 @@ class HelmConfigITCase implements JKubeCase, MavenCase {
     final File helmDirectory = new File(
       String.format("../%s/target/jkube/helm/different-name-for-oc/openshift", getProject()));
     assertThat(new File(helmDirectory, "Chart.yaml"), yaml(allOf(
-      aMapWithSize(8),
+      aMapWithSize(9),
       hasEntry("apiVersion", "v1"),
       hasEntry("name", "different-name-for-oc"),
       hasEntry("version", "0.1-OC"),

@@ -59,7 +59,7 @@ abstract class ZeroConfig implements JKubeCase {
   static void assertHelm(File helmDirectory) {
     assertThat(helmDirectory.exists(), equalTo(true));
     assertThat(new File(helmDirectory, "Chart.yaml"), yaml(allOf(
-      aMapWithSize(4),
+      aMapWithSize(5),
       hasEntry("apiVersion", "v1"),
       hasEntry("name", "spring-boot-zero-config"),
       hasEntry("description", "Spring Boot with Zero Config project")

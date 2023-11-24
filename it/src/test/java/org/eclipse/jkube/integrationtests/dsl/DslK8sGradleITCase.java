@@ -106,7 +106,7 @@ class DslK8sGradleITCase implements JKubeCase {
       .resolve("helm").resolve(getApplication()).resolve("kubernetes");
     assertThat(helmDirectory.resolve(getApplication() + "-0.0.0-SNAPSHOT.tar.gz").toFile(), anExistingFile());
     assertThat(helmDirectory.resolve("Chart.yaml").toFile(), yaml(allOf(
-      aMapWithSize(3),
+      aMapWithSize(4),
       hasEntry("apiVersion", "v1"),
       hasEntry("name", getApplication()),
       hasEntry("version", "0.0.0-SNAPSHOT")
