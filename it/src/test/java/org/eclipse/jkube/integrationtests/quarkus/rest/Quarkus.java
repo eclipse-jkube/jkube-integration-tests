@@ -73,7 +73,7 @@ abstract class Quarkus implements JKubeCase, MavenCase {
   final void assertHelm(File helmDirectory) {
     assertThat(helmDirectory.exists(), equalTo(true));
     assertThat(new File(helmDirectory, "Chart.yaml"), yaml(allOf(
-      aMapWithSize(4),
+      aMapWithSize(5),
       hasEntry("apiVersion", "v1"),
       hasEntry("name", "quarkus-rest"),
       hasEntry("description", "Quarkus REST JSON project")
