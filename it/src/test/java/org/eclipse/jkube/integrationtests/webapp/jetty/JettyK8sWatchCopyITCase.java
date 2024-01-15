@@ -51,8 +51,7 @@ class JettyK8sWatchCopyITCase extends JettyK8sWatch {
   void k8sWatchCopy() throws Exception {
     try (final ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
       // Given
-      mavenWatch = mavenAsync(
-        "k8s:watch", properties("jkube.watch.mode", "copy"), baos, null);
+      mavenWatch = mavenAsync("k8s:watch", null, baos, null);
       await(baos::toString).apply(log -> log.contains("Waiting ...")).get(2, TimeUnit.MINUTES);
       // When
       FileUtils.write(fileToChange, "<html><body><h2>Eclipse JKube Jetty v2</h2></body></html>", StandardCharsets.UTF_8);
