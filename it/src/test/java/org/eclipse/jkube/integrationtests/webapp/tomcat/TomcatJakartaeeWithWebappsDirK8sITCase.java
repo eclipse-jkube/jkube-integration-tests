@@ -53,21 +53,21 @@ import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
  */
 @Tag(KUBERNETES)
 @TestMethodOrder(OrderAnnotation.class)
-class TomcatJakartaeeK8sITCase extends Tomcat {
+class TomcatJakartaeeWithWebappsDirK8sITCase extends Tomcat {
 
   @Override
   public String getProject() {
-    return PROJECT_TOMCAT_JAKARTAEE;
+    return PROJECT_TOMCAT_JAKARTAEE_WITH_WEBAPPS_DIR;
   }
 
   @Override
   public String getApplication() {
-    return APPLICATION_NAME_TOMCAT_JAKARTAEE;
+    return APPLICATION_NAME_TOMCAT_JAKARTAEE_WITH_WEBAPPS_DIR;
   }
 
   @Test
   @Order(1)
-  @DisplayName("k8s:build should display the Tomcat webapps dir hint by default")
+  @DisplayName("k8s:build, with jkube.generator.webapp.env should not display the Tomcat webapps dir hint")
   void k8sBuild() throws Exception {
     // When
     final MavenInvocationResult invocationResult = maven("k8s:build");
@@ -77,8 +77,8 @@ class TomcatJakartaeeK8sITCase extends Tomcat {
     final List<String> imageFiles = listImageFiles(String.format("%s/%s", "integration-tests", getApplication()),
         "/deployments");
     assertThat(imageFiles, hasItem("/deployments/ROOT.war"));
-    assertThat(invocationResult.getStdOut(), containsString(
-        "[INFO] k8s: webapp: HINT: Tomcat webapps dir is set to `webapps-javaee` by default for retrocompatibility. If your project is already JakartaEE compliant, set `jkube.generator.webapp.env` to `TOMCAT_WEBAPPS_DIR=webapps` for a faster startup."));
+    assertThat(invocationResult.getStdOut(), not(containsString(
+        "[INFO] k8s: webapp: HINT: Tomcat webapps dir is set to `webapps-javaee` by default for retrocompatibility. If your project is already JakartaEE compliant, set `jkube.generator.webapp.env` to `TOMCAT_WEBAPPS_DIR=webapps` for a faster startup.")));
   }
 
   @Test
@@ -89,13 +89,13 @@ class TomcatJakartaeeK8sITCase extends Tomcat {
     final InvocationResult invocationResult = maven("k8s:resource");
     // Then
     assertInvocation(invocationResult);
-    final File metaInfDirectory = new File(String.format("../%s/target/classes/META-INF", PROJECT_TOMCAT_JAKARTAEE));
+    final File metaInfDirectory = new File(String.format("../%s/target/classes/META-INF", getProject()));
     assertThat(metaInfDirectory.exists(), equalTo(true));
     assertListResource(new File(metaInfDirectory, "jkube/kubernetes.yml"));
-    assertThat(new File(metaInfDirectory, "jkube/kubernetes/webapp-tomcat-jakartaee-deployment.yml"),
-        yaml(not(anEmptyMap())));
-    assertThat(new File(metaInfDirectory, "jkube/kubernetes/webapp-tomcat-jakartaee-service.yml"),
-        yaml(not(anEmptyMap())));
+    assertThat(new File(metaInfDirectory, "jkube/kubernetes/webapp-tomcat-jakartaee-with-webapps-dir-deployment.yml"),
+      yaml(not(anEmptyMap())));
+    assertThat(new File(metaInfDirectory, "jkube/kubernetes/webapp-tomcat-jakartaee-with-webapps-dir-service.yml"),
+      yaml(not(anEmptyMap())));
   }
 
   @Test
@@ -108,45 +108,46 @@ class TomcatJakartaeeK8sITCase extends Tomcat {
     // Then
     assertInvocation(invocationResult);
     final Pod pod = assertThatShouldApplyResources();
-    awaitDeployment(pod.getMetadata().getNamespace(), "integration-tests/webapp-tomcat-jakartaee:latest");
+    awaitDeployment(pod.getMetadata().getNamespace(), "integration-tests/webapp-tomcat-jakartaee-with-webapps-dir:latest");
     awaitService(this, pod.getMetadata().getNamespace()) //
-        .assertIsClusterIp();
-  }
-
-  @Test
-  @Order(3)
-  @DisplayName("The JakartaEE servlet, exposed as a NodePort Service, should return a string and contain `Hello World`")
-  void testJakartaeeNodePortResponse() throws Exception {
-    // Given
-    final Service service = serviceSpecTypeToNodePort();
-    // Then
-    awaitService(this, service.getMetadata().getNamespace()).assertNodePortResponse("http",
-        containsString("Hello World"), "hello-world?name=World");
+      .assertIsClusterIp();
   }
 
   @Test
   @Order(3)
   @ResourceLock(value = CLUSTER_RESOURCE_INTENSIVE, mode = READ_WRITE)
-  @DisplayName("k8s:log, should retrieve log with migration notice")
-  void k8sLog() throws Exception {
+  @DisplayName("JakartaEE Service as NodePort response should return String")
+  void testJakartaEENodePortResponse() throws Exception {
+    // Given
+    final Service service = serviceSpecTypeToNodePort();
+    // Then
+    awaitService(this, service.getMetadata().getNamespace()) //
+        .assertNodePortResponse("http", containsString("Hello World"), "hello-world?name=World");
+  }
+
+  @Test
+  @Order(3)
+  @ResourceLock(value = CLUSTER_RESOURCE_INTENSIVE, mode = READ_WRITE)
+  @DisplayName("k8s:log, should retrieve log without JavaEE migration notice")
+  void k8sLogWithoutJavaeeMigrationNotice() throws Exception {
     // When
     final MavenInvocationResult invocationResult = maven("k8s:log", properties("jkube.log.follow", "false"));
     // Then
     assertInvocation(invocationResult);
-    assertLogWithMigrationNotice(invocationResult.getStdOut());
+    assertLogWithoutMigrationNotice(invocationResult.getStdOut());
   }
 
   @Test
   @Order(4)
   @DisplayName("k8s:undeploy, should delete all applied resources")
-  void k8sUndeployJakartaEE() throws Exception {
+  void k8sUndeploy() throws Exception {
     // When
     final InvocationResult invocationResult = maven("k8s:undeploy");
     // Then
     assertInvocation(invocationResult);
     assertJKube(this) //
-        .assertThatShouldDeleteAllAppliedResources() //
-        .assertDeploymentDeleted();
+      .assertThatShouldDeleteAllAppliedResources() //
+      .assertDeploymentDeleted();
   }
 
 }

@@ -42,9 +42,11 @@ import static org.hamcrest.Matchers.stringContainsInOrder;
 abstract class Tomcat implements JKubeCase, MavenCase {
 
   static final String PROJECT_TOMCAT_JAKARTAEE = "projects-to-be-tested/maven/webapp/tomcat-jakartaee";
+  static final String PROJECT_TOMCAT_JAKARTAEE_WITH_WEBAPPS_DIR = "projects-to-be-tested/maven/webapp/tomcat-jakartaee-with-webapps-dir";
   static final String PROJECT_TOMCAT_JAVAEE = "projects-to-be-tested/maven/webapp/tomcat-javaeelegacy";
   static final String PROJECT_TOMCAT_JAVAEE_WITH_WEBAPPS_DIR = "projects-to-be-tested/maven/webapp/tomcat-javaeelegacy-with-webapps-dir";
   static final String APPLICATION_NAME_TOMCAT_JAKARTAEE = "webapp-tomcat-jakartaee";
+  static final String APPLICATION_NAME_TOMCAT_JAKARTAEE_WITH_WEBAPPS_DIR = "webapp-tomcat-jakartaee-with-webapps-dir";
   static final String APPLICATION_NAME_TOMCAT_JAVAEE = "webapp-tomcat-javaee-legacy";
   static final String APPLICATION_NAME_TOMCAT_JAVAEE_WITH_WEBAPPS_DIR = "webapp-tomcat-javaee-legacy-with-webapps-dir";
 
