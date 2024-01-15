@@ -409,6 +409,7 @@
         <module>projects-to-be-tested/maven/webapp/wildfly</module>
         <module>projects-to-be-tested/maven/webapp/zero-config</module>
         <module>projects-to-be-tested/maven/webapp/tomcat-jakartaee</module>
+        <module>projects-to-be-tested/maven/webapp/tomcat-jakartaee-with-webapps-dir</module>
         <module>projects-to-be-tested/maven/webapp/tomcat-javaeelegacy</module>
         <module>projects-to-be-tested/maven/webapp/tomcat-javaeelegacy-with-webapps-dir</module>
       </modules>
