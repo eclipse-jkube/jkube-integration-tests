@@ -26,15 +26,16 @@
     <relativePath>../../../../pom.xml</relativePath>
   </parent>
 
-  <artifactId>webapp-jetty-watch</artifactId>
+  <artifactId>webapp-jetty-watch-none</artifactId>
   <packaging>war</packaging>
-  <name>${global.name} :: WebApp :: Jetty (Watch)</name>
+  <name>${global.name} :: WebApp :: Jetty Watch :: None</name>
   <description>
-    WebApp with Jetty as container (watch mode test)
+    WebApp with Jetty as container (watch mode test jkube.watch.mode=none)
   </description>
 
   <properties>
     <jkube.enricher.jkube-service.type>NodePort</jkube.enricher.jkube-service.type>
+    <jkube.watch.mode>none</jkube.watch.mode>
   </properties>
   <build>
     <plugins>
