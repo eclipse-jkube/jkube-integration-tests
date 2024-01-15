@@ -47,7 +47,7 @@ abstract class JettyK8sWatch implements JKubeCase, MavenCase {
   static final String PROJECT_JETTY_WATCH = "projects-to-be-tested/maven/webapp/jetty-watch";
   static final String APPLICATION_JETTY_WATCH = "webapp-jetty-watch";
 
-  private static KubernetesClient kubernetesClient;
+  private KubernetesClient kubernetesClient;
   File fileToChange;
   private String originalFileContent;
   Pod originalPod;

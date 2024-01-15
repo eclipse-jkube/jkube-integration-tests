@@ -32,7 +32,7 @@ abstract class Jetty implements JKubeCase, MavenCase {
 
   static final String PROJECT_JETTY = "projects-to-be-tested/maven/webapp/jetty";
 
-  private static KubernetesClient kubernetesClient;
+  private KubernetesClient kubernetesClient;
 
   @Override
   public KubernetesClient getKubernetesClient() {
