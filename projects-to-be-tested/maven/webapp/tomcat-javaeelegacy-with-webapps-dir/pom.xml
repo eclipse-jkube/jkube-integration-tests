@@ -24,24 +24,28 @@
     <relativePath>../../../../pom.xml</relativePath>
   </parent>
 
-  <artifactId>webapp-tomcat-jakartaee</artifactId>
+  <artifactId>webapp-tomcat-javaee-legacy-with-webapps-dir</artifactId>
   <packaging>war</packaging>
-  <name>${global.name} :: WebApp :: Tomcat :: Jakartaee</name>
+  <name>${global.name} :: WebApp :: Tomcat :: JavaEELegacy (webapps dir)</name>
   <description>
-    Tomcat Jakartaee webapp project
+    Tomcat Javaee legacy webapp project with webapps directory (should fail)
   </description>
+
+  <properties>
+    <jkube.generator.webapp.env>TOMCAT_WEBAPPS_DIR=webapps</jkube.generator.webapp.env>
+  </properties>
 
   <dependencies>
     <dependency>
-      <groupId>jakarta.servlet</groupId>
-      <artifactId>jakarta.servlet-api</artifactId>
-      <version>${jakarta.servlet-api.version}</version>
+      <groupId>javax.servlet</groupId>
+      <artifactId>javax.servlet-api</artifactId>
+      <version>${javax.servlet-api.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>jakarta.servlet.jsp</groupId>
-      <artifactId>jakarta.servlet.jsp-api</artifactId>
-      <version>${jakarta.servlet.jsp-api.version}</version>
+      <groupId>javax.servlet.jsp</groupId>
+      <artifactId>javax.servlet.jsp-api</artifactId>
+      <version>${javax.servlet.jsp-api.version}</version>
       <scope>provided</scope>
     </dependency>
   </dependencies>
