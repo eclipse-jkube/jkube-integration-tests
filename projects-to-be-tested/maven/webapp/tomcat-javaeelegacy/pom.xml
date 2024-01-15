@@ -31,6 +31,10 @@
     Tomcat Javaee legacy webapp project
   </description>
 
+  <properties>
+    <jkube.enricher.jkube-service.type>NodePort</jkube.enricher.jkube-service.type>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>javax.servlet</groupId>

@@ -14,7 +14,6 @@
 package org.eclipse.jkube.integrationtests.webapp.tomcat;
 
 import io.fabric8.kubernetes.api.model.Pod;
-import io.fabric8.kubernetes.api.model.Service;
 import org.apache.maven.shared.invoker.InvocationResult;
 import org.eclipse.jkube.integrationtests.maven.MavenInvocationResult;
 import org.junit.jupiter.api.DisplayName;
@@ -110,7 +109,7 @@ class TomcatJavaeeWithWebappsDirK8sITCase extends Tomcat {
     final Pod pod = assertThatShouldApplyResources();
     awaitDeployment(pod.getMetadata().getNamespace(), "integration-tests/webapp-tomcat-javaee-legacy-with-webapps-dir:latest");
     awaitService(this, pod.getMetadata().getNamespace()) //
-      .assertIsClusterIp();
+      .assertIsNodePort();
   }
 
   @Test
@@ -118,11 +117,9 @@ class TomcatJavaeeWithWebappsDirK8sITCase extends Tomcat {
   @ResourceLock(value = CLUSTER_RESOURCE_INTENSIVE, mode = READ_WRITE)
   @DisplayName("JavaEE Service as NodePort response should return 500 and java.lang.NoClassDefFoundError message")
   void testJavaEENodePortResponseError() throws Exception {
-    // Given
-    final Service service = serviceSpecTypeToNodePort();
-    // Then
-    // n.b. only the first request will fail with 500, subsequent requests will return 404
-    awaitService(this, service.getMetadata().getNamespace())
+    final Pod pod = assertThatShouldApplyResources();
+    awaitService(this, pod.getMetadata().getNamespace())
+      // n.b. only the first request will fail with 500, subsequent requests will return 404
       .assertNodePortResponse("http", containsString("java.lang.NoClassDefFoundError"), "hello-world?name=World");
   }
 
