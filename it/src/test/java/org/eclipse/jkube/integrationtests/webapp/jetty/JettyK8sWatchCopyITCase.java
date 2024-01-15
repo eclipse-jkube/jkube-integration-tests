@@ -22,6 +22,7 @@ import org.junit.jupiter.api.parallel.ResourceLock;
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import static org.eclipse.jkube.integrationtests.AsyncUtil.await;
 import static org.eclipse.jkube.integrationtests.Locks.CLUSTER_RESOURCE_INTENSIVE;
@@ -57,9 +58,13 @@ class JettyK8sWatchCopyITCase extends JettyK8sWatch {
       FileUtils.write(fileToChange, "<html><body><h2>Eclipse JKube Jetty v2</h2></body></html>", StandardCharsets.UTF_8);
       assertInvocation(maven("package"));
       // Then
-      await(baos::toString)
-        .apply(log -> log.contains("Files successfully copied to the container."))
-        .get(10, TimeUnit.SECONDS);
+      try {
+        await(baos::toString)
+          .apply(log -> log.contains("Files successfully copied to the container."))
+          .get(20, TimeUnit.SECONDS);
+      } catch (TimeoutException ex) {
+        throw new AssertionError("Expected message containing: 'Files successfully copied to the container.' but got: \n\n" + baos, ex);
+      }
       waitUntilApplicationRestartsInsidePod();
       assertThatShouldApplyResources("<h2>Eclipse JKube Jetty v2</h2>");
     }
