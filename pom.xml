@@ -42,6 +42,10 @@
     <gradle.version>8.2.1</gradle.version>
     <gradle-api-maven-plugin-version>0.0.3</gradle-api-maven-plugin-version>
     <hamcrest.version>2.0.0.0</hamcrest.version>
+    <jakarta.servlet-api.version>6.0.0</jakarta.servlet-api.version>
+    <jakarta.servlet.jsp-api.version>3.1.1</jakarta.servlet.jsp-api.version>
+    <javax.servlet-api.version>4.0.1</javax.servlet-api.version>
+    <javax.servlet.jsp-api.version>2.3.3</javax.servlet.jsp-api.version>
     <jkube.version>1.15-SNAPSHOT</jkube.version>
     <junit.version>5.10.0</junit.version>
     <karaf.version>4.4.4</karaf.version>
@@ -406,6 +410,7 @@
         <module>projects-to-be-tested/maven/webapp/zero-config</module>
         <module>projects-to-be-tested/maven/webapp/tomcat-jakartaee</module>
         <module>projects-to-be-tested/maven/webapp/tomcat-javaeelegacy</module>
+        <module>projects-to-be-tested/maven/webapp/tomcat-javaeelegacy-with-webapps-dir</module>
       </modules>
       <activation>
         <file>
