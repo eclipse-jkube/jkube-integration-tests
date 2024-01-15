@@ -30,7 +30,7 @@ abstract class Complete implements JKubeCase, MavenCase {
 
   private static final String PROJECT_COMPLETE = "projects-to-be-tested/maven/spring/complete";
 
-  private static KubernetesClient kubernetesClient;
+  private KubernetesClient kubernetesClient;
 
   @Override
   public KubernetesClient getKubernetesClient() {

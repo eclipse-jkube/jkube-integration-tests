@@ -45,7 +45,7 @@ abstract class Tomcat implements JKubeCase, MavenCase {
   static final String APPLICATION_NAME_TOMCAT_JAVAEE = "webapp-tomcat-javaee-legacy";
   static final String APPLICATION_NAME_TOMCAT_JAVAEE_WITH_WEBAPPS_DIR = "webapp-tomcat-javaee-legacy-with-webapps-dir";
 
-  private static KubernetesClient kubernetesClient;
+  private KubernetesClient kubernetesClient;
 
   @Override
   public KubernetesClient getKubernetesClient() {
