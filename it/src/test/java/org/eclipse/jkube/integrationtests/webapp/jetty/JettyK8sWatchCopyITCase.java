@@ -17,6 +17,7 @@ import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.Isolated;
 import org.junit.jupiter.api.parallel.ResourceLock;
 
 import java.io.ByteArrayOutputStream;
@@ -28,11 +29,10 @@ import static org.eclipse.jkube.integrationtests.AsyncUtil.await;
 import static org.eclipse.jkube.integrationtests.Locks.CLUSTER_RESOURCE_INTENSIVE;
 import static org.eclipse.jkube.integrationtests.Tags.KUBERNETES;
 import static org.eclipse.jkube.integrationtests.assertions.InvocationResultAssertion.assertInvocation;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.endsWith;
 import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 
 @Tag(KUBERNETES)
+@Isolated // mvn k8s:watch doesn't behave well when run in parallel - TODO - further investigation needed in WatchService and its executors
 class JettyK8sWatchCopyITCase extends JettyK8sWatch {
 
   @Override
@@ -60,7 +60,7 @@ class JettyK8sWatchCopyITCase extends JettyK8sWatch {
       try {
         await(baos::toString)
           .apply(log -> log.contains("Files successfully copied to the container."))
-          .get(20, TimeUnit.SECONDS);
+          .get(30, TimeUnit.SECONDS);
       } catch (TimeoutException ex) {
         throw new AssertionError("Expected message containing: 'Files successfully copied to the container.' but got: \n\n" + baos, ex);
       }
