@@ -67,10 +67,8 @@ abstract class ZeroConfig implements JKubeCase, MavenCase {
     final Pod pod = awaitPod(this).getKubernetesResource();
     final Service serviceToUpdate = service(pod.getMetadata().getNamespace())
       .edit(s -> new ServiceBuilder(s).editSpec().withType("NodePort").endSpec().build());
-    service(serviceToUpdate.getMetadata().getNamespace())
-      .waitUntilReady(10, TimeUnit.SECONDS);
     final Service updatedService = service(serviceToUpdate.getMetadata().getNamespace())
-      .waitUntilCondition(s -> s.getSpec().getType().equals("NodePort"), 10, TimeUnit.SECONDS);
+      .waitUntilCondition(s -> s.getSpec().getType().equals("NodePort") && s.getSpec().getPorts().iterator().next().getNodePort() != null, 10, TimeUnit.SECONDS);
     final long throttleMilliseconds = 500L;
     Thread.sleep(throttleMilliseconds);
     return updatedService;
