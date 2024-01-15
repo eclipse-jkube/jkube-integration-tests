@@ -15,15 +15,10 @@ package org.eclipse.jkube.integrationtests.webapp.tomcat;
 
 import io.fabric8.junit.jupiter.api.KubernetesTest;
 import io.fabric8.kubernetes.api.model.Pod;
-import io.fabric8.kubernetes.api.model.Service;
-import io.fabric8.kubernetes.api.model.ServiceBuilder;
 import io.fabric8.kubernetes.client.KubernetesClient;
-import io.fabric8.kubernetes.client.dsl.ServiceResource;
 import org.eclipse.jkube.integrationtests.JKubeCase;
 import org.eclipse.jkube.integrationtests.assertions.DeploymentAssertion;
 import org.eclipse.jkube.integrationtests.maven.MavenCase;
-
-import java.util.concurrent.TimeUnit;
 
 import static org.eclipse.jkube.integrationtests.assertions.PodAssertion.assertPod;
 import static org.eclipse.jkube.integrationtests.assertions.PodAssertion.awaitPod;
@@ -62,27 +57,9 @@ abstract class Tomcat implements JKubeCase, MavenCase {
     assertPod(pod).apply(this).logContains("Catalina.start Server startup", 60);
     awaitService(this, pod.getMetadata().getNamespace()) //
       .assertPorts(hasSize(1)) //
-      .assertPort("http", 8080, false) //
-      .assertIsClusterIp();
+      .assertPort("http", 8080, true) //
+      .assertIsNodePort();
     return pod;
-  }
-
-  @SuppressWarnings("squid:S2925")
-  final Service serviceSpecTypeToNodePort() throws Exception {
-    final Pod pod = awaitPod(this).getKubernetesResource();
-    final Service serviceToUpdate = service(pod.getMetadata().getNamespace()) //
-      .edit(s -> new ServiceBuilder(s).editSpec().withType("NodePort").editFirstPort()
-        .withPort(8080).endPort().endSpec().build());
-    service(serviceToUpdate.getMetadata().getNamespace()).waitUntilReady(10, TimeUnit.SECONDS);
-    final Service updatedService = service(serviceToUpdate.getMetadata().getNamespace()).waitUntilCondition(
-      s -> s.getSpec().getType().equals("NodePort"), 10, TimeUnit.SECONDS);
-    final long throttleMilliseconds = 500L;
-    Thread.sleep(throttleMilliseconds);
-    return updatedService;
-  }
-
-  private ServiceResource<Service> service(String namespace) {
-    return getKubernetesClient().services().inNamespace(namespace).withName(getApplication());
   }
 
   final void assertLogWithMigrationNotice(String log) {

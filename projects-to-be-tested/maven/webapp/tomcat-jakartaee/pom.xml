@@ -31,6 +31,10 @@
     Tomcat Jakartaee webapp project
   </description>
 
+  <properties>
+    <jkube.enricher.jkube-service.type>NodePort</jkube.enricher.jkube-service.type>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>jakarta.servlet</groupId>

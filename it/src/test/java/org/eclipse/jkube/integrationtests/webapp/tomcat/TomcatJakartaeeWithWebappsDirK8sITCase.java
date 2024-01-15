@@ -14,7 +14,6 @@
 package org.eclipse.jkube.integrationtests.webapp.tomcat;
 
 import io.fabric8.kubernetes.api.model.Pod;
-import io.fabric8.kubernetes.api.model.Service;
 import org.apache.maven.shared.invoker.InvocationResult;
 import org.eclipse.jkube.integrationtests.maven.MavenInvocationResult;
 import org.junit.jupiter.api.DisplayName;
@@ -110,7 +109,7 @@ class TomcatJakartaeeWithWebappsDirK8sITCase extends Tomcat {
     final Pod pod = assertThatShouldApplyResources();
     awaitDeployment(pod.getMetadata().getNamespace(), "integration-tests/webapp-tomcat-jakartaee-with-webapps-dir:latest");
     awaitService(this, pod.getMetadata().getNamespace()) //
-      .assertIsClusterIp();
+      .assertIsNodePort();
   }
 
   @Test
@@ -118,10 +117,8 @@ class TomcatJakartaeeWithWebappsDirK8sITCase extends Tomcat {
   @ResourceLock(value = CLUSTER_RESOURCE_INTENSIVE, mode = READ_WRITE)
   @DisplayName("JakartaEE Service as NodePort response should return String")
   void testJakartaEENodePortResponse() throws Exception {
-    // Given
-    final Service service = serviceSpecTypeToNodePort();
-    // Then
-    awaitService(this, service.getMetadata().getNamespace()) //
+    final Pod pod = assertThatShouldApplyResources();
+    awaitService(this, pod.getMetadata().getNamespace())
         .assertNodePortResponse("http", containsString("Hello World"), "hello-world?name=World");
   }
 

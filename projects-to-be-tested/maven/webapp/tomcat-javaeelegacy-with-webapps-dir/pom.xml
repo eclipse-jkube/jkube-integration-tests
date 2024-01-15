@@ -32,6 +32,7 @@
   </description>
 
   <properties>
+    <jkube.enricher.jkube-service.type>NodePort</jkube.enricher.jkube-service.type>
     <jkube.generator.webapp.env>TOMCAT_WEBAPPS_DIR=webapps</jkube.generator.webapp.env>
   </properties>
 
