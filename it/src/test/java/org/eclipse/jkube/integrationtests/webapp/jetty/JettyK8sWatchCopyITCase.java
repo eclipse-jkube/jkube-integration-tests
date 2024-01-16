@@ -17,7 +17,6 @@ import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.parallel.Isolated;
 import org.junit.jupiter.api.parallel.ResourceLock;
 
 import java.io.ByteArrayOutputStream;
@@ -32,7 +31,6 @@ import static org.eclipse.jkube.integrationtests.assertions.InvocationResultAsse
 import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 
 @Tag(KUBERNETES)
-@Isolated // mvn k8s:watch doesn't behave well when run in parallel - TODO - further investigation needed in WatchService and its executors
 class JettyK8sWatchCopyITCase extends JettyK8sWatch {
 
   @Override
