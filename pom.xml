@@ -46,7 +46,7 @@
     <jakarta.servlet.jsp-api.version>3.1.1</jakarta.servlet.jsp-api.version>
     <javax.servlet-api.version>4.0.1</javax.servlet-api.version>
     <javax.servlet.jsp-api.version>2.3.3</javax.servlet.jsp-api.version>
-    <jkube.version>1.15-SNAPSHOT</jkube.version>
+    <jkube.version>1.16-SNAPSHOT</jkube.version>
     <junit.version>5.10.0</junit.version>
     <karaf.version>4.4.4</karaf.version>
     <license-maven-plugin.version>4.2</license-maven-plugin.version>
