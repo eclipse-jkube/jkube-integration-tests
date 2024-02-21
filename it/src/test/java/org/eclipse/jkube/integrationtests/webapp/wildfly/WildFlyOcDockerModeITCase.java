@@ -32,6 +32,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.eclipse.jkube.integrationtests.Locks.CLUSTER_RESOURCE_INTENSIVE;
+import static org.eclipse.jkube.integrationtests.Tags.OPEN_SHIFT_OSCI;
 import static org.eclipse.jkube.integrationtests.assertions.InvocationResultAssertion.assertInvocation;
 import static org.eclipse.jkube.integrationtests.assertions.JKubeAssertions.assertJKube;
 import static org.eclipse.jkube.integrationtests.assertions.KubernetesListAssertion.assertListResource;
@@ -47,6 +48,7 @@ import static org.hamcrest.Matchers.stringContainsInOrder;
 import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 
 @Tag(Tags.OPEN_SHIFT)
+@Tag(OPEN_SHIFT_OSCI)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class WildFlyOcDockerModeITCase extends WildFly implements OpenShiftCase {
 

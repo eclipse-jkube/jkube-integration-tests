@@ -34,6 +34,7 @@ import java.util.stream.Stream;
 
 import static org.eclipse.jkube.integrationtests.Tags.KUBERNETES;
 import static org.eclipse.jkube.integrationtests.Tags.OPEN_SHIFT;
+import static org.eclipse.jkube.integrationtests.Tags.OPEN_SHIFT_OSCI;
 import static org.eclipse.jkube.integrationtests.assertions.InvocationResultAssertion.assertInvocation;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -70,6 +71,7 @@ class MultiProfileITCase implements MavenCase {
 
   @Test
   @Tag(OPEN_SHIFT)
+  @Tag(OPEN_SHIFT_OSCI)
   @DisplayName("oc:resource, no specified default profile, should create default resource manifests")
   void ocResource() throws Exception {
     // When
@@ -92,6 +94,7 @@ class MultiProfileITCase implements MavenCase {
 
   @Test
   @Tag(OPEN_SHIFT)
+  @Tag(OPEN_SHIFT_OSCI)
   @DisplayName("oc:resource, production profile, should create production resource manifests")
   void ocResourceProductionProfile() throws Exception {
     // When

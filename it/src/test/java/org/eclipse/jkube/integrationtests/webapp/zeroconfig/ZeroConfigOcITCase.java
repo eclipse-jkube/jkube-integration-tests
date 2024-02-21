@@ -31,6 +31,7 @@ import java.io.File;
 
 import static org.eclipse.jkube.integrationtests.Locks.CLUSTER_RESOURCE_INTENSIVE;
 import static org.eclipse.jkube.integrationtests.Tags.OPEN_SHIFT;
+import static org.eclipse.jkube.integrationtests.Tags.OPEN_SHIFT_OSCI;
 import static org.eclipse.jkube.integrationtests.assertions.InvocationResultAssertion.assertInvocation;
 import static org.eclipse.jkube.integrationtests.assertions.JKubeAssertions.assertJKube;
 import static org.eclipse.jkube.integrationtests.assertions.KubernetesListAssertion.assertListResource;
@@ -45,6 +46,7 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 
 @Tag(OPEN_SHIFT)
+@Tag(OPEN_SHIFT_OSCI)
 @TestMethodOrder(OrderAnnotation.class)
 class ZeroConfigOcITCase extends ZeroConfig implements OpenShiftCase {
 

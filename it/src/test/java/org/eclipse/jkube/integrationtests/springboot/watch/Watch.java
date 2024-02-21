@@ -45,7 +45,7 @@ import static org.hamcrest.Matchers.stringContainsInOrder;
 import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 
 @KubernetesTest(createEphemeralNamespace = false)
-abstract class Watch  implements JKubeCase, MavenCase {
+abstract class Watch implements JKubeCase, MavenCase {
 
   private static final String PROJECT_SPRING_BOOT_WATCH = "projects-to-be-tested/maven/spring/watch";
 

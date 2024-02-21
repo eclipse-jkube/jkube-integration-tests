@@ -32,6 +32,7 @@ import org.junit.jupiter.api.parallel.ResourceLock;
 
 import static org.eclipse.jkube.integrationtests.Locks.CLUSTER_RESOURCE_INTENSIVE;
 import static org.eclipse.jkube.integrationtests.Tags.OPEN_SHIFT;
+import static org.eclipse.jkube.integrationtests.Tags.OPEN_SHIFT_OSCI;
 import static org.eclipse.jkube.integrationtests.assertions.DeploymentConfigAssertion.awaitDeploymentConfig;
 import static org.eclipse.jkube.integrationtests.assertions.JKubeAssertions.assertJKube;
 import static org.eclipse.jkube.integrationtests.assertions.KubernetesListAssertion.assertListResource;
@@ -56,6 +57,7 @@ import static org.hamcrest.io.FileMatchers.anExistingFile;
 import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 
 @Tag(OPEN_SHIFT)
+@Tag(OPEN_SHIFT_OSCI)
 @Application("dsl")
 @KubernetesTest(createEphemeralNamespace = false)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
