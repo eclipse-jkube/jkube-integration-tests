@@ -11,7 +11,7 @@ way.
 ### Tags
 
 There are three [tags](src/test/java/org/eclipse/jkube/integrationtests/Tags.java) which match with a maven profile
-(`Kubernetes`, `OpenShift` & `Windows`).
+(`Kubernetes`, `OpenShift`, `OpenShiftOSCI` & `Windows`).
 
 Each of these tags should be applied to a specific test case suite in order to execute
 the given tests only when that profile is specified.

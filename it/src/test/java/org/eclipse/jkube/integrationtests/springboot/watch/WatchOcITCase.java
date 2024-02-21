@@ -16,6 +16,7 @@ package org.eclipse.jkube.integrationtests.springboot.watch;
 import org.junit.jupiter.api.Tag;
 
 import static org.eclipse.jkube.integrationtests.Tags.OPEN_SHIFT;
+import static org.eclipse.jkube.integrationtests.Tags.OPEN_SHIFT_OSCI;
 
 @Tag(OPEN_SHIFT)
 class WatchOcITCase extends Watch {

@@ -32,6 +32,7 @@ import java.util.Properties;
 
 import static org.eclipse.jkube.integrationtests.Tags.KUBERNETES;
 import static org.eclipse.jkube.integrationtests.Tags.OPEN_SHIFT;
+import static org.eclipse.jkube.integrationtests.Tags.OPEN_SHIFT_OSCI;
 import static org.eclipse.jkube.integrationtests.assertions.InvocationResultAssertion.assertInvocation;
 import static org.eclipse.jkube.integrationtests.assertions.YamlAssertion.yaml;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -81,6 +82,7 @@ class HelmConfigITCase implements JKubeCase, MavenCase {
   @Test
   @Order(1)
   @Tag(OPEN_SHIFT)
+  @Tag(OPEN_SHIFT_OSCI)
   @DisplayName("oc:resource, no specified profile, should create default resource manifests")
   void ocResource() throws Exception {
     // When
@@ -129,6 +131,7 @@ class HelmConfigITCase implements JKubeCase, MavenCase {
   @Test
   @Order(2)
   @Tag(OPEN_SHIFT)
+  @Tag(OPEN_SHIFT_OSCI)
   @DisplayName("oc:helm, should create Helm charts")
   void ocHelm() throws Exception {
     // When
@@ -188,6 +191,7 @@ class HelmConfigITCase implements JKubeCase, MavenCase {
   @Test
   @Order(3)
   @Tag(OPEN_SHIFT)
+  @Tag(OPEN_SHIFT_OSCI)
   @DisplayName("oc:helm-push, should push the charts")
   void ocHelmPush() throws Exception {
     // Given
