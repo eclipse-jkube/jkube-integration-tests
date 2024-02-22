@@ -100,14 +100,14 @@ class HelmConfigITCase implements JKubeCase, MavenCase {
     final InvocationResult invocationResult = maven("k8s:helm");
     // Then
     assertInvocation(invocationResult);
-    assertThat(new File(String.format("../%s/target/jkube/helm/This is the chart name/kubernetes/This is the chart name-1.0-KUBERNETES.tar", getProject()))
+    assertThat(new File(String.format("../%s/target/jkube/helm/the-chart-name/kubernetes/the-chart-name-1.0-KUBERNETES.tar", getProject()))
       .exists(), equalTo(true));
     final File helmDirectory = new File(
-      String.format("../%s/target/jkube/helm/This is the chart name/kubernetes", getProject()));
+      String.format("../%s/target/jkube/helm/the-chart-name/kubernetes", getProject()));
     assertThat(new File(helmDirectory, "Chart.yaml"), yaml(allOf(
       aMapWithSize(10),
       hasEntry("apiVersion", "v1"),
-      hasEntry("name", "This is the chart name"),
+      hasEntry("name", "the-chart-name"),
       hasEntry("version", "1.0-KUBERNETES"),
       hasEntry("description", "Description different to that in the pom.xml"),
       hasEntry("home", "https://www.home.example.com"),
@@ -173,7 +173,6 @@ class HelmConfigITCase implements JKubeCase, MavenCase {
   void k8sHelmPush() throws Exception {
     // Given
     final Properties properties = properties(
-      "jkube.helm.chart", "the-chart-name",
       "jkube.helm.stableRepository.type", "OCI",
       "jkube.helm.stableRepository.name", "docker",
       "jkube.helm.stableRepository.url", "oci://" + registry,
@@ -196,8 +195,7 @@ class HelmConfigITCase implements JKubeCase, MavenCase {
   void ocHelmPush() throws Exception {
     // Given
     final Properties properties = properties(
-      "jkube.helm.chart", "the-chart-name",
-      "jkube.helm.stableRepository.type", "OCI",
+        "jkube.helm.stableRepository.type", "OCI",
       "jkube.helm.stableRepository.name", "docker",
       "jkube.helm.stableRepository.url", "oci://" + registry,
       "jkube.helm.stableRepository.username", "ignored",
@@ -207,7 +205,7 @@ class HelmConfigITCase implements JKubeCase, MavenCase {
     final InvocationResult invocationResult = maven("oc:helm-push", properties);
     // Then
     assertInvocation(invocationResult);
-    assertThat(httpGet("http://" + registry + "/v2/the-chart-name/tags/list").body(),
-      containsString("{\"name\":\"the-chart-name\",\"tags\":[\"0.1-OC\"]}"));
+    assertThat(httpGet("http://" + registry + "/v2/different-name-for-oc/tags/list").body(),
+      containsString("{\"name\":\"different-name-for-oc\",\"tags\":[\"0.1-OC\"]}"));
   }
 }

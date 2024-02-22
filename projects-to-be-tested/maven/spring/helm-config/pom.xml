@@ -65,7 +65,7 @@
         <artifactId>kubernetes-maven-plugin</artifactId>
         <configuration>
           <helm>
-            <chart>This is the chart name</chart>
+            <chart>the-chart-name</chart>
             <chartExtension>tar</chartExtension>
             <version>1.0-KUBERNETES</version>
             <description>Description different to that in the pom.xml</description>
