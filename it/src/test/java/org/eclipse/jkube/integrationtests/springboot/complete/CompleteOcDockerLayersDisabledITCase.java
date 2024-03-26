@@ -127,4 +127,11 @@ class CompleteOcDockerLayersDisabledITCase extends Complete implements OpenShift
       .assertThatShouldDeleteAllAppliedResources();
     cleanUpCluster();
   }
+
+  @Override
+  public void cleanUpCluster() {
+    // NO OP
+    // Don't clean up cluster to avoid removing builds and image streams for other tests
+    // TODO: Split the Complete test project by profile into multiple projects to avoid this issue
+  }
 }
