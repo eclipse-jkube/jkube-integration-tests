@@ -19,7 +19,7 @@ spec:
       volumes:
         - name: jkube
           gitRepo:
-            repository: 'https://github.com/eclipse/jkube.git'
+            repository: 'https://github.com/eclipse-jkube/jkube.git'
             revision: '0.1.0'
       containers:
         - command: ["java"]

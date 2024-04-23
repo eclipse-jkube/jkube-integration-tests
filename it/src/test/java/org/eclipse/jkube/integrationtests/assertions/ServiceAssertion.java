@@ -109,7 +109,7 @@ public class ServiceAssertion extends KubernetesClientAssertion<Service> {
       .get(KubernetesClientAssertion.DEFAULT_AWAIT_TIME_SECONDS, TimeUnit.SECONDS);
     assertThat(response.body(), notNullValue());
     // replacing character `–` with `-` to avoid issue described in
-    // https://github.com/jkubeio/jkube-integration-tests/issues/183
+    // https://github.com/eclipse-jkube/jkube-integration-tests/issues/183
     assertThat(response.body().replace("–", "-"), responseBodyMatcher);
     return this;
   }
