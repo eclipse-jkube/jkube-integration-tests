@@ -99,7 +99,8 @@ class CompleteK8sJibITCase extends Complete {
     assertThat(invocationResult.getStdOut(), stringContainsInOrder(
       "JIB image build started",
       "JIB> [==============================] 100.0% complete",
-      "docker-build.tar successfully built"
+      ".tar successfully built",
+      "[INFO] BUILD SUCCESS"
     ));
   }
 
