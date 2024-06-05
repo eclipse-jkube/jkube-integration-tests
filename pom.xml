@@ -46,6 +46,7 @@
     <jakarta.servlet.jsp-api.version>3.1.1</jakarta.servlet.jsp-api.version>
     <javax.servlet-api.version>4.0.1</javax.servlet-api.version>
     <javax.servlet.jsp-api.version>2.3.3</javax.servlet.jsp-api.version>
+    <!-- JKube version also needs to be updated in projects-to-be-tested/maven/buildpacks/simple/pom.xml -->
     <jkube.version>1.17-SNAPSHOT</jkube.version>
     <junit.version>5.10.0</junit.version>
     <karaf.version>4.4.4</karaf.version>
@@ -290,6 +291,7 @@
         <module>projects-to-be-tested/maven/vertx/simplest</module>
         <module>projects-to-be-tested/maven/wildfly-jar/microprofile</module>
         <module>projects-to-be-tested/maven/karaf/camel-log</module>
+        <module>projects-to-be-tested/maven/buildpacks/simple</module>
       </modules>
       <activation>
         <file>
@@ -311,6 +313,7 @@
                 <include>**/integrationtests/wildfly/jar/**/*ITCase.java</include>
                 <include>**/integrationtests/karaf/**/*ITCase.java</include>
                 <include>**/integrationtests/dsl/**/*ITCase.java</include>
+                <include>**/integrationtests/buildpacks/**/*ITCase.java</include>
               </includes>
             </configuration>
           </plugin>

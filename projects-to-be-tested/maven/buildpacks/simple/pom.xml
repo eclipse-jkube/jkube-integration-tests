@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright (c) 2019 Red Hat, Inc.
+    This program and the accompanying materials are made
+    available under the terms of the Eclipse Public License 2.0
+    which is available at:
+
+        https://www.eclipse.org/legal/epl-2.0/
+
+    SPDX-License-Identifier: EPL-2.0
+
+    Contributors:
+      Red Hat, Inc. - initial API and implementation
+
+-->
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <!--
+    This project does not have any parent pom at the moment because we are building container image using BuildPacks
+    build strategy. BuildPacks starts a fresh maven build inside a docker container where only the current project directory
+    is loaded, not the parent pom. Without excluding parent, it starts failing to resolve a property from parent pom; since
+    project is not compiled from root pom in BuildPacks build container, it’s unable to resolve property from root pom.
+  -->
+
+  <groupId>org.eclipse.jkube.integration-tests</groupId>
+  <artifactId>buildpacks-simple</artifactId>
+  <version>0.0.0-SNAPSHOT</version>
+  <name>JKube :: Integration Tests :: BuildPacks :: Simple</name>
+  <packaging>jar</packaging>
+
+  <properties>
+    <!-- Since there is no parent pom, we have to manually define JKube version here -->
+    <jkube.version>1.17-SNAPSHOT</jkube.version>
+    <jkube.build.strategy>buildpacks</jkube.build.strategy>
+    <jkube.enricher.jkube-service.type>NodePort</jkube.enricher.jkube-service.type>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+  </properties>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.6.1</version>
+        <configuration>
+          <source>1.8</source>
+          <target>1.8</target>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>1.5.0</version>
+        <configuration>
+          <mainClass>org.eclipse.jkube.sample.helloworld.App</mainClass>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>3.0.2</version>
+        <configuration>
+          <archive>
+            <manifest>
+              <mainClass>org.eclipse.jkube.integrationtests.buildpacks.simple.App</mainClass>
+            </manifest>
+          </archive>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.eclipse.jkube</groupId>
+        <artifactId>kubernetes-maven-plugin</artifactId>
+        <version>${jkube.version}</version>
+      </plugin>
+    </plugins>
+  </build>
+</project>

@@ -13,6 +13,7 @@
  */
 package org.eclipse.jkube.integrationtests.docker;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.eclipse.jkube.integrationtests.cli.CliUtils;
 import org.eclipse.jkube.integrationtests.cli.CliUtils.CliResult;
 
@@ -20,6 +21,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -77,6 +79,23 @@ public class DockerUtils {
     if (result.getExitCode() != 0) {
       throw new IOException(String.format("Docker image was not loaded: %s", result.getOutput()));
     }
+  }
+
+  public static List<String> listDockerVolumeNames() throws IOException, InterruptedException {
+    final CliResult result = CliUtils.runCommand("docker volume ls --format=\"{{.Name}}\"");
+    if (result.getExitCode() != 0) {
+      throw new IOException(String.format("Error in listing docker volumes: %s", result.getOutput()));
+    }
+    return Arrays.asList(result.getOutput().split("\r?\n"));
+  }
+
+  public static Map<String, String> getLabels(String id) throws IOException, InterruptedException {
+    final CliResult result = CliUtils.runCommand(String.format("docker inspect -f \"{{json .Config.Labels}}\" %s", id));
+    if (result.getExitCode() != 0) {
+      throw new IOException(String.format("Error in getting labels: %s", result.getOutput()));
+    }
+    ObjectMapper objectMapper = new ObjectMapper();
+    return objectMapper.readValue(result.getOutput(), Map.class);
   }
 
   public static final class DockerImage {
