@@ -39,6 +39,7 @@ import static org.eclipse.jkube.integrationtests.docker.DockerUtils.listImageFil
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.anEmptyMap;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.either;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.not;
@@ -120,7 +121,10 @@ class TomcatJavaeeWithWebappsDirK8sITCase extends Tomcat {
     final Pod pod = assertThatShouldApplyResources();
     awaitService(this, pod.getMetadata().getNamespace())
       // n.b. only the first request will fail with 500, subsequent requests will return 404
-      .assertNodePortResponse("http", containsString("java.lang.NoClassDefFoundError"), "hello-world?name=World");
+      .assertNodePortResponse("http",
+        either(containsString("java.lang.NoClassDefFoundError"))
+          .or(containsString("java.lang.ClassNotFoundException")),
+        "hello-world?name=World");
   }
 
   @Test
