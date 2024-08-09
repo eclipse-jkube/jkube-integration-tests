@@ -27,6 +27,7 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.util.Properties;
 
@@ -207,5 +208,106 @@ class HelmConfigITCase implements JKubeCase, MavenCase {
     assertInvocation(invocationResult);
     assertThat(httpGet("http://" + registry + "/v2/different-name-for-oc/tags/list").body(),
       containsString("{\"name\":\"different-name-for-oc\",\"tags\":[\"0.1-OC\"]}"));
+  }
+
+  @Test
+  @Order(3)
+  @Tag(KUBERNETES)
+  @DisplayName("k8s:helm-uninstall, no release present, display error message")
+  void k8sHelmUninstall_whenNoReleasePresent_thenErrorMessageDisplayed() throws Exception {
+    // Given
+    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+    // When
+    maven("k8s:helm-uninstall", properties("jkube.helm.release.name", "spring-boot-helm-config-k8s"), byteArrayOutputStream);
+    // Then
+    assertThat(byteArrayOutputStream.toString(), allOf(
+      containsString("helm-uninstall failed"),
+      containsString("uninstall: Release not loaded: spring-boot-helm-config-k8s: release: not found")
+    ));
+  }
+
+  @Test
+  @Order(3)
+  @Tag(OPEN_SHIFT)
+  @Tag(OPEN_SHIFT_OSCI)
+  @DisplayName("oc:helm-uninstall, no release present, display error message")
+  void ocHelmUninstall_whenNoReleasePresent_thenErrorMessageDisplayed() throws Exception {
+    // Given
+    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+    // When
+    maven("oc:helm-uninstall", properties("jkube.helm.release.name", "spring-boot-helm-config-oc"), byteArrayOutputStream);
+    // Then
+    assertThat(byteArrayOutputStream.toString(), allOf(
+      containsString("helm-uninstall failed"),
+      containsString("uninstall: Release not loaded: spring-boot-helm-config-oc: release: not found")
+    ));
+  }
+
+  @Test
+  @Order(4)
+  @Tag(KUBERNETES)
+  @DisplayName("k8s:helm-install, should install the charts")
+  void k8sHelmInstall() throws Exception {
+    // Given
+    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+    // When
+    maven("k8s:helm-install", properties("jkube.helm.release.name", "spring-boot-helm-config-k8s"), byteArrayOutputStream);
+    // Then
+    assertThat(byteArrayOutputStream.toString(),
+      allOf(containsString("Installing Helm Chart the-chart-name 1.0-KUBERNETES"),
+        containsString("NAME : spring-boot-helm-config-k8s"),
+        containsString("NAMESPACE : "),
+        containsString("STATUS : deployed"),
+        containsString("REVISION : 1")));
+  }
+
+  @Test
+  @Order(5)
+  @Tag(KUBERNETES)
+  @DisplayName("k8s:helm-uninstall, should uninstall the charts")
+  void k8sHelmUninstall() throws Exception {
+    // Given
+    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+    // When
+    maven("k8s:helm-uninstall", properties("jkube.helm.release.name", "spring-boot-helm-config-k8s"), byteArrayOutputStream);
+    // Then
+    assertThat(byteArrayOutputStream.toString(),
+      allOf(containsString("Uninstalling Helm Chart the-chart-name 1.0-KUBERNETES"),
+        containsString("release \"spring-boot-helm-config-k8s\" uninstalled")));
+  }
+
+  @Test
+  @Order(6)
+  @Tag(OPEN_SHIFT)
+  @Tag(OPEN_SHIFT_OSCI)
+  @DisplayName("oc:helm-install, should install the charts")
+  void ocHelmInstall() throws Exception {
+    // Given
+    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+    // When
+    maven("oc:helm-install", properties("jkube.helm.release.name", "spring-boot-helm-config-oc"), byteArrayOutputStream);
+    // Then
+    assertThat(byteArrayOutputStream.toString(),
+      allOf(containsString("Installing Helm Chart different-name-for-oc 0.1-OC"),
+        containsString("NAME : spring-boot-helm-config-oc"),
+        containsString("NAMESPACE : "),
+        containsString("STATUS : deployed"),
+        containsString("REVISION : 1")));
+  }
+
+  @Test
+  @Order(7)
+  @Tag(OPEN_SHIFT)
+  @Tag(OPEN_SHIFT_OSCI)
+  @DisplayName("oc:helm-uninstall, should uninstall the charts")
+  void ocHelmUninstall() throws Exception {
+    // Given
+    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+    // When
+    maven("oc:helm-uninstall", properties("jkube.helm.release.name", "spring-boot-helm-config-oc"), byteArrayOutputStream);
+    // Then
+    assertThat(byteArrayOutputStream.toString(),
+      allOf(containsString("Uninstalling Helm Chart different-name-for-oc 0.1-OC"),
+        containsString("release \"spring-boot-helm-config-oc\" uninstalled")));
   }
 }
