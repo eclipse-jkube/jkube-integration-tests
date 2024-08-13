@@ -152,7 +152,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        openshift: [v3.11.0,v3.10.0]
+        openshift: [v3.10.0]
         suite: ['quarkus','springboot','webapp','other']
     steps:
 #     This seems to cause problems with OpenShift Setup Action
