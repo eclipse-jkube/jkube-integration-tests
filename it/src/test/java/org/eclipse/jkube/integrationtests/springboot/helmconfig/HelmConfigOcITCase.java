@@ -143,10 +143,10 @@ class HelmConfigOcITCase extends HelmConfig {
     // Then
     assertThat(byteArrayOutputStream.toString(),
       allOf(containsString("Installing Helm Chart different-name-for-oc 0.1-OC"),
-        containsString("NAME : spring-boot-helm-config-oc"),
-        containsString("NAMESPACE : "),
-        containsString("STATUS : deployed"),
-        containsString("REVISION : 1")));
+        containsString("NAME: spring-boot-helm-config-oc"),
+        containsString("NAMESPACE: "),
+        containsString("STATUS: deployed"),
+        containsString("REVISION: 1")));
   }
 
   @Test
