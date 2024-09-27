@@ -141,10 +141,10 @@ class HelmConfigK8sITCase extends HelmConfig {
     // Then
     assertThat(byteArrayOutputStream.toString(),
       allOf(containsString("Installing Helm Chart the-chart-name 1.0-KUBERNETES"),
-        containsString("NAME : spring-boot-helm-config-k8s"),
-        containsString("NAMESPACE : "),
-        containsString("STATUS : deployed"),
-        containsString("REVISION : 1")));
+        containsString("NAME: spring-boot-helm-config-k8s"),
+        containsString("NAMESPACE: "),
+        containsString("STATUS: deployed"),
+        containsString("REVISION: 1")));
   }
 
   @Test
