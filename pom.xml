@@ -47,7 +47,7 @@
     <javax.servlet-api.version>4.0.1</javax.servlet-api.version>
     <javax.servlet.jsp-api.version>2.3.3</javax.servlet.jsp-api.version>
     <!-- JKube version also needs to be updated in projects-to-be-tested/maven/buildpacks/simple/pom.xml -->
-    <jkube.version>1.17-SNAPSHOT</jkube.version>
+    <jkube.version>1.18-SNAPSHOT</jkube.version>
     <junit.version>5.11.0</junit.version>
     <karaf.version>4.4.6</karaf.version>
     <license-maven-plugin.version>4.2</license-maven-plugin.version>
@@ -383,6 +383,7 @@
         <module>projects-to-be-tested/maven/spring/watch</module>
         <module>projects-to-be-tested/maven/spring/zero-config</module>
         <module>projects-to-be-tested/maven/spring/zero-config-fatjar</module>
+        <module>projects-to-be-tested/maven/spring/layered-jar-disabled</module>
       </modules>
       <activation>
         <file>

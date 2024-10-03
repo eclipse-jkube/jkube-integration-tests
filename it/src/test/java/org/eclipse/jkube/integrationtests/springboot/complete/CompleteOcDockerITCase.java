@@ -53,6 +53,11 @@ class CompleteOcDockerITCase extends Complete implements OpenShiftCase {
     return Collections.singletonList("OpenShift-Docker");
   }
 
+  @Override
+  public String getApplication() {
+    return "spring-boot-complete";
+  }
+
   @Test
   @Order(1)
   @ResourceLock(value = CLUSTER_RESOURCE_INTENSIVE, mode = READ_WRITE)
@@ -128,12 +133,5 @@ class CompleteOcDockerITCase extends Complete implements OpenShiftCase {
     assertJKube(this)
       .assertThatShouldDeleteAllAppliedResources();
     cleanUpCluster();
-  }
-
-  @Override
-  public void cleanUpCluster() {
-    // NO OP
-    // Don't clean up cluster to avoid removing builds and image streams for other tests
-    // TODO: Split the Complete test project by profile into multiple projects to avoid this issue
   }
 }
