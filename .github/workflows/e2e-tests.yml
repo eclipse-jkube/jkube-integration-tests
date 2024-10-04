@@ -40,7 +40,7 @@ jobs:
       fail-fast: false
       matrix:
         kubernetes: [v1.25.13,v1.28.1]
-        suite: ['quarkus','quarkus-native','springboot','webapp','other','dockerfile']
+        suite: ['quarkus','quarkus-native','springboot-zeroconfig','springboot-complete','springboot-others','webapp','other','dockerfile']
     steps:
       - name: Checkout
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11
@@ -118,7 +118,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        suite: ['quarkus','quarkus-native','springboot','webapp','other','dockerfile']
+        suite: ['quarkus','quarkus-native','springboot-zeroconfig','springboot-complete','springboot-others','webapp','other','dockerfile']
     steps:
       - name: Checkout
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11
@@ -197,7 +197,7 @@ jobs:
       fail-fast: false
       matrix:
         openshift: [v3.10.0]
-        suite: ['quarkus','springboot','webapp','other']
+        suite: ['quarkus','springboot-zeroconfig','springboot-complete','springboot-others','webapp','other']
     steps:
 #     This seems to cause problems with OpenShift Setup Action
 #     - name: Harden Runner

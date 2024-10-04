@@ -53,6 +53,11 @@ class CompleteOcDockerITCase extends Complete implements OpenShiftCase {
     return Collections.singletonList("OpenShift-Docker");
   }
 
+  @Override
+  public String getApplication() {
+    return "spring-boot-complete-openshift-docker";
+  }
+
   @Test
   @Order(1)
   @ResourceLock(value = CLUSTER_RESOURCE_INTENSIVE, mode = READ_WRITE)
@@ -86,9 +91,9 @@ class CompleteOcDockerITCase extends Complete implements OpenShiftCase {
     final File metaInfDirectory = new File(
       String.format("../%s/target/classes/META-INF", getProject()));
     assertThat(metaInfDirectory.exists(), equalTo(true));
-    assertListResource(new File(metaInfDirectory, "jkube/openshift.yml"));
-    assertThat(new File(metaInfDirectory, "jkube/openshift/spring-boot-complete-deploymentconfig.yml"), yaml(not(anEmptyMap())));
-    assertThat(new File(metaInfDirectory, "jkube/openshift/spring-boot-complete-service.yml"), yaml(not(anEmptyMap())));
+    assertListResource(new File(metaInfDirectory, "jkube-openshift-docker/openshift.yml"));
+    assertThat(new File(metaInfDirectory, "jkube-openshift-docker/openshift/spring-boot-complete-openshift-docker-deploymentconfig.yml"), yaml(not(anEmptyMap())));
+    assertThat(new File(metaInfDirectory, "jkube-openshift-docker/openshift/spring-boot-complete-openshift-docker-service.yml"), yaml(not(anEmptyMap())));
   }
 
   @Test
@@ -128,12 +133,5 @@ class CompleteOcDockerITCase extends Complete implements OpenShiftCase {
     assertJKube(this)
       .assertThatShouldDeleteAllAppliedResources();
     cleanUpCluster();
-  }
-
-  @Override
-  public void cleanUpCluster() {
-    // NO OP
-    // Don't clean up cluster to avoid removing builds and image streams for other tests
-    // TODO: Split the Complete test project by profile into multiple projects to avoid this issue
   }
 }

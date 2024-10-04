@@ -53,6 +53,12 @@ class CompleteOcDockerLayersDisabledITCase extends Complete implements OpenShift
     return Collections.singletonList("OpenShift-Docker-Spring-Layers-Disabled");
   }
 
+
+  @Override
+  public String getApplication() {
+    return "spring-boot-complete-oc-docker-spring-layers-disabled";
+  }
+
   @Test
   @Order(1)
   @ResourceLock(value = CLUSTER_RESOURCE_INTENSIVE, mode = READ_WRITE)
@@ -84,9 +90,9 @@ class CompleteOcDockerLayersDisabledITCase extends Complete implements OpenShift
     final File metaInfDirectory = new File(
       String.format("../%s/target/classes/META-INF", getProject()));
     assertThat(metaInfDirectory.exists(), equalTo(true));
-    assertListResource(new File(metaInfDirectory, "jkube/openshift.yml"));
-    assertThat(new File(metaInfDirectory, "jkube/openshift/spring-boot-complete-deploymentconfig.yml"), yaml(not(anEmptyMap())));
-    assertThat(new File(metaInfDirectory, "jkube/openshift/spring-boot-complete-service.yml"), yaml(not(anEmptyMap())));
+    assertListResource(new File(metaInfDirectory, "jkube-oc-docker-spring-layers-disabled/openshift.yml"));
+    assertThat(new File(metaInfDirectory, "jkube-oc-docker-spring-layers-disabled/openshift/spring-boot-complete-oc-docker-spring-layers-disabled-deploymentconfig.yml"), yaml(not(anEmptyMap())));
+    assertThat(new File(metaInfDirectory, "jkube-oc-docker-spring-layers-disabled/openshift/spring-boot-complete-oc-docker-spring-layers-disabled-service.yml"), yaml(not(anEmptyMap())));
   }
 
   @Test
@@ -126,12 +132,5 @@ class CompleteOcDockerLayersDisabledITCase extends Complete implements OpenShift
     assertJKube(this)
       .assertThatShouldDeleteAllAppliedResources();
     cleanUpCluster();
-  }
-
-  @Override
-  public void cleanUpCluster() {
-    // NO OP
-    // Don't clean up cluster to avoid removing builds and image streams for other tests
-    // TODO: Split the Complete test project by profile into multiple projects to avoid this issue
   }
 }

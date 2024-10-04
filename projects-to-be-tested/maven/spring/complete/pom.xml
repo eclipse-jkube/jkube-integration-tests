@@ -189,6 +189,12 @@
       <properties>
         <jkube.environment>oc</jkube.environment>
         <jkube.build.strategy>docker</jkube.build.strategy>
+        <jkube.generator.name>spring-boot-complete-openshift-docker</jkube.generator.name>
+        <jkube.targetDir>${project.build.outputDirectory}/META-INF/jkube-openshift-docker</jkube.targetDir>
+        <jkube.openshiftManifest>${project.build.outputDirectory}/META-INF/jkube-openshift-docker/openshift.yml</jkube.openshiftManifest>
+        <jkube.enricher.jkube-controller.name>spring-boot-complete-openshift-docker</jkube.enricher.jkube-controller.name>
+        <jkube.enricher.jkube-project-label.app>spring-boot-complete-openshift-docker</jkube.enricher.jkube-project-label.app>
+        <jkube.enricher.jkube-service.name>spring-boot-complete-openshift-docker</jkube.enricher.jkube-service.name>
       </properties>
       <build>
         <plugins>
@@ -219,6 +225,12 @@
       <id>OpenShift-Docker-Spring-Layers-Disabled</id>
       <properties>
         <jkube.build.strategy>docker</jkube.build.strategy>
+        <jkube.generator.name>spring-boot-complete-oc-docker-spring-layers-disabled</jkube.generator.name>
+        <jkube.targetDir>${project.build.outputDirectory}/META-INF/jkube-oc-docker-spring-layers-disabled</jkube.targetDir>
+        <jkube.openshiftManifest>${project.build.outputDirectory}/META-INF/jkube-oc-docker-spring-layers-disabled/openshift.yml</jkube.openshiftManifest>
+        <jkube.enricher.jkube-controller.name>spring-boot-complete-oc-docker-spring-layers-disabled</jkube.enricher.jkube-controller.name>
+        <jkube.enricher.jkube-project-label.app>spring-boot-complete-oc-docker-spring-layers-disabled</jkube.enricher.jkube-project-label.app>
+        <jkube.enricher.jkube-service.name>spring-boot-complete-oc-docker-spring-layers-disabled</jkube.enricher.jkube-service.name>
       </properties>
       <build>
         <plugins>
