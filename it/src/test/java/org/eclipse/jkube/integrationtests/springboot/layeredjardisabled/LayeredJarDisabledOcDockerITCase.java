@@ -11,7 +11,7 @@
  * Contributors:
  *   Red Hat, Inc. - initial API and implementation
  */
-package org.eclipse.jkube.integrationtests.springboot.complete;
+package org.eclipse.jkube.integrationtests.springboot.layeredjardisabled;
 
 import io.fabric8.openshift.api.model.ImageStream;
 import org.apache.maven.shared.invoker.InvocationResult;
@@ -26,8 +26,6 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.parallel.ResourceLock;
 
 import java.io.File;
-import java.util.Collections;
-import java.util.List;
 
 import static org.eclipse.jkube.integrationtests.Locks.CLUSTER_RESOURCE_INTENSIVE;
 import static org.eclipse.jkube.integrationtests.Tags.OPEN_SHIFT;
@@ -47,12 +45,7 @@ import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 @Tag(OPEN_SHIFT)
 @Tag(OPEN_SHIFT_OSCI)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class CompleteOcDockerLayersDisabledITCase extends Complete implements OpenShiftCase {
-  @Override
-  public List<String> getProfiles() {
-    return Collections.singletonList("OpenShift-Docker-Spring-Layers-Disabled");
-  }
-
+class LayeredJarDisabledOcDockerITCase extends LayeredJarDisabled implements OpenShiftCase {
   @Test
   @Order(1)
   @ResourceLock(value = CLUSTER_RESOURCE_INTENSIVE, mode = READ_WRITE)
@@ -68,7 +61,7 @@ class CompleteOcDockerLayersDisabledITCase extends Complete implements OpenShift
     assertOpenShiftDockerBuildCompletedWithLogs(
       "FROM quay.io/jkube/jkube-java:",
       "ENV JAVA_APP_DIR=/deployments",
-      "EXPOSE 8082 8778 9779",
+      "EXPOSE 8080 8778 9779",
       "COPY /jkube-generated-layer-original/deployments /deployments/",
       "WORKDIR /deployment");
   }
@@ -85,8 +78,9 @@ class CompleteOcDockerLayersDisabledITCase extends Complete implements OpenShift
       String.format("../%s/target/classes/META-INF", getProject()));
     assertThat(metaInfDirectory.exists(), equalTo(true));
     assertListResource(new File(metaInfDirectory, "jkube/openshift.yml"));
-    assertThat(new File(metaInfDirectory, "jkube/openshift/spring-boot-complete-deploymentconfig.yml"), yaml(not(anEmptyMap())));
-    assertThat(new File(metaInfDirectory, "jkube/openshift/spring-boot-complete-service.yml"), yaml(not(anEmptyMap())));
+    assertThat(new File(metaInfDirectory, "jkube/openshift/spring-boot-layered-jar-disabled-deploymentconfig.yml"), yaml(not(anEmptyMap())));
+    assertThat(new File(metaInfDirectory, "jkube/openshift/spring-boot-layered-jar-disabled-service.yml"), yaml(not(anEmptyMap())));
+    assertThat(new File(metaInfDirectory, "jkube/openshift/spring-boot-layered-jar-disabled-route.yml"), yaml(not(anEmptyMap())));
   }
 
   @Test
@@ -112,7 +106,7 @@ class CompleteOcDockerLayersDisabledITCase extends Complete implements OpenShift
     // Then
     assertInvocation(invocationResult);
     assertThat(invocationResult.getStdOut(),
-      stringContainsInOrder("Tomcat started on port(s)", "Started CompleteApplication in", "seconds"));
+      stringContainsInOrder("Tomcat started on port(s)", "Started LayeredJarDisabledApplication in", "seconds"));
   }
 
   @Test
@@ -126,12 +120,5 @@ class CompleteOcDockerLayersDisabledITCase extends Complete implements OpenShift
     assertJKube(this)
       .assertThatShouldDeleteAllAppliedResources();
     cleanUpCluster();
-  }
-
-  @Override
-  public void cleanUpCluster() {
-    // NO OP
-    // Don't clean up cluster to avoid removing builds and image streams for other tests
-    // TODO: Split the Complete test project by profile into multiple projects to avoid this issue
   }
 }
