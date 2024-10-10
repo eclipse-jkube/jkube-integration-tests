@@ -94,7 +94,7 @@ jobs:
           java-version: '11'
           distribution: 'temurin'
       - name: Setup Minikube-Kubernetes
-        uses: manusa/actions-setup-minikube@3856c6fa039819f1c8e7e248b1fc5a8564e354c9
+        uses: manusa/actions-setup-minikube@0e8062ceff873bd77979f39cf8fd3621416afe4d
         with:
           minikube version: v1.31.2
           kubernetes version: ${{ matrix.kubernetes }}
