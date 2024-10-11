@@ -12,7 +12,7 @@
 #   Red Hat, Inc. - initial API and implementation
 #
 
-name: E2E CRC OKD Jkube Integration Tests
+name: JKube E2E Tests (CRC-OKD)
 
 on:
   workflow_dispatch:
