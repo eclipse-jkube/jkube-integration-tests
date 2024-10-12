@@ -16,6 +16,7 @@ name: JKube E2E Tests (CRC-OKD)
 
 on:
   workflow_dispatch:
+  pull_request:
   schedule:
     - cron: '0 4 * * *' # Every day at 4am
 
@@ -65,7 +66,7 @@ jobs:
       - name: Install required virtualization software
         run: |
           sudo apt-get update
-          sudo apt install qemu-kvm libvirt-daemon libvirt-daemon-system
+          sudo apt install qemu-kvm libvirt-daemon libvirt-daemon-system virtiofsd
           sudo usermod -a -G libvirt $USER
       - name: Remove unwanted stuff to free up disk image
         run: |
@@ -96,12 +97,6 @@ jobs:
           sudo -su $USER crc setup
       - name: Start the crc
         run: sudo -su $USER crc start
-      - name: Login into OpenShift Cluster
-        run: |
-          sudo -su $USER eval $(crc oc-env)         
-          sudo -su $USER oc version
-          LOGIN_COMMAND=`sudo -su $USER crc console --credentials | grep admin | awk -F"'" '$0=$2'`
-          eval $LOGIN_COMMAND
       - name: Install and Run Integration Tests
         run: |
           JKUBE_VERSION=$(./mvnw -q -f 'jkube/pom.xml' -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec) \
