@@ -91,7 +91,7 @@ public class KubernetesClientAssertion<T extends KubernetesResource> {
       System.err.println(pod.getStatus());
       System.err.println("---------------------------");
     });
-    if (jKubeCase.getKubernetesClient().isAdaptable(OpenShiftClient.class)) {
+    if (jKubeCase.getKubernetesClient().adapt(OpenShiftClient.class).supports(Route.class)) {
       final OpenShiftClient oc = jKubeCase.getKubernetesClient().adapt(OpenShiftClient.class);
       System.err.println("\n\n===========================");
       System.err.println("\nDeployment:");
