@@ -20,7 +20,7 @@ on:
       - main
   pull_request:
   schedule:
-    - cron: '0 1 * * *' # Everyday at 1
+    - cron: '0 1 * * *' # Every day at 1
 
 permissions:
   contents: read

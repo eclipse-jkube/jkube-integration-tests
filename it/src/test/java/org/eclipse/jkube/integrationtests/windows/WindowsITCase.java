@@ -13,9 +13,7 @@
  */
 package org.eclipse.jkube.integrationtests.windows;
 
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
+import io.fabric8.kubernetes.client.utils.HttpClientUtils;
 import org.apache.maven.shared.invoker.InvocationResult;
 import org.apache.maven.shared.invoker.MavenInvocationException;
 import org.eclipse.jkube.integrationtests.jupiter.api.DockerRegistry;
@@ -34,6 +32,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Collections;
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -97,11 +96,15 @@ class WindowsITCase implements MavenCase {
     final InvocationResult invocationResult = maven("k8s:push", properties);
     // Then
     assertInvocation(invocationResult);
-    final Response response = new OkHttpClient.Builder().build().newCall(new Request.Builder()
-        .get().url("http://localhost:5000/v2/integration-tests/windows/tags/list").build())
-      .execute();
-    assertThat(response.body().string(),
-      containsString("{\"name\":\"integration-tests/windows\",\"tags\":[\"latest\"]}"));
+    final var httpFactory = HttpClientUtils.getHttpClientFactory();
+    try (final var http = httpFactory.newBuilder().build()) {
+      final var req = http.newHttpRequestBuilder().uri("http://localhost:5000/v2/integration-tests/windows/tags/list")
+        .build();
+      final var res = http.sendAsync(req, String.class).get(10, TimeUnit.SECONDS);
+      assertThat(res.isSuccessful(), equalTo(true));
+      assertThat(res.bodyString(),
+        containsString("{\"name\":\"integration-tests/windows\",\"tags\":[\"latest\"]}"));
+    }
   }
 
   @Test
