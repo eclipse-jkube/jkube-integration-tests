@@ -112,7 +112,7 @@ jobs:
           path: ./it/target/jkube-test-report.txt
 
   minikube-legacy:
-    name: K8S
+    name: K8S (Minikube Legacy)
     needs: build-jkube
     runs-on: ubuntu-20.04
     strategy:
