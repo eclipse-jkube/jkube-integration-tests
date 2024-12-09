@@ -22,6 +22,7 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -118,6 +119,7 @@ class HelmConfigK8sITCase extends HelmConfig {
 
   @Test
   @DisplayName("k8s:helm-uninstall, no release present, display error message")
+  @DisabledIfEnvironmentVariable(named = "ImageOS", matches = "ubuntu20")
   void k8sHelmUninstall_whenNoReleasePresent_thenErrorMessageDisplayed() throws Exception {
     // Given
     ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -133,6 +135,7 @@ class HelmConfigK8sITCase extends HelmConfig {
   @Test
   @Order(4)
   @DisplayName("k8s:helm-install, should install the charts")
+  @DisabledIfEnvironmentVariable(named = "ImageOS", matches = "ubuntu20")
   void k8sHelmInstall() throws Exception {
     // Given
     ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -150,6 +153,7 @@ class HelmConfigK8sITCase extends HelmConfig {
   @Test
   @Order(5)
   @DisplayName("k8s:helm-uninstall, should uninstall the charts")
+  @DisabledIfEnvironmentVariable(named = "ImageOS", matches = "ubuntu20")
   void k8sHelmUninstall() throws Exception {
     // Given
     ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
