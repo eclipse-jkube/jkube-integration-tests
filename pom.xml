@@ -58,7 +58,6 @@
     <slf4j.version>2.0.7</slf4j.version>
     <spring-boot.version>2.7.11</spring-boot.version>
     <spring-boot.fat-jar.version>2.3.9.RELEASE</spring-boot.fat-jar.version>
-    <thorntail.version>2.7.0.Final</thorntail.version>
     <vertx.version>4.4.5</vertx.version>
     <vertx.plugin.version>1.0.28</vertx.plugin.version>
     <wildfly.jar.plugin.version>11.0.2.Final</wildfly.jar.plugin.version>
@@ -168,11 +167,6 @@
           <groupId>io.reactiverse</groupId>
           <artifactId>vertx-maven-plugin</artifactId>
           <version>${vertx.plugin.version}</version>
-        </plugin>
-        <plugin>
-          <groupId>io.thorntail</groupId>
-          <artifactId>thorntail-maven-plugin</artifactId>
-          <version>${thorntail.version}</version>
         </plugin>
         <plugin>
           <groupId>org.wildfly.plugins</groupId>
@@ -288,7 +282,6 @@
       <id>other</id>
       <modules>
         <module>projects-to-be-tested/maven/openliberty/rest</module>
-        <module>projects-to-be-tested/maven/thorntail/microprofile</module>
         <module>projects-to-be-tested/maven/vertx/simplest</module>
         <module>projects-to-be-tested/maven/wildfly-jar/microprofile</module>
         <module>projects-to-be-tested/maven/karaf/camel-log</module>
@@ -297,7 +290,7 @@
       <activation>
         <file>
           <exists>
-            projects-to-be-tested/maven/thorntail/microprofile/target
+            projects-to-be-tested/maven/vertx/simplest/target
           </exists>
         </file>
       </activation>
@@ -309,7 +302,6 @@
             <configuration>
               <includes>
                 <include>**/integrationtests/openliberty/**/*ITCase.java</include>
-                <include>**/integrationtests/thorntail/**/*ITCase.java</include>
                 <include>**/integrationtests/vertx/**/*ITCase.java</include>
                 <include>**/integrationtests/wildfly/jar/**/*ITCase.java</include>
                 <include>**/integrationtests/karaf/**/*ITCase.java</include>
