@@ -66,6 +66,7 @@ class ZeroConfigFatJarK8sITCase extends ZeroConfigFatJar {
     assertThat(imageFiles, hasItem("/deployments/spring-boot-zero-config-fatjar-0.0.0-SNAPSHOT.jar"));
     final List<String> imageHistory = getImageHistory(String.format("%s/%s", "integration-tests", getApplication()));
     long dirCopyLayers = imageHistory.stream()
+      .filter(l -> !l.startsWith("<missing>"))
       .filter(l -> l.contains("COPY dir:"))
       .count();
     assertThat(dirCopyLayers, equalTo(1L));

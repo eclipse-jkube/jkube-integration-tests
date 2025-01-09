@@ -88,6 +88,7 @@ class ZeroConfigK8sITCase extends ZeroConfig implements MavenCase {
     assertThat(imageFiles, hasItem("/deployments/org/springframework/boot/loader/JarLauncher.class"));
     final List<String> imageHistory = getImageHistory(String.format("%s/%s", "integration-tests", getApplication()));
     long dirCopyLayers = imageHistory.stream()
+      .filter(l -> !l.startsWith("<missing>"))
       .filter(l -> l.contains("COPY dir:"))
       .count();
     assertThat(dirCopyLayers, equalTo(3L));
