@@ -26,7 +26,7 @@ jar {
 def imageDef = {
   name = "gradle/${project.name}"
   build {
-    from = 'openjdk:11-jre-slim'
+    from = 'openjdk:11.0.16-jre-slim'
     env {
       GREETING = 'May the 4th be with you'
     }

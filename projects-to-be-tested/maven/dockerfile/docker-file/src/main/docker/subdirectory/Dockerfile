@@ -12,6 +12,6 @@
 #   Red Hat, Inc. - initial API and implementation
 #
 
-FROM openjdk:11-jre-slim
+FROM openjdk:11.0.16-jre-slim
 COPY maven/file-in-context.txt /deployments/file-in-context.txt
 ENTRYPOINT [ "echo READY PLAYER 1 && sleep 3600" ]
