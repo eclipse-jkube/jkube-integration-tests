@@ -12,7 +12,7 @@
 #   Red Hat, Inc. - initial API and implementation
 #
 
-FROM openjdk:11-jre-slim
+FROM openjdk:11.0.16-jre-slim
 COPY maven/target/*.jar /deployments/app.jar
 COPY maven/static-dir-in-project-root/my-file.txt /deployments/my-file.txt
 EXPOSE 8080
