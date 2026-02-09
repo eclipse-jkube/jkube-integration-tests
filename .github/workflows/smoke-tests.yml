@@ -83,7 +83,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        kubernetes: [v1.25.13,v1.28.1]
+        kubernetes: [v1.32.11,v1.34.3]
         suite: ['quarkus','quarkus-native','springboot','webapp','other','dockerfile']
     steps:
       - name: Checkout
