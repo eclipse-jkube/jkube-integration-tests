@@ -12,15 +12,31 @@
 #   Red Hat, Inc. - initial API and implementation
 #
 
+# The gitRepo volume type was removed in Kubernetes v1.33 (KEP-5040) due to security
+# concerns (exploitable for remote code execution during volume provisioning).
+# Replaced with an initContainer + emptyDir to achieve the same result.
+# https://github.com/kubernetes/enhancements/issues/5040
+#
+# Original gitRepo volume definition:
+#   volumes:
+#     - name: jkube
+#       gitRepo:
+#         repository: 'https://github.com/eclipse-jkube/jkube.git'
+#         revision: '0.1.0'
 spec:
   replicas: 1
   template:
     spec:
+      initContainers:
+        - name: git-clone
+          image: alpine/git:latest
+          command: ['sh', '-c', 'git clone --branch v0.1.0 --depth 1 https://github.com/eclipse-jkube/jkube.git /repo/jkube']
+          volumeMounts:
+            - name: jkube
+              mountPath: /repo
       volumes:
         - name: jkube
-          gitRepo:
-            repository: 'https://github.com/eclipse-jkube/jkube.git'
-            revision: '0.1.0'
+          emptyDir: {}
       containers:
         - command: ["java"]
           args: ["org.springframework.boot.loader.JarLauncher"]
