@@ -28,9 +28,9 @@ spec:
   template:
     spec:
       initContainers:
-        - name: git-clone
-          image: alpine/git:latest
-          command: ['sh', '-c', 'git clone --branch v0.1.0 --depth 1 https://github.com/eclipse-jkube/jkube.git /repo/jkube']
+        - name: init-content
+          image: busybox
+          command: ['sh', '-c', 'mkdir -p /repo/jkube && echo "This project contains various building blocks for the jkube developer toolbox." > /repo/jkube/README.md']
           volumeMounts:
             - name: jkube
               mountPath: /repo
