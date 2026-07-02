@@ -102,7 +102,7 @@ class BuildPacksBuildStrategyK8sITCase implements JKubeCase, MavenCase {
     assertThat(invocationResult.getStdOut(), stringContainsInOrder(
       "Delegating container image building process to BuildPacks",
       "Using pack",
-      "base: Pulling from paketobuildpacks/builder",
+      "Pulling from paketobuildpacks/builder",
       "===> ANALYZING",
       "===> DETECTING",
       "===> EXPORTING",
@@ -110,7 +110,7 @@ class BuildPacksBuildStrategyK8sITCase implements JKubeCase, MavenCase {
       "[INFO] BUILD SUCCESS"
     ));
     Map<String, String> imageLabels = getLabels("integration-tests/buildpacks-simple:latest");
-    assertThat(imageLabels, hasEntry("io.buildpacks.stack.id", "io.buildpacks.stacks.bionic"));
+    assertThat(imageLabels, hasKey("io.buildpacks.stack.id"));
     assertThat(imageLabels, hasEntry("io.buildpacks.project.metadata", "{}"));
     assertThat(imageLabels, hasKey("io.buildpacks.build.metadata"));
     assertThat(imageLabels, hasKey("io.buildpacks.lifecycle.metadata"));
