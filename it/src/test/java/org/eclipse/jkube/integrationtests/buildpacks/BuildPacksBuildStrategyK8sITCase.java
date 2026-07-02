@@ -110,7 +110,7 @@ class BuildPacksBuildStrategyK8sITCase implements JKubeCase, MavenCase {
       "[INFO] BUILD SUCCESS"
     ));
     Map<String, String> imageLabels = getLabels("integration-tests/buildpacks-simple:latest");
-    assertThat(imageLabels, hasKey("io.buildpacks.stack.id"));
+    assertThat(imageLabels, hasEntry("io.buildpacks.stack.id", "io.buildpacks.stacks.jammy"));
     assertThat(imageLabels, hasEntry("io.buildpacks.project.metadata", "{}"));
     assertThat(imageLabels, hasKey("io.buildpacks.build.metadata"));
     assertThat(imageLabels, hasKey("io.buildpacks.lifecycle.metadata"));
