@@ -11,15 +11,11 @@
  * Contributors:
  *   Red Hat, Inc. - initial API and implementation
  */
-package org.eclipse.jkube.integrationtests.webapp.jetty;
+package org.eclipse.jkube.integrationtests.webapp.jetty9;
 
 import io.fabric8.kubernetes.api.model.Pod;
-import io.fabric8.kubernetes.client.KubernetesClient;
-import io.fabric8.kubernetes.client.KubernetesClientBuilder;
 import org.apache.maven.shared.invoker.InvocationResult;
 import org.eclipse.jkube.integrationtests.maven.MavenInvocationResult;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Order;
@@ -53,7 +49,7 @@ import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 
 @Tag(KUBERNETES)
 @TestMethodOrder(OrderAnnotation.class)
-class JettyK8sITCase extends Jetty {
+class Jetty9K8sITCase extends Jetty9 {
 
   @Test
   @Order(1)
@@ -81,8 +77,8 @@ class JettyK8sITCase extends Jetty {
       String.format("../%s/target/classes/META-INF", getProject()));
     assertThat(metaInfDirectory.exists(), equalTo(true));
     assertListResource(new File(metaInfDirectory, "jkube/kubernetes.yml"));
-    assertThat(new File(metaInfDirectory, "jkube/kubernetes/webapp-jetty-deployment.yml"), yaml(not(anEmptyMap())));
-    assertThat(new File(metaInfDirectory, "jkube/kubernetes/webapp-jetty-service.yml"), yaml(not(anEmptyMap())));
+    assertThat(new File(metaInfDirectory, "jkube/kubernetes/webapp-jetty9-deployment.yml"), yaml(not(anEmptyMap())));
+    assertThat(new File(metaInfDirectory, "jkube/kubernetes/webapp-jetty9-service.yml"), yaml(not(anEmptyMap())));
   }
 
   @Test
@@ -100,7 +96,7 @@ class JettyK8sITCase extends Jetty {
       .assertReplicas(equalTo(1))
       .assertContainers(hasSize(1))
       .assertContainers(hasItems(allOf(
-        hasProperty("image", equalTo("integration-tests/webapp-jetty:latest")),
+        hasProperty("image", equalTo("integration-tests/webapp-jetty9:latest")),
         hasProperty("name", equalTo("webapp")),
         hasProperty("ports", hasSize(1)),
         hasProperty("ports", hasItems(allOf(

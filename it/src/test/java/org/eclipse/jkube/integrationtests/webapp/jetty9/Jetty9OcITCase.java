@@ -11,7 +11,7 @@
  * Contributors:
  *   Red Hat, Inc. - initial API and implementation
  */
-package org.eclipse.jkube.integrationtests.webapp.jetty;
+package org.eclipse.jkube.integrationtests.webapp.jetty9;
 
 import io.fabric8.openshift.api.model.ImageStream;
 import org.apache.maven.shared.invoker.InvocationResult;
@@ -44,7 +44,7 @@ import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 @Tag(OPEN_SHIFT)
 @Tag(OPEN_SHIFT_OSCI)
 @TestMethodOrder(OrderAnnotation.class)
-class JettyOcITCase extends Jetty implements OpenShiftCase {
+class Jetty9OcITCase extends Jetty9 implements OpenShiftCase {
 
   @Test
   @Order(1)
@@ -72,9 +72,9 @@ class JettyOcITCase extends Jetty implements OpenShiftCase {
       String.format("../%s/target/classes/META-INF", getProject()));
     assertThat(metaInfDirectory.exists(), equalTo(true));
     assertListResource(new File(metaInfDirectory, "jkube/openshift.yml"));
-    assertThat(new File(metaInfDirectory, "jkube/openshift/webapp-jetty-deploymentconfig.yml"), yaml(not(anEmptyMap())));
-    assertThat(new File(metaInfDirectory, "jkube/openshift/webapp-jetty-route.yml"), yaml(not(anEmptyMap())));
-    assertThat(new File(metaInfDirectory, "jkube/openshift/webapp-jetty-service.yml"), yaml(not(anEmptyMap())));
+    assertThat(new File(metaInfDirectory, "jkube/openshift/webapp-jetty9-deploymentconfig.yml"), yaml(not(anEmptyMap())));
+    assertThat(new File(metaInfDirectory, "jkube/openshift/webapp-jetty9-route.yml"), yaml(not(anEmptyMap())));
+    assertThat(new File(metaInfDirectory, "jkube/openshift/webapp-jetty9-service.yml"), yaml(not(anEmptyMap())));
   }
 
   @Test

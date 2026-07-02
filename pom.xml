@@ -406,6 +406,10 @@
         <module>projects-to-be-tested/maven/webapp/jetty-watch-both</module>
         <module>projects-to-be-tested/maven/webapp/jetty-watch-none</module>
         <module>projects-to-be-tested/maven/webapp/jetty-watch-copy</module>
+        <module>projects-to-be-tested/maven/webapp/jetty9</module>
+        <module>projects-to-be-tested/maven/webapp/jetty9-watch-both</module>
+        <module>projects-to-be-tested/maven/webapp/jetty9-watch-none</module>
+        <module>projects-to-be-tested/maven/webapp/jetty9-watch-copy</module>
         <module>projects-to-be-tested/maven/webapp/wildfly</module>
         <module>projects-to-be-tested/maven/webapp/zero-config</module>
         <module>projects-to-be-tested/maven/webapp/tomcat-jakartaee</module>

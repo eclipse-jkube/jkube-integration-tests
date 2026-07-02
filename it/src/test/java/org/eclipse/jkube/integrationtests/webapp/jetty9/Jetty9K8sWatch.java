@@ -11,7 +11,7 @@
  * Contributors:
  *   Red Hat, Inc. - initial API and implementation
  */
-package org.eclipse.jkube.integrationtests.webapp.jetty;
+package org.eclipse.jkube.integrationtests.webapp.jetty9;
 
 import io.fabric8.junit.jupiter.api.KubernetesTest;
 import io.fabric8.kubernetes.api.model.Pod;
@@ -42,10 +42,10 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasSize;
 
 @KubernetesTest(createEphemeralNamespace = false)
-abstract class JettyK8sWatch implements JKubeCase, MavenCase {
+abstract class Jetty9K8sWatch implements JKubeCase, MavenCase {
 
-  static final String PROJECT_JETTY_WATCH = "projects-to-be-tested/maven/webapp/jetty-watch";
-  static final String APPLICATION_JETTY_WATCH = "webapp-jetty-watch";
+  static final String PROJECT_JETTY9_WATCH = "projects-to-be-tested/maven/webapp/jetty9-watch";
+  static final String APPLICATION_JETTY9_WATCH = "webapp-jetty9-watch";
 
   private KubernetesClient kubernetesClient;
   File fileToChange;
@@ -90,7 +90,10 @@ abstract class JettyK8sWatch implements JKubeCase, MavenCase {
   void waitUntilApplicationRestartsInsidePod() throws ExecutionException, InterruptedException, TimeoutException {
     PodResource podResource = getKubernetesClient().pods().resource(originalPod);
     await(podResource::getLog)
-      .apply(l -> l.contains("Scanner-0: Started oeje10w.WebAppContext"))
+      .apply(l -> l.contains("Stopped o.e.j.w.WebAppContext"))
+      .get(10, TimeUnit.SECONDS);
+    await(podResource::getLog)
+      .apply(l -> l.contains("ContextHandler:Scanner-0: Started o.e.j.w.WebAppContext"))
       .get(10, TimeUnit.SECONDS);
   }
 }
