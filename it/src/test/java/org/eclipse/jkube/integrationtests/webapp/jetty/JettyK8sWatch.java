@@ -90,7 +90,10 @@ abstract class JettyK8sWatch implements JKubeCase, MavenCase {
   void waitUntilApplicationRestartsInsidePod() throws ExecutionException, InterruptedException, TimeoutException {
     PodResource podResource = getKubernetesClient().pods().resource(originalPod);
     await(podResource::getLog)
-      .apply(l -> l.contains("Scanner-0: Started oeje10w.WebAppContext"))
+      .apply(l -> l.contains("Stopped oeje10w.WebAppContext"))
+      .get(10, TimeUnit.SECONDS);
+    await(podResource::getLog)
+      .apply(l -> l.indexOf("Started oeje10w.WebAppContext", l.indexOf("Stopped oeje10w.WebAppContext")) > 0)
       .get(10, TimeUnit.SECONDS);
   }
 }

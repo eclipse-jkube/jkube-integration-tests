@@ -1,0 +1,7 @@
+spec:
+  template:
+    spec:
+      containers:
+        - env:
+            - name: JAVA_TOOL_OPTIONS
+              value: "-Djetty.deploy.scanInterval=1"
