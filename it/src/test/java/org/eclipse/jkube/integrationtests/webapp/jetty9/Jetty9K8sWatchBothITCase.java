@@ -11,7 +11,7 @@
  * Contributors:
  *   Red Hat, Inc. - initial API and implementation
  */
-package org.eclipse.jkube.integrationtests.webapp.jetty;
+package org.eclipse.jkube.integrationtests.webapp.jetty9;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.DisplayName;
@@ -21,32 +21,34 @@ import org.junit.jupiter.api.parallel.ResourceLock;
 
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import static org.eclipse.jkube.integrationtests.AsyncUtil.await;
 import static org.eclipse.jkube.integrationtests.Locks.CLUSTER_RESOURCE_INTENSIVE;
 import static org.eclipse.jkube.integrationtests.Tags.KUBERNETES;
 import static org.eclipse.jkube.integrationtests.assertions.InvocationResultAssertion.assertInvocation;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.stringContainsInOrder;
 import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 
 @Tag(KUBERNETES)
-class JettyK8sWatchCopyITCase extends JettyK8sWatch {
+class Jetty9K8sWatchBothITCase extends Jetty9K8sWatch {
 
   @Override
   public String getProject() {
-    return PROJECT_JETTY_WATCH + "-copy";
+    return PROJECT_JETTY9_WATCH + "-both";
   }
 
   @Override
   public String getApplication() {
-    return APPLICATION_JETTY_WATCH + "-copy";
+    return APPLICATION_JETTY9_WATCH + "-both";
   }
 
   @Test
-  @DisplayName("k8s:watch, with mode=copy, SHOULD hot deploy the application")
+  @DisplayName("k8s:watch, with mode=both, SHOULD hot deploy the application")
   @ResourceLock(value = CLUSTER_RESOURCE_INTENSIVE, mode = READ_WRITE)
-  void k8sWatchCopy() throws Exception {
+  void k8sWatchBuildAndRun() throws Exception {
     try (final ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
       // Given
       mavenWatch = mavenAsync("k8s:watch", null, baos, null);
@@ -54,17 +56,17 @@ class JettyK8sWatchCopyITCase extends JettyK8sWatch {
       // When
       FileUtils.write(fileToChange, "<html><body><h2>Eclipse JKube Jetty v2</h2></body></html>", StandardCharsets.UTF_8);
       assertInvocation(maven("package"));
+      await(baos::toString).apply(log -> log.contains("Updating Deployment")).get(10, TimeUnit.SECONDS);
       // Then
-      try {
-        await(baos::toString)
-          .apply(log -> log.contains("Files successfully copied to the container."))
-          .get(30, TimeUnit.SECONDS);
-      } catch (TimeoutException ex) {
-        throw new AssertionError("Expected message containing: 'Files successfully copied to the container.' but got: \n\n" + baos, ex);
-      }
-      waitUntilApplicationRestartsInsidePod();
+      getKubernetesClient().pods().resource(originalPod).waitUntilCondition(Objects::isNull, 30, TimeUnit.SECONDS);
+      assertThat(baos.toString(StandardCharsets.UTF_8), stringContainsInOrder(
+        "Waiting ...",
+        // Build
+        "Built image sha256:",
+        // Run
+        "Updating Deployment " + getApplication() + " to use image: integration-tests/" + getApplication() + ":snapshot"
+      ));
       assertThatShouldApplyResources("<h2>Eclipse JKube Jetty v2</h2>");
     }
   }
-
 }

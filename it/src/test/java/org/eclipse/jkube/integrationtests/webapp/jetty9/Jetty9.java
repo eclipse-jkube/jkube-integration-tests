@@ -11,7 +11,7 @@
  * Contributors:
  *   Red Hat, Inc. - initial API and implementation
  */
-package org.eclipse.jkube.integrationtests.webapp.jetty;
+package org.eclipse.jkube.integrationtests.webapp.jetty9;
 
 import io.fabric8.junit.jupiter.api.KubernetesTest;
 import io.fabric8.kubernetes.api.model.Pod;
@@ -28,9 +28,9 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.stringContainsInOrder;
 
 @KubernetesTest(createEphemeralNamespace = false)
-abstract class Jetty implements JKubeCase, MavenCase {
+abstract class Jetty9 implements JKubeCase, MavenCase {
 
-  static final String PROJECT_JETTY = "projects-to-be-tested/maven/webapp/jetty";
+  static final String PROJECT_JETTY9 = "projects-to-be-tested/maven/webapp/jetty9";
 
   private KubernetesClient kubernetesClient;
 
@@ -41,12 +41,12 @@ abstract class Jetty implements JKubeCase, MavenCase {
 
   @Override
   public String getProject() {
-    return PROJECT_JETTY;
+    return PROJECT_JETTY9;
   }
 
   @Override
   public String getApplication() {
-    return "webapp-jetty";
+    return "webapp-jetty9";
   }
 
   final Pod assertThatShouldApplyResources() throws Exception {
@@ -63,8 +63,7 @@ abstract class Jetty implements JKubeCase, MavenCase {
     assertThat(log,
       stringContainsInOrder(
         "/var/lib/jetty/webapps",
-        "Deployment monitor",
-        "[file:///var/lib/jetty/webapps/]",
+        "Deployment monitor [file:///var/lib/jetty/webapps/]",
         "Server:main: Started"));
   }
 }

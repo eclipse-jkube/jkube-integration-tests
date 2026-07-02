@@ -11,7 +11,7 @@
  * Contributors:
  *   Red Hat, Inc. - initial API and implementation
  */
-package org.eclipse.jkube.integrationtests.webapp.jetty;
+package org.eclipse.jkube.integrationtests.webapp.jetty9;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.DisplayName;
@@ -31,16 +31,16 @@ import static org.eclipse.jkube.integrationtests.assertions.InvocationResultAsse
 import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 
 @Tag(KUBERNETES)
-class JettyK8sWatchCopyITCase extends JettyK8sWatch {
+class Jetty9K8sWatchCopyITCase extends Jetty9K8sWatch {
 
   @Override
   public String getProject() {
-    return PROJECT_JETTY_WATCH + "-copy";
+    return PROJECT_JETTY9_WATCH + "-copy";
   }
 
   @Override
   public String getApplication() {
-    return APPLICATION_JETTY_WATCH + "-copy";
+    return APPLICATION_JETTY9_WATCH + "-copy";
   }
 
   @Test
