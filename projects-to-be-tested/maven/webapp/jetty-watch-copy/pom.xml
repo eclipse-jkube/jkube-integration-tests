@@ -35,6 +35,7 @@
 
   <properties>
     <jkube.enricher.jkube-service.type>NodePort</jkube.enricher.jkube-service.type>
+    <jkube.generator.webapp.env>JAVA_TOOL_OPTIONS=-Djetty.deploy.scanInterval=1</jkube.generator.webapp.env>
     <jkube.watch.mode>copy</jkube.watch.mode>
   </properties>
   <build>

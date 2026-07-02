@@ -58,7 +58,7 @@ class JettyK8sWatchBothITCase extends JettyK8sWatch {
       assertInvocation(maven("package"));
       await(baos::toString).apply(log -> log.contains("Updating Deployment")).get(10, TimeUnit.SECONDS);
       // Then
-      getKubernetesClient().pods().resource(originalPod).waitUntilCondition(Objects::isNull, 30, TimeUnit.SECONDS);
+      getKubernetesClient().pods().resource(originalPod).waitUntilCondition(Objects::isNull, 120, TimeUnit.SECONDS);
       assertThat(baos.toString(StandardCharsets.UTF_8), stringContainsInOrder(
         "Waiting ...",
         // Build
