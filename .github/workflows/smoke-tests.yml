@@ -83,7 +83,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        kubernetes: [v1.32.11,v1.34.3]
+        kubernetes: [v1.36.2, v1.34.9]
         suite: ['quarkus','quarkus-native','springboot','webapp','other','dockerfile']
     steps:
       - name: Checkout
@@ -94,9 +94,9 @@ jobs:
           java-version: '11'
           distribution: 'temurin'
       - name: Setup Minikube-Kubernetes
-        uses: manusa/actions-setup-minikube@96202dee4ae1c2f46a62fe197273aaf22b83f42d
+        uses: manusa/actions-setup-minikube@b65276017fdec6f1e6498129fb740e34e260dc55
         with:
-          minikube version: v1.38.0
+          minikube version: v1.38.1
           kubernetes version: ${{ matrix.kubernetes }}
           github token: ${{ secrets.GITHUB_TOKEN }}
           start args: --force
