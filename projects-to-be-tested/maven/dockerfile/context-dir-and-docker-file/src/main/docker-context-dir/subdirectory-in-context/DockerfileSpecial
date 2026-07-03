@@ -12,7 +12,7 @@
 #   Red Hat, Inc. - initial API and implementation
 #
 
-FROM openjdk:11.0.16-jre-slim
+FROM eclipse-temurin:11-jre
 ADD maven/subdirectory-in-context /deployments/subdirectory
 COPY maven/file-in-context.txt /deployments/file-in-context.txt
 ENTRYPOINT [ "echo READY PLAYER 1 && sleep 3600" ]

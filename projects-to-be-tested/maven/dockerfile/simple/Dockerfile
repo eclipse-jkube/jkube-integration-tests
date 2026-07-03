@@ -12,7 +12,7 @@
 #   Red Hat, Inc. - initial API and implementation
 #
 
-FROM openjdk:11.0.16-jre-slim
+FROM eclipse-temurin:11-jre
 COPY maven/target/*.jar /deployments/app.jar
 COPY maven/static-dir-in-project-root/my-file.txt /deployments/my-file.txt
 EXPOSE 8080

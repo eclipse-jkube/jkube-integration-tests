@@ -84,7 +84,7 @@ class CompleteDockerITCase extends Complete {
     assertThat(new File(dockerDirectory, "tmp/docker-build.tar.gz").exists(), equalTo(true));
     final String dockerFileContent = String.join("\n",
       Files.readAllLines(new File(dockerDirectory, "build/Dockerfile").toPath()));
-    assertThat(dockerFileContent, containsString("FROM adoptopenjdk/openjdk11:alpine-slim"));
+    assertThat(dockerFileContent, containsString("FROM eclipse-temurin:11-jre-alpine"));
     assertThat(dockerFileContent, containsString("ENV JAVA_APP_DIR=/deployments"));
     assertThat(dockerFileContent, containsString("LABEL some.label=\"The value\""));
     assertThat(dockerFileContent, containsString("EXPOSE 8082 8778 9779"));
