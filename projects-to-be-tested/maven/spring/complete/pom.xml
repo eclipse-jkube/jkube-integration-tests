@@ -73,7 +73,7 @@
         <jkube.environment>docker</jkube.environment>
         <jkube.targetDir>${project.build.outputDirectory}/META-INF/jkube-docker</jkube.targetDir>
         <jkube.kubernetesManifest>${project.build.outputDirectory}/META-INF/jkube-docker/kubernetes.yml</jkube.kubernetesManifest>
-        <jkube.generator.from>adoptopenjdk/openjdk11:jdk-11.0.6_10-alpine-slim</jkube.generator.from>
+        <jkube.generator.from>eclipse-temurin:11-jdk-alpine</jkube.generator.from>
         <jkube.enricher.jkube-controller.name>spring-boot-complete-docker</jkube.enricher.jkube-controller.name>
         <jkube.enricher.jkube-project-label.app>spring-boot-complete-docker</jkube.enricher.jkube-project-label.app>
         <jkube.enricher.jkube-service.name>spring-boot-complete-docker</jkube.enricher.jkube-service.name>
@@ -91,7 +91,7 @@
                 <build>
                   <cleanup>remove</cleanup>
                   <compression>gzip</compression>
-                  <from>adoptopenjdk/openjdk11:alpine-slim</from>
+                  <from>eclipse-temurin:11-jre-alpine</from>
                   <tags>
                     <tag>latest</tag>
                     <tag>1337</tag>

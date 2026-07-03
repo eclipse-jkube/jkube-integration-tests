@@ -40,7 +40,7 @@
     <com.fasterxml.jackson.dataformat.yaml.version>2.15.2</com.fasterxml.jackson.dataformat.yaml.version>
     <fabric8.kubernetes-client.version>7.0.1</fabric8.kubernetes-client.version>
     <guava.version>32.1.2-jre</guava.version> <!-- Required by Gradle Test Toolkit (testkit) -->
-    <gradle.version>8.7</gradle.version>
+    <gradle.version>8.14.5</gradle.version>
     <gradle-api-maven-plugin-version>0.0.3</gradle-api-maven-plugin-version>
     <hamcrest.version>2.0.0.0</hamcrest.version>
     <jakarta.servlet-api.version>6.0.0</jakarta.servlet-api.version>
@@ -48,17 +48,17 @@
     <javax.servlet-api.version>4.0.1</javax.servlet-api.version>
     <javax.servlet.jsp-api.version>2.3.3</javax.servlet.jsp-api.version>
     <!-- JKube version also needs to be updated in projects-to-be-tested/maven/buildpacks/simple/pom.xml -->
-    <jkube.version>1.18-SNAPSHOT</jkube.version>
+    <jkube.version>1.20-SNAPSHOT</jkube.version>
     <junit.version>5.11.0</junit.version>
-    <karaf.version>4.4.6</karaf.version>
+    <karaf.version>4.4.11</karaf.version>
     <license-maven-plugin.version>4.2</license-maven-plugin.version>
-    <openliberty.version>23.0.0.9</openliberty.version>
+    <openliberty.version>25.0.0.12</openliberty.version>
     <openliberty.plugin.version>3.0.1</openliberty.plugin.version>
-    <quarkus.version>3.2.3.Final</quarkus.version>
+    <quarkus.version>3.2.12.Final</quarkus.version>
     <slf4j.version>2.0.7</slf4j.version>
-    <spring-boot.version>2.7.11</spring-boot.version>
-    <spring-boot.fat-jar.version>2.3.9.RELEASE</spring-boot.fat-jar.version>
-    <vertx.version>4.4.5</vertx.version>
+    <spring-boot.version>2.7.18</spring-boot.version>
+    <spring-boot.fat-jar.version>2.3.12.RELEASE</spring-boot.fat-jar.version>
+    <vertx.version>4.5.28</vertx.version>
     <vertx.plugin.version>1.0.28</vertx.plugin.version>
     <wildfly.jar.plugin.version>11.0.2.Final</wildfly.jar.plugin.version>
     <version.org.jboss.spec.javax.ws.jboss-jaxrs-api_2.1_spec>2.0.2.Final</version.org.jboss.spec.javax.ws.jboss-jaxrs-api_2.1_spec>

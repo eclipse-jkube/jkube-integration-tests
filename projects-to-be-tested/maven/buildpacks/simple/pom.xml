@@ -32,7 +32,7 @@
 
   <properties>
     <!-- Since there is no parent pom, we have to manually define JKube version here -->
-    <jkube.version>1.17-SNAPSHOT</jkube.version>
+    <jkube.version>1.20-SNAPSHOT</jkube.version>
     <jkube.build.strategy>buildpacks</jkube.build.strategy>
     <jkube.enricher.jkube-service.type>NodePort</jkube.enricher.jkube-service.type>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
