@@ -21,9 +21,16 @@ on:
   pull_request:
   schedule:
     - cron: '0 1 * * *' # Every day at 1
+  workflow_dispatch:
 
 permissions:
   contents: read
+
+concurrency:
+  # Include the event name so a push to main does not cancel the in-flight
+  # nightly schedule run (both resolve github.ref to refs/heads/main).
+  group: ${{ github.workflow }}-${{ github.ref }}-${{ github.event_name }}
+  cancel-in-progress: true
 
 env:
   JKUBE_REPOSITORY: https://github.com/eclipse-jkube/jkube.git
@@ -61,4 +68,11 @@ jobs:
           cd $env:JKUBE_DIR
           $env:JKUBE_VERSION = (mvn org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression='project.version' -q -DforceStdout) | Out-String
           cd ..
+          $PSNativeCommandUseErrorActionPreference = $false
+          $start = Get-Date
           mvn -B -PWindows clean verify -D'jkube.version'=$env:JKUBE_VERSION
+          $rc = $LASTEXITCODE
+          $seconds = [int]((Get-Date) - $start).TotalSeconds
+          $icon = if ($rc -eq 0) { ':heavy_check_mark:' } else { ':x:' }
+          "| windows-latest | Windows | ${seconds}s | $icon |" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
+          exit $rc
