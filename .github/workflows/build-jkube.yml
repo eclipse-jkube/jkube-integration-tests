@@ -62,6 +62,7 @@ jobs:
         id: jkube-sha
         run: |
           sha=$(git ls-remote "$JKUBE_REPOSITORY" "refs/heads/$JKUBE_REVISION" | cut -f1)
+          [ -n "$sha" ] || { echo "::error::could not resolve $JKUBE_REVISION SHA"; exit 1; }
           echo "sha=$sha" >> "$GITHUB_OUTPUT"
       # Third-party dependencies, stable across runs (invalidated when poms change).
       # Restored first so the SHA-keyed JKube cache below wins for org/eclipse/jkube.

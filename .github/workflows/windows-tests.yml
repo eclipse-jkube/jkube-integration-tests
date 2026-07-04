@@ -27,7 +27,9 @@ permissions:
   contents: read
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  # Include the event name so a push to main does not cancel the in-flight
+  # nightly schedule run (both resolve github.ref to refs/heads/main).
+  group: ${{ github.workflow }}-${{ github.ref }}-${{ github.event_name }}
   cancel-in-progress: true
 
 env:

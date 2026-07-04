@@ -42,13 +42,13 @@ jobs:
       # Restore the same caches populated by the build-jkube job (m2 first so the
       # SHA-keyed JKube cache wins for org/eclipse/jkube).
       - name: Restore third-party Maven dependencies
-        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830
         with:
           path: ~/.m2/repository
           key: m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: m2-
       - name: Restore JKube build
-        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830
         with:
           path: |
             ./jkube
