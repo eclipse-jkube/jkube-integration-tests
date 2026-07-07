@@ -47,6 +47,6 @@ class JavaVersionK8sITCase implements MavenCase {
       properties("jkube.java.version", "21"));
     // Then
     assertInvocation(result);
-    assertThat(result.getStdOut(), containsString("jkube-java21"));
+    assertThat(result.getStdOut(), containsString("jkube-java-21"));
   }
 }

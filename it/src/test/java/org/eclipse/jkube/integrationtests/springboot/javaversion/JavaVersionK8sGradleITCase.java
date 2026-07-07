@@ -40,6 +40,6 @@ class JavaVersionK8sGradleITCase {
     // When
     final var result = gradle.tasks("-Pjkube.java.version=21", "k8sBuild").build();
     // Then
-    assertThat(result.getOutput(), containsString("jkube-java21"));
+    assertThat(result.getOutput(), containsString("jkube-java-21"));
   }
 }

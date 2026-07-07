@@ -49,7 +49,7 @@ class JavaVersionK8sITCase implements MavenCase {
       properties("jkube.java.version", "21"));
     // Then
     assertInvocation(result);
-    assertThat(result.getStdOut(), containsString("jkube-java21"));
+    assertThat(result.getStdOut(), containsString("jkube-java-21"));
   }
 
   @Test
@@ -62,10 +62,10 @@ class JavaVersionK8sITCase implements MavenCase {
     assertInvocation(result);
     assertThat(result.getStdOut(), allOf(
       containsString("jkube-java"),
-      not(containsString("jkube-java11")),
-      not(containsString("jkube-java17")),
-      not(containsString("jkube-java21")),
-      not(containsString("jkube-java25"))
+      not(containsString("jkube-java-11")),
+      not(containsString("jkube-java-17")),
+      not(containsString("jkube-java-21")),
+      not(containsString("jkube-java-25"))
     ));
   }
 }
