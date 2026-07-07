@@ -14,7 +14,9 @@
 package org.eclipse.jkube.integrationtests.springboot.javaversion;
 
 import org.eclipse.jkube.integrationtests.javaversion.JavaVersionMaven;
+import org.junit.jupiter.api.Disabled;
 
+@Disabled("Pending jkube.java.version support — eclipse-jkube/jkube#3931")
 class JavaVersionK8sITCase extends JavaVersionMaven {
 
   @Override

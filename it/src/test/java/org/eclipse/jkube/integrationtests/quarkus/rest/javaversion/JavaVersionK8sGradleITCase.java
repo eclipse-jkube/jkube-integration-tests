@@ -17,7 +17,9 @@ import org.eclipse.jkube.integrationtests.gradle.JKubeGradleRunner;
 import org.eclipse.jkube.integrationtests.javaversion.JavaVersionGradle;
 import org.eclipse.jkube.integrationtests.jupiter.api.Application;
 import org.eclipse.jkube.integrationtests.jupiter.api.Gradle;
+import org.junit.jupiter.api.Disabled;
 
+@Disabled("Pending jkube.java.version support — eclipse-jkube/jkube#3931")
 @Application("quarkus-rest")
 class JavaVersionK8sGradleITCase extends JavaVersionGradle {
 
