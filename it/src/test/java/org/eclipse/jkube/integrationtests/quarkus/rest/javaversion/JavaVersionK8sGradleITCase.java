@@ -81,8 +81,11 @@ class JavaVersionK8sGradleITCase implements JKubeCase {
     gradle.tasks("k8sApply").build();
     // Then
     final Pod pod = awaitPod(this).getKubernetesResource();
+    final String namespace = pod.getMetadata().getNamespace();
     final var javaVersion = runCommand(
-      "kubectl exec " + pod.getMetadata().getName() + " -- java -version");
+      "kubectl run jkube-java-version-check --rm -i --image=gradle/"
+        + getApplication() + ":latest --restart=Never --image-pull-policy=Never -n "
+        + namespace + " --command -- java -version");
     assertThat(javaVersion.getOutput(), containsString("\"21"));
   }
 

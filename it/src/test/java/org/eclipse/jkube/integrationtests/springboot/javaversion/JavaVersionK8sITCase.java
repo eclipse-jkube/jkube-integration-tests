@@ -100,8 +100,11 @@ class JavaVersionK8sITCase implements JKubeCase, MavenCase {
     final Pod pod = awaitPod(this)
       .logContains("Started", 60)
       .getKubernetesResource();
+    final String namespace = pod.getMetadata().getNamespace();
     final var javaVersion = runCommand(
-      "kubectl exec " + pod.getMetadata().getName() + " -- java -version");
+      "kubectl run jkube-java-version-check --rm -i --image=integration-tests/"
+        + APPLICATION + ":latest --restart=Never --image-pull-policy=Never -n "
+        + namespace + " --command -- java -version");
     assertThat(javaVersion.getOutput(), containsString("\"21"));
   }
 
