@@ -33,7 +33,10 @@ import static org.eclipse.jkube.integrationtests.assertions.JKubeAssertions.asse
 import static org.eclipse.jkube.integrationtests.assertions.PodAssertion.awaitPod;
 import static org.eclipse.jkube.integrationtests.cli.CliUtils.runCommand;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.not;
 import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 
 @Disabled("Pending jkube.java.version support — eclipse-jkube/jkube#3931")
@@ -87,9 +90,10 @@ public abstract class JavaVersionGradle implements JKubeCase {
     final Pod pod = podAssertion.getKubernetesResource();
     final String namespace = pod.getMetadata().getNamespace();
     final var javaVersion = runCommand(
-      "kubectl run jkube-java-version-check --rm -i --image=gradle/"
+      "kubectl run jkube-jv-check-" + getApplication() + " --rm -i --image=gradle/"
         + getApplication() + ":latest --restart=Never --image-pull-policy=Never -n "
         + namespace + " --command -- java -version");
+    assertThat(javaVersion.getExitCode(), equalTo(0));
     assertThat(javaVersion.getOutput(), containsString("\"21"));
   }
 
@@ -103,5 +107,22 @@ public abstract class JavaVersionGradle implements JKubeCase {
     assertJKube(this)
       .assertThatShouldDeleteAllAppliedResources()
       .assertDeploymentDeleted();
+  }
+
+  // Runs after undeploy — local-only build, no cluster interaction
+  @Test
+  @Order(4)
+  @DisplayName("k8sBuild without jkube.java.version, should use default jkube-java base image")
+  protected void k8sBuildDefault() {
+    // When
+    final var result = getGradle().tasks("k8sBuild").build();
+    // Then
+    assertThat(result.getOutput(), allOf(
+      containsString("jkube-java"),
+      not(containsString("jkube-java-11")),
+      not(containsString("jkube-java-17")),
+      not(containsString("jkube-java-21")),
+      not(containsString("jkube-java-25"))
+    ));
   }
 }

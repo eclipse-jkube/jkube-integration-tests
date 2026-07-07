@@ -37,6 +37,7 @@ import static org.eclipse.jkube.integrationtests.cli.CliUtils.runCommand;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.not;
 import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 
@@ -95,9 +96,10 @@ public abstract class JavaVersionMaven implements JKubeCase, MavenCase {
     final Pod pod = podAssertion.getKubernetesResource();
     final String namespace = pod.getMetadata().getNamespace();
     final var javaVersion = runCommand(
-      "kubectl run jkube-java-version-check --rm -i --image=integration-tests/"
+      "kubectl run jkube-jv-check-" + getApplication() + " --rm -i --image=integration-tests/"
         + getApplication() + ":latest --restart=Never --image-pull-policy=Never -n "
         + namespace + " --command -- java -version");
+    assertThat(javaVersion.getExitCode(), equalTo(0));
     assertThat(javaVersion.getOutput(), containsString("\"21"));
   }
 
@@ -114,6 +116,7 @@ public abstract class JavaVersionMaven implements JKubeCase, MavenCase {
       .assertDeploymentDeleted();
   }
 
+  // Runs after undeploy — local-only build, no cluster interaction
   @Test
   @Order(4)
   @DisplayName("k8s:build without jkube.java.version, should use default jkube-java base image")
