@@ -15,6 +15,7 @@ package org.eclipse.jkube.integrationtests.springboot.javaversion;
 
 import org.eclipse.jkube.integrationtests.maven.MavenCase;
 import org.eclipse.jkube.integrationtests.maven.MavenInvocationResult;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Order;
@@ -29,6 +30,7 @@ import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
 
+@Disabled("Pending jkube.java.version support — eclipse-jkube/jkube#3931")
 @Tag(KUBERNETES)
 @TestMethodOrder(OrderAnnotation.class)
 class JavaVersionK8sITCase implements MavenCase {
