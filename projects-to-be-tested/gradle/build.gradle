@@ -19,6 +19,7 @@ allprojects {
     jkube_version = project.hasProperty('jkubeVersion') ? project.getProperty('jkubeVersion') : '1.14-SNAPSHOT'
     spring_boot_version = '2.6.7'
     spring_boot_dependency_management_version = '1.0.11.RELEASE'
+    quarkus_version = project.hasProperty('quarkusVersion') ? project.getProperty('quarkusVersion') : '3.2.12.Final'
   }
 
   repositories {
