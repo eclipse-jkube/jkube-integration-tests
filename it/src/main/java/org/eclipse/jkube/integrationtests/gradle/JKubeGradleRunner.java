@@ -18,8 +18,10 @@ import org.gradle.testkit.runner.GradleRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -71,16 +73,24 @@ public class JKubeGradleRunner {
 
   public CompletableFuture<BuildResult> tasksAsync(OutputStream out, boolean offline, boolean forModule, String... tasks) {
     final GradleRunner configuredRunner = tasks(offline, forModule, tasks);
-    if (out != null) {
-      configuredRunner.forwardStdOutput(new OutputStreamWriter(out, StandardCharsets.UTF_8));
-      configuredRunner.forwardStdError(new OutputStreamWriter(out, StandardCharsets.UTF_8));
+    final Writer stdOutWriter = out != null ? newAutoFlushWriter(out) : null;
+    final Writer stdErrWriter = out != null ? newAutoFlushWriter(out) : null;
+    if (stdOutWriter != null) {
+      configuredRunner.forwardStdOutput(stdOutWriter);
+      configuredRunner.forwardStdError(stdErrWriter);
     }
     final CompletableFuture<BuildResult> future = new CompletableFuture<>();
     final var asyncRun = CompletableFuture.runAsync(() -> {
       try {
         future.complete(configuredRunner.build());
       } catch (Exception e) {
+        if (e instanceof InterruptedException) {
+          Thread.currentThread().interrupt();
+        }
         future.completeExceptionally(e);
+      } finally {
+        closeQuietly(stdOutWriter);
+        closeQuietly(stdErrWriter);
       }
     }, executorService());
     future.whenCompleteAsync((result, throwable) -> {
@@ -89,6 +99,38 @@ public class JKubeGradleRunner {
       }
     });
     return future;
+  }
+
+  private static Writer newAutoFlushWriter(OutputStream out) {
+    return new OutputStreamWriter(out, StandardCharsets.UTF_8) {
+      @Override
+      public void write(char[] cbuf, int off, int len) throws IOException {
+        super.write(cbuf, off, len);
+        super.flush();
+      }
+
+      @Override
+      public void write(int c) throws IOException {
+        super.write(c);
+        super.flush();
+      }
+
+      @Override
+      public void write(String str, int off, int len) throws IOException {
+        super.write(str, off, len);
+        super.flush();
+      }
+    };
+  }
+
+  private static void closeQuietly(Writer writer) {
+    if (writer != null) {
+      try {
+        writer.flush();
+        writer.close();
+      } catch (IOException ignored) {
+      }
+    }
   }
 
   public Path getProjectPath() {

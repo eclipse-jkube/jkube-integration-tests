@@ -28,6 +28,7 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.Isolated;
 import org.junit.jupiter.api.parallel.ResourceLock;
 
 import java.io.ByteArrayOutputStream;
@@ -51,6 +52,7 @@ import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 @Tag(KUBERNETES)
 @Application("sb-watch")
 @KubernetesTest(createEphemeralNamespace = false)
+@Isolated
 @Disabled("Spring Boot DevTools remote upload fails on Minikube networking")
 public class WatchK8sGradleITCase implements JKubeCase {
 
