@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (c) 2019 Red Hat, Inc.
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -16,6 +16,7 @@ package org.eclipse.jkube.integrationtests.javaversion;
 import io.fabric8.junit.jupiter.api.KubernetesTest;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.client.KubernetesClient;
+import io.fabric8.kubernetes.client.dsl.ExecWatch;
 import org.eclipse.jkube.integrationtests.JKubeCase;
 import org.eclipse.jkube.integrationtests.maven.MavenCase;
 import org.eclipse.jkube.integrationtests.maven.MavenInvocationResult;
@@ -28,19 +29,22 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.parallel.ResourceLock;
 
+import java.io.ByteArrayOutputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.concurrent.TimeUnit;
+
 import static org.eclipse.jkube.integrationtests.Locks.CLUSTER_RESOURCE_INTENSIVE;
 import static org.eclipse.jkube.integrationtests.Tags.KUBERNETES;
 import static org.eclipse.jkube.integrationtests.assertions.InvocationResultAssertion.assertInvocation;
 import static org.eclipse.jkube.integrationtests.assertions.JKubeAssertions.assertJKube;
 import static org.eclipse.jkube.integrationtests.assertions.PodAssertion.awaitPod;
-import static org.eclipse.jkube.integrationtests.cli.CliUtils.runCommand;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.matchesPattern;
 import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 
+// TODO(eclipse-jkube/jkube#3931): remove @Disabled once merged
 @Disabled("Pending jkube.java.version support — eclipse-jkube/jkube#3931")
 @Tag(KUBERNETES)
 @TestMethodOrder(OrderAnnotation.class)
@@ -95,12 +99,14 @@ public abstract class JavaVersionMaven implements JKubeCase, MavenCase {
     }
     final Pod pod = podAssertion.getKubernetesResource();
     final String namespace = pod.getMetadata().getNamespace();
-    final var javaVersion = runCommand(
-      "kubectl run jkube-jv-check-" + getApplication() + " --rm -i --image=integration-tests/"
-        + getApplication() + ":latest --restart=Never --image-pull-policy=Never -n "
-        + namespace + " --command -- java -version");
-    assertThat(javaVersion.getExitCode(), equalTo(0));
-    assertThat(javaVersion.getOutput(), containsString("\"21"));
+    final var output = new ByteArrayOutputStream();
+    try (ExecWatch ignored = getKubernetesClient().pods().inNamespace(namespace)
+        .withName(pod.getMetadata().getName())
+        .writingOutput(output).writingError(output)
+        .exec("java", "-version")) {
+      ignored.exitCode().get(30, TimeUnit.SECONDS);
+    }
+    assertThat(output.toString(StandardCharsets.UTF_8), containsString("version \"21"));
   }
 
   @Test
@@ -125,12 +131,7 @@ public abstract class JavaVersionMaven implements JKubeCase, MavenCase {
     final MavenInvocationResult result = maven("k8s:build");
     // Then
     assertInvocation(result);
-    assertThat(result.getStdOut(), allOf(
-      containsString("jkube-java"),
-      not(containsString("jkube-java-11")),
-      not(containsString("jkube-java-17")),
-      not(containsString("jkube-java-21")),
-      not(containsString("jkube-java-25"))
-    ));
+    assertThat(result.getStdOut(), containsString("/jkube-java:"));
+    assertThat(result.getStdOut(), not(matchesPattern("(?s).*jkube-java-\\d+.*")));
   }
 }

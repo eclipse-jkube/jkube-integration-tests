@@ -13,22 +13,14 @@
  */
 package org.eclipse.jkube.integrationtests.springboot.javaversion;
 
-import org.eclipse.jkube.integrationtests.javaversion.JavaVersionMaven;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-class JavaVersionK8sITCase extends JavaVersionMaven {
+@SpringBootApplication
+public class JavaVersionApplication {
 
-  @Override
-  public String getProject() {
-    return "projects-to-be-tested/maven/spring/java-version";
-  }
+	public static void main(String[] args) {
+		SpringApplication.run(JavaVersionApplication.class, args);
+	}
 
-  @Override
-  public String getApplication() {
-    return "spring-boot-java-version";
-  }
-
-  @Override
-  protected String getLogMarker() {
-    return "Started";
-  }
 }

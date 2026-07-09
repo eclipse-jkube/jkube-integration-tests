@@ -13,22 +13,16 @@
  */
 package org.eclipse.jkube.integrationtests.springboot.javaversion;
 
-import org.eclipse.jkube.integrationtests.javaversion.JavaVersionMaven;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-class JavaVersionK8sITCase extends JavaVersionMaven {
+@RestController
+@RequestMapping("/")
+public class JavaVersionResource {
 
-  @Override
-  public String getProject() {
-    return "projects-to-be-tested/maven/spring/java-version";
-  }
-
-  @Override
-  public String getApplication() {
-    return "spring-boot-java-version";
-  }
-
-  @Override
-  protected String getLogMarker() {
-    return "Started";
+  @GetMapping
+  public String hello() {
+    return "Java Version Test";
   }
 }

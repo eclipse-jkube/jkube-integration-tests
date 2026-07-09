@@ -318,6 +318,7 @@
       <modules>
         <module>projects-to-be-tested/maven/quarkus/rest</module>
         <module>projects-to-be-tested/maven/quarkus/rest-trace-logging-enabled</module>
+        <module>projects-to-be-tested/maven/quarkus/java-version</module>
       </modules>
       <activation>
         <file>
@@ -377,6 +378,7 @@
         <module>projects-to-be-tested/maven/spring/zero-config</module>
         <module>projects-to-be-tested/maven/spring/zero-config-fatjar</module>
         <module>projects-to-be-tested/maven/spring/layered-jar-disabled</module>
+        <module>projects-to-be-tested/maven/spring/java-version</module>
       </modules>
       <activation>
         <file>
