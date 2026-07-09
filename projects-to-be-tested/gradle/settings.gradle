@@ -19,5 +19,5 @@ pluginManagement {
   }
 }
 
-include 'dsl', 'quarkus-java-version', 'sb-java-version', 'sb-zero-config'
+include 'dsl', 'qk-java-version', 'sb-java-version', 'sb-zero-config'
 

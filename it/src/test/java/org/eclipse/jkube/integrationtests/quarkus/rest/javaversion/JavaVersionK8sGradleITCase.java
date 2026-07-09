@@ -21,10 +21,10 @@ import org.junit.jupiter.api.Disabled;
 
 // TODO(eclipse-jkube/jkube#3931): remove @Disabled once merged
 @Disabled("Pending jkube.java.version support — eclipse-jkube/jkube#3931")
-@Application("quarkus-java-version")
+@Application("qk-java-version")
 class JavaVersionK8sGradleITCase extends JavaVersionGradle {
 
-  @Gradle(project = "quarkus-java-version")
+  @Gradle(project = "qk-java-version")
   private JKubeGradleRunner gradle;
 
   @Override
