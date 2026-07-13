@@ -17,10 +17,6 @@ import org.eclipse.jkube.integrationtests.gradle.JKubeGradleRunner;
 import org.eclipse.jkube.integrationtests.javaversion.JavaVersionGradle;
 import org.eclipse.jkube.integrationtests.jupiter.api.Application;
 import org.eclipse.jkube.integrationtests.jupiter.api.Gradle;
-import org.junit.jupiter.api.Disabled;
-
-// TODO(eclipse-jkube/jkube#3931): remove @Disabled once merged
-@Disabled("Pending jkube.java.version support — eclipse-jkube/jkube#3931")
 @Application("sb-java-version")
 class JavaVersionK8sGradleITCase extends JavaVersionGradle {
 

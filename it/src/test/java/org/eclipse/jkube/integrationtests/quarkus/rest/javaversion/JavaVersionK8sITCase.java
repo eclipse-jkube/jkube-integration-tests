@@ -14,10 +14,6 @@
 package org.eclipse.jkube.integrationtests.quarkus.rest.javaversion;
 
 import org.eclipse.jkube.integrationtests.javaversion.JavaVersionMaven;
-import org.junit.jupiter.api.Disabled;
-
-// TODO(eclipse-jkube/jkube#3931): remove @Disabled once merged
-@Disabled("Pending jkube.java.version support — eclipse-jkube/jkube#3931")
 class JavaVersionK8sITCase extends JavaVersionMaven {
 
   @Override
