@@ -41,7 +41,7 @@ public class KubernetesClientAssertion<T extends KubernetesResource> {
       try {
         return jKubeCase.httpGet(url);
       } catch (Exception e) {
-        log.warn("Connection to {} failed, retrying", url);
+        log.warn("Connection to {} failed, retrying", url, e);
       }
       return null;
     }, 3000L).apply(Objects::nonNull);
