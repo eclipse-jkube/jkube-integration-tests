@@ -33,13 +33,13 @@ jobs:
     uses: ./.github/workflows/build-jkube.yml
 
   openshift-kubernetes-distribution:
-    name: CRC ${{ matrix.crc }} / OKD ${{ matrix.okd }} / ${{ matrix.suite }}
+    name: CRC ${{ matrix.crc }} / OKD ${{ matrix.okd-bundle }} / ${{ matrix.suite }}
     runs-on: ubuntu-latest
     needs: build-jkube
     strategy:
       fail-fast: false
       matrix:
-        okd: [ v4.22.1 ]
+        okd-bundle: [ 4.22.0-okd-scos.6 ]
         crc: [ 2.62.0 ]
         suite: ['quarkus', 'springboot', 'webapp', 'other']
     steps:
@@ -109,7 +109,7 @@ jobs:
         run: |
           crc config set preset okd
           crc config set network-mode user
-          crc config set bundle docker://quay.io/crcont/okd-bundle:4.22.0-okd-scos.6
+          crc config set bundle docker://quay.io/crcont/okd-bundle:${{ matrix.okd-bundle }}
       - name: Setup the crc
         run: |
           sudo -su $USER crc setup
