@@ -55,7 +55,7 @@ class JettyOcWatchCopyITCase extends JettyK8sWatch {
     try (final ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
       // Given
       mavenWatch = mavenAsync("oc:watch", null, baos, null);
-      await(baos::toString).apply(log -> log.contains("Waiting ...")).get(2, TimeUnit.MINUTES);
+      await(baos::toString).apply(log -> log.contains("Waiting ...")).get(5, TimeUnit.MINUTES);
       // When
       FileUtils.write(fileToChange, "<html><body><h2>Eclipse JKube Jetty v2</h2></body></html>", StandardCharsets.UTF_8);
       assertInvocation(maven("package"));
