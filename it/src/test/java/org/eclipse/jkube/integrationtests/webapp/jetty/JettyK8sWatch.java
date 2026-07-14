@@ -53,12 +53,16 @@ abstract class JettyK8sWatch implements JKubeCase, MavenCase {
   Pod originalPod;
   Future<MavenInvocationResult> mavenWatch;
 
+  String getPrefix() {
+    return "k8s";
+  }
+
   @BeforeEach
   void setUp() throws Exception {
     fileToChange = new File(String.format("../%s/src/main/webapp/index.html", getProject()));
     originalFileContent = FileUtils.readFileToString(fileToChange, StandardCharsets.UTF_8);
     // Tests start with a fresh deployment to watch for
-    assertInvocation(maven("clean package k8s:build k8s:resource k8s:apply"));
+    assertInvocation(maven(String.format("clean package %1$s:build %1$s:resource %1$s:apply", getPrefix())));
     originalPod = assertThatShouldApplyResources("<h2>Eclipse JKube on Jetty rocks!</h2>");
   }
 
@@ -68,7 +72,7 @@ abstract class JettyK8sWatch implements JKubeCase, MavenCase {
       mavenWatch.cancel(true);
     }
     kubernetesClient.resource(originalPod).withGracePeriod(0).delete();
-    assertInvocation(maven("k8s:undeploy"));
+    assertInvocation(maven(String.format("%s:undeploy", getPrefix())));
     FileUtils.write(fileToChange, originalFileContent, StandardCharsets.UTF_8);
   }
 
