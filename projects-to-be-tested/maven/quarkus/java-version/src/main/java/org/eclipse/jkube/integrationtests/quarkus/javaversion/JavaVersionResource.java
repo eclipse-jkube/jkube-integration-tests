@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (c) 2019 Red Hat, Inc.
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -11,12 +11,19 @@
  * Contributors:
  *   Red Hat, Inc. - initial API and implementation
  */
-pluginManagement {
-  repositories {
-    gradlePluginPortal()
-    mavenCentral()
-    mavenLocal()
+package org.eclipse.jkube.integrationtests.quarkus.javaversion;
+
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+
+@Path("/")
+public class JavaVersionResource {
+
+  @GET
+  @Produces(MediaType.TEXT_PLAIN)
+  public String hello() {
+    return "Java Version Test";
   }
 }
-
-include 'dsl', 'qk-java-version', 'sb-java-version', 'sb-zero-config', 'webapp-jetty-watch-copy', 'sb-watch'
