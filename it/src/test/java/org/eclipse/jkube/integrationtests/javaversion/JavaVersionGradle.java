@@ -19,7 +19,6 @@ import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.dsl.ExecWatch;
 import org.eclipse.jkube.integrationtests.JKubeCase;
 import org.eclipse.jkube.integrationtests.gradle.JKubeGradleRunner;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Order;
@@ -42,8 +41,6 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.matchesPattern;
 import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 
-// TODO(eclipse-jkube/jkube#3931): remove @Disabled once merged
-@Disabled("Pending jkube.java.version support — eclipse-jkube/jkube#3931")
 @Tag(KUBERNETES)
 @TestMethodOrder(OrderAnnotation.class)
 @KubernetesTest(createEphemeralNamespace = false)
