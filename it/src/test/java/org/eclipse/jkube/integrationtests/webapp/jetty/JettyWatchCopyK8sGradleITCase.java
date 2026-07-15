@@ -14,6 +14,7 @@
 package org.eclipse.jkube.integrationtests.webapp.jetty;
 
 import io.fabric8.junit.jupiter.api.KubernetesTest;
+import io.fabric8.kubernetes.client.dsl.ExecWatch;
 import org.apache.commons.io.FileUtils;
 import org.eclipse.jkube.integrationtests.gradle.JKubeGradleRunner;
 import org.eclipse.jkube.integrationtests.jupiter.api.Application;
@@ -35,6 +36,8 @@ import java.util.concurrent.TimeoutException;
 import static org.eclipse.jkube.integrationtests.AsyncUtil.await;
 import static org.eclipse.jkube.integrationtests.Locks.CLUSTER_RESOURCE_INTENSIVE;
 import static org.eclipse.jkube.integrationtests.Tags.KUBERNETES;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 
 @Tag(KUBERNETES)
@@ -75,6 +78,8 @@ class JettyWatchCopyK8sGradleITCase extends JettyK8sWatch {
   @DisplayName("k8sWatch, with mode=copy, SHOULD hot deploy the application (Gradle)")
   @ResourceLock(value = CLUSTER_RESOURCE_INTENSIVE, mode = READ_WRITE)
   void k8sWatchCopy() throws Exception {
+    // Verify scanInterval=1 reaches the deployed pod (jkube#3928)
+    assertScanIntervalReachesDeployedPod();
     try (final ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
       // Given
       gradleWatch = gradle.tasksAsync(baos, false, true, "k8sWatch");
@@ -93,5 +98,18 @@ class JettyWatchCopyK8sGradleITCase extends JettyK8sWatch {
       waitUntilApplicationRestartsInsidePod();
       assertThatShouldApplyResources("<h2>Eclipse JKube Jetty v2</h2>");
     }
+  }
+
+  private void assertScanIntervalReachesDeployedPod() throws Exception {
+    final String namespace = originalPod.getMetadata().getNamespace();
+    final var output = new ByteArrayOutputStream();
+    try (ExecWatch ignored = kubernetesClient.pods().inNamespace(namespace)
+        .withName(originalPod.getMetadata().getName())
+        .writingOutput(output).writingError(output)
+        .exec("env")) {
+      ignored.exitCode().get(30, TimeUnit.SECONDS);
+    }
+    assertThat(output.toString(StandardCharsets.UTF_8),
+      containsString("jetty.deploy.scanInterval=1"));
   }
 }
