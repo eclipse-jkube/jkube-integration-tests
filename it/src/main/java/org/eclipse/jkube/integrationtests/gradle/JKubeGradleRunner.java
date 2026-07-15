@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright (c) 2019 Red Hat, Inc.
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -26,6 +26,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
 import java.util.stream.Stream;
 
 import static org.eclipse.jkube.integrationtests.AsyncUtil.executorService;
@@ -80,20 +81,16 @@ public class JKubeGradleRunner {
       configuredRunner.forwardStdError(stdErrWriter);
     }
     final CompletableFuture<BuildResult> future = new CompletableFuture<>();
-    final var asyncRun = CompletableFuture.runAsync(() -> {
+    final Future<?> asyncRun = executorService().submit(() -> {
       try {
         future.complete(configuredRunner.build());
       } catch (Exception e) {
-        if (e instanceof InterruptedException) {
-          Thread.currentThread().interrupt();
-        }
         future.completeExceptionally(e);
       } finally {
-        closeQuietly(stdOutWriter);
-        closeQuietly(stdErrWriter);
+        resetOutputForwarding(configuredRunner, stdOutWriter, stdErrWriter);
       }
-    }, executorService());
-    future.whenCompleteAsync((result, throwable) -> {
+    });
+    future.whenComplete((result, throwable) -> {
       if (!asyncRun.isDone()) {
         asyncRun.cancel(true);
       }
@@ -123,14 +120,17 @@ public class JKubeGradleRunner {
     };
   }
 
-  private static void closeQuietly(Writer writer) {
-    if (writer != null) {
-      try {
-        writer.flush();
-        writer.close();
-      } catch (IOException ignored) {
+  private static void resetOutputForwarding(GradleRunner runner, Writer... writers) {
+    for (Writer writer : writers) {
+      if (writer != null) {
+        try {
+          writer.flush();
+        } catch (IOException ignored) {
+        }
       }
     }
+    runner.forwardStdOutput(Writer.nullWriter());
+    runner.forwardStdError(Writer.nullWriter());
   }
 
   public Path getProjectPath() {

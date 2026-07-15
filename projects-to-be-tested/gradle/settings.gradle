@@ -19,4 +19,4 @@ pluginManagement {
   }
 }
 
-include 'dsl', 'qk-java-version', 'sb-java-version', 'sb-zero-config', 'webapp-jetty-watch-copy', 'sb-watch'
+include 'dsl', 'qk-java-version', 'sb-java-version', 'sb-zero-config', 'wa-jetty-wc', 'sb-watch'

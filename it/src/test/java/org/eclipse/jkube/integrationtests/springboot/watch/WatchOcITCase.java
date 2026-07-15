@@ -19,7 +19,7 @@ import static org.eclipse.jkube.integrationtests.Tags.OPEN_SHIFT;
 import static org.eclipse.jkube.integrationtests.Tags.OPEN_SHIFT_OSCI;
 
 @Tag(OPEN_SHIFT)
-class WatchOcITCase extends Watch {
+class WatchOcITCase extends WatchMaven {
   @Override
   String getPrefix() {
     return "oc";

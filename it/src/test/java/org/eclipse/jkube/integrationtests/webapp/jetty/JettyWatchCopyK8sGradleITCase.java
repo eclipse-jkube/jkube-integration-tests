@@ -14,11 +14,7 @@
 package org.eclipse.jkube.integrationtests.webapp.jetty;
 
 import io.fabric8.junit.jupiter.api.KubernetesTest;
-import io.fabric8.kubernetes.api.model.Pod;
-import io.fabric8.kubernetes.client.KubernetesClient;
-import io.fabric8.kubernetes.client.dsl.PodResource;
 import org.apache.commons.io.FileUtils;
-import org.eclipse.jkube.integrationtests.JKubeCase;
 import org.eclipse.jkube.integrationtests.gradle.JKubeGradleRunner;
 import org.eclipse.jkube.integrationtests.jupiter.api.Application;
 import org.eclipse.jkube.integrationtests.jupiter.api.Gradle;
@@ -31,41 +27,25 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.ResourceLock;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import static org.eclipse.jkube.integrationtests.AsyncUtil.await;
 import static org.eclipse.jkube.integrationtests.Locks.CLUSTER_RESOURCE_INTENSIVE;
 import static org.eclipse.jkube.integrationtests.Tags.KUBERNETES;
-import static org.eclipse.jkube.integrationtests.assertions.PodAssertion.assertPod;
-import static org.eclipse.jkube.integrationtests.assertions.PodAssertion.awaitPod;
-import static org.eclipse.jkube.integrationtests.assertions.ServiceAssertion.awaitService;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 
 @Tag(KUBERNETES)
-@Application("webapp-jetty-watch-copy")
+@Application(JettyK8sWatch.GRADLE_APPLICATION)
 @KubernetesTest(createEphemeralNamespace = false)
-class JettyWatchCopyK8sGradleITCase implements JKubeCase {
+class JettyWatchCopyK8sGradleITCase extends JettyK8sWatch {
 
-  @Gradle(project = "webapp-jetty-watch-copy")
+  @Gradle(project = "wa-jetty-wc")
   private JKubeGradleRunner gradle;
 
-  private KubernetesClient kubernetesClient;
-  private File fileToChange;
-  private String originalFileContent;
-  private Pod originalPod;
   private CompletableFuture<BuildResult> gradleWatch;
-
-  @Override
-  public KubernetesClient getKubernetesClient() {
-    return kubernetesClient;
-  }
 
   @BeforeEach
   void setUp() throws Exception {
@@ -78,12 +58,17 @@ class JettyWatchCopyK8sGradleITCase implements JKubeCase {
 
   @AfterEach
   void tearDown() throws Exception {
-    if (gradleWatch != null) {
-      gradleWatch.cancel(true);
+    try {
+      if (gradleWatch != null) {
+        gradleWatch.cancel(true);
+      }
+      if (originalPod != null) {
+        kubernetesClient.resource(originalPod).withGracePeriod(0).delete();
+      }
+      gradle.tasks(false, true, "k8sUndeploy").build();
+    } finally {
+      FileUtils.write(fileToChange, originalFileContent, StandardCharsets.UTF_8);
     }
-    kubernetesClient.resource(originalPod).withGracePeriod(0).delete();
-    gradle.tasks(false, true, "k8sUndeploy").build();
-    FileUtils.write(fileToChange, originalFileContent, StandardCharsets.UTF_8);
   }
 
   @Test
@@ -108,25 +93,5 @@ class JettyWatchCopyK8sGradleITCase implements JKubeCase {
       waitUntilApplicationRestartsInsidePod();
       assertThatShouldApplyResources("<h2>Eclipse JKube Jetty v2</h2>");
     }
-  }
-
-  private Pod assertThatShouldApplyResources(String response) throws Exception {
-    final Pod pod = awaitPod(this).getKubernetesResource();
-    assertPod(pod).apply(this).logContains("Server:main: Started", 120);
-    awaitService(this, pod.getMetadata().getNamespace())
-      .assertPorts(hasSize(1))
-      .assertPort("http", 8080, true)
-      .assertNodePortResponse("http", containsString(response));
-    return pod;
-  }
-
-  private void waitUntilApplicationRestartsInsidePod() throws ExecutionException, InterruptedException, TimeoutException {
-    PodResource podResource = getKubernetesClient().pods().resource(originalPod);
-    await(podResource::getLog)
-      .apply(l -> l.contains("Stopped oeje10w.WebAppContext"))
-      .get(10, TimeUnit.SECONDS);
-    await(podResource::getLog)
-      .apply(l -> l.indexOf("Started oeje10w.WebAppContext", l.indexOf("Stopped oeje10w.WebAppContext")) > 0)
-      .get(10, TimeUnit.SECONDS);
   }
 }

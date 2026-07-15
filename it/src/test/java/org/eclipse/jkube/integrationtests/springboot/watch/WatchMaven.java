@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright (c) 2019 Red Hat, Inc.
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -15,83 +15,79 @@ package org.eclipse.jkube.integrationtests.springboot.watch;
 
 import io.fabric8.junit.jupiter.api.KubernetesTest;
 import org.apache.commons.io.FileUtils;
-import org.eclipse.jkube.integrationtests.gradle.JKubeGradleRunner;
-import org.eclipse.jkube.integrationtests.jupiter.api.Application;
-import org.eclipse.jkube.integrationtests.jupiter.api.Gradle;
-import org.gradle.testkit.runner.BuildResult;
+import org.eclipse.jkube.integrationtests.maven.MavenCase;
+import org.eclipse.jkube.integrationtests.maven.MavenInvocationResult;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.parallel.Isolated;
 import org.junit.jupiter.api.parallel.ResourceLock;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.nio.charset.StandardCharsets;
-import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import static org.eclipse.jkube.integrationtests.AsyncUtil.await;
 import static org.eclipse.jkube.integrationtests.Locks.CLUSTER_RESOURCE_INTENSIVE;
-import static org.eclipse.jkube.integrationtests.Tags.KUBERNETES;
+import static org.eclipse.jkube.integrationtests.assertions.InvocationResultAssertion.assertInvocation;
 import static org.eclipse.jkube.integrationtests.assertions.PodAssertion.awaitPod;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.stringContainsInOrder;
 import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 
-@Tag(KUBERNETES)
-@Application(Watch.GRADLE_APPLICATION)
 @KubernetesTest(createEphemeralNamespace = false)
-@Isolated
-@Disabled("Spring Boot DevTools remote upload fails on Minikube networking")
-public class WatchK8sGradleITCase extends Watch {
+abstract class WatchMaven extends Watch implements MavenCase {
 
-  @Gradle(project = "sb-watch")
-  private JKubeGradleRunner gradle;
+  private static final String PROJECT_SPRING_BOOT_WATCH = "projects-to-be-tested/maven/spring/watch";
 
-  private CompletableFuture<BuildResult> gradleWatch;
+  private Future<MavenInvocationResult> mavenWatch;
+
+  abstract String getPrefix();
+
+  @Override
+  public String getProject() {
+    return PROJECT_SPRING_BOOT_WATCH;
+  }
+
+  @Override
+  public String getApplication() {
+    return MAVEN_APPLICATION;
+  }
 
   @BeforeEach
   void setUp() throws Exception {
-    fileToChange = gradle.getModulePath()
-      .resolve("src").resolve("main").resolve("java")
-      .resolve("org").resolve("eclipse").resolve("jkube").resolve("integrationtests")
-      .resolve("springbootwatch").resolve("SpringBootWatchResource.java").toFile();
+    fileToChange = new File(String.format(
+      "../%s/src/main/java/org/eclipse/jkube/integrationtests/springbootwatch/SpringBootWatchResource.java", getProject()));
     originalFileContent = FileUtils.readFileToString(fileToChange, StandardCharsets.UTF_8);
-    gradle.tasks(false, true, "k8sBuild", "k8sResource", "k8sApply").build();
+    assertInvocation(maven(String.format("clean package %1$s:build %1$s:resource %1$s:apply", getPrefix())));
     originalPod = assertThatShouldApplyResources("Spring Boot Watch v1");
   }
 
   @AfterEach
   void tearDown() throws Exception {
-    try {
-      if (gradleWatch != null) {
-        gradleWatch.cancel(true);
-      }
-      if (originalPod != null) {
-        kubernetesClient.resource(originalPod).withGracePeriod(0).delete();
-      }
-      gradle.tasks(false, true, "k8sUndeploy").build();
-    } finally {
-      FileUtils.write(fileToChange, originalFileContent, StandardCharsets.UTF_8);
+    if (mavenWatch != null) {
+      mavenWatch.cancel(true);
     }
+    kubernetesClient.resource(originalPod).withGracePeriod(0).delete();
+    assertInvocation(maven(String.format("%s:undeploy", getPrefix())));
+    FileUtils.write(fileToChange, originalFileContent, StandardCharsets.UTF_8);
   }
 
   @Test
   @ResourceLock(value = CLUSTER_RESOURCE_INTENSIVE, mode = READ_WRITE)
-  @DisplayName("k8sWatch, SHOULD hot reload application on changes (Gradle)")
+  @DisplayName("watch, SHOULD hot reload application on changes")
   void watch_whenSourceModified_shouldLiveReloadChanges() throws Exception {
     try (final ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
       // Given
-      gradleWatch = gradle.tasksAsync(baos, false, true, "k8sWatch");
+      mavenWatch = mavenAsync(String.format("%s:watch", getPrefix()), null, baos, null);
       await(baos::toString).apply(log -> log.contains("Started RemoteSpringApplication")).get(2, TimeUnit.MINUTES);
       // When
       FileUtils.write(fileToChange, originalFileContent.replace(
         "\"Spring Boot Watch v1\";", "\"Spring Boot Watch v2\";"), StandardCharsets.UTF_8);
-      gradle.tasks(false, true, "build").build();
+      assertInvocation(maven("package"));
       try {
         await(baos::toString).apply(log -> log.contains("Remote server has changed, triggering LiveReload"))
           .get(1, TimeUnit.MINUTES);

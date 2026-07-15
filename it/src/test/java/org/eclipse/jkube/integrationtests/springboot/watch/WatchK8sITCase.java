@@ -23,7 +23,7 @@ import static org.eclipse.jkube.integrationtests.Tags.KUBERNETES;
 @Isolated
 @Disabled("Test won't pass on CI (Minikube)")
 // o.s.b.d.r.c.ClassPathChangeUploader      : A failure occurred when uploading to http://localhost:51337/.~~spring-boot!~/restart. Upload will be retried in 2 seconds
-public class WatchK8sITCase extends Watch {
+public class WatchK8sITCase extends WatchMaven {
   @Override
   String getPrefix() {
     return "k8s";
