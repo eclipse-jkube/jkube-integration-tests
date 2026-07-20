@@ -27,6 +27,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
@@ -90,9 +91,11 @@ abstract class WatchMaven extends Watch implements MavenCase {
       mavenWatch = mavenAsync(String.format("%s:watch", getPrefix()), null, baos, null);
       await(baos::toString).apply(log -> log.contains("Started RemoteSpringApplication")).get(2, TimeUnit.MINUTES);
       // When
+      final ScheduledFuture<?> keepalive = startPortForwardKeepalive(baos.toString(StandardCharsets.UTF_8));
       FileUtils.write(fileToChange, originalFileContent.replace(
         "\"Spring Boot Watch v1\";", "\"Spring Boot Watch v2\";"), StandardCharsets.UTF_8);
       assertInvocation(maven("package"));
+      stopKeepalive(keepalive);
       try {
         await(baos::toString).apply(log -> log.contains("Remote server has changed, triggering LiveReload"))
           .get(1, TimeUnit.MINUTES);

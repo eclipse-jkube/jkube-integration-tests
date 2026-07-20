@@ -30,6 +30,7 @@ import org.junit.jupiter.api.parallel.ResourceLock;
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import static org.eclipse.jkube.integrationtests.AsyncUtil.await;
@@ -86,9 +87,11 @@ public class WatchOcGradleITCase extends Watch {
       gradleWatch = gradle.tasksAsync(baos, false, true, "ocWatch");
       await(baos::toString).apply(log -> log.contains(":: Spring Boot Remote ::")).get(2, TimeUnit.MINUTES);
       // When
+      final ScheduledFuture<?> keepalive = startPortForwardKeepalive(baos.toString(StandardCharsets.UTF_8));
       FileUtils.write(fileToChange, originalFileContent.replace(
         "\"Spring Boot Watch v1\";", "\"Spring Boot Watch v2\";"), StandardCharsets.UTF_8);
       gradle.tasks(false, true, "build").build();
+      stopKeepalive(keepalive);
       // Then — SLF4J log assertions (LiveReload, Started) unavailable in Gradle (jkube#3960)
       assertThat(baos.toString(StandardCharsets.UTF_8), stringContainsInOrder(
         "Running watcher spring-boot",
