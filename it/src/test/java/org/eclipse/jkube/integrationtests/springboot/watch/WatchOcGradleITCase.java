@@ -92,7 +92,8 @@ public class WatchOcGradleITCase extends Watch {
         "\"Spring Boot Watch v1\";", "\"Spring Boot Watch v2\";"), StandardCharsets.UTF_8);
       gradle.tasks(false, true, "build").build();
       stopKeepalive(keepalive);
-      // Then — SLF4J log assertions (LiveReload, Started) unavailable in Gradle (jkube#3960)
+      // Then — LiveReload/Started log lines go through SLF4J which falls back to NOP in
+      // Gradle TestKit due to SLF4J 2.x vs logback 1.2.x classpath conflict (jkube#3960)
       assertThat(baos.toString(StandardCharsets.UTF_8), stringContainsInOrder(
         "Running watcher spring-boot",
         ":: Spring Boot Remote ::"
