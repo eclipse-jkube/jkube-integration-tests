@@ -68,12 +68,17 @@ abstract class WatchMaven extends Watch implements MavenCase {
 
   @AfterEach
   void tearDown() throws Exception {
-    if (mavenWatch != null) {
-      mavenWatch.cancel(true);
+    try {
+      if (mavenWatch != null) {
+        mavenWatch.cancel(true);
+      }
+      if (originalPod != null) {
+        kubernetesClient.resource(originalPod).withGracePeriod(0).delete();
+      }
+      assertInvocation(maven(String.format("%s:undeploy", getPrefix())));
+    } finally {
+      FileUtils.write(fileToChange, originalFileContent, StandardCharsets.UTF_8);
     }
-    kubernetesClient.resource(originalPod).withGracePeriod(0).delete();
-    assertInvocation(maven(String.format("%s:undeploy", getPrefix())));
-    FileUtils.write(fileToChange, originalFileContent, StandardCharsets.UTF_8);
   }
 
   @Test

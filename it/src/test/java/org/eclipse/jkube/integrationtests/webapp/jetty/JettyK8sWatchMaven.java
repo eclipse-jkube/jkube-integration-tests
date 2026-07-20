@@ -43,11 +43,16 @@ abstract class JettyK8sWatchMaven extends JettyK8sWatch implements MavenCase {
 
   @AfterEach
   void tearDown() throws IOException, MavenInvocationException, InterruptedException {
-    if (mavenWatch != null) {
-      mavenWatch.cancel(true);
+    try {
+      if (mavenWatch != null) {
+        mavenWatch.cancel(true);
+      }
+      if (originalPod != null) {
+        kubernetesClient.resource(originalPod).withGracePeriod(0).delete();
+      }
+      assertInvocation(maven("k8s:undeploy"));
+    } finally {
+      FileUtils.write(fileToChange, originalFileContent, StandardCharsets.UTF_8);
     }
-    kubernetesClient.resource(originalPod).withGracePeriod(0).delete();
-    assertInvocation(maven("k8s:undeploy"));
-    FileUtils.write(fileToChange, originalFileContent, StandardCharsets.UTF_8);
   }
 }
