@@ -33,7 +33,7 @@ import static org.hamcrest.Matchers.endsWith;
 import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 
 @Tag(KUBERNETES)
-class JettyK8sWatchNoneITCase extends JettyK8sWatch {
+class JettyK8sWatchNoneITCase extends JettyK8sWatchMaven {
 
   @Override
   public String getProject() {

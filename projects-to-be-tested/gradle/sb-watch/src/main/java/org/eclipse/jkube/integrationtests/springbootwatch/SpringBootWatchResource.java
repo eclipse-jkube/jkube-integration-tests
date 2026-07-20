@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (c) 2019 Red Hat, Inc.
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -11,18 +11,16 @@
  * Contributors:
  *   Red Hat, Inc. - initial API and implementation
  */
-package org.eclipse.jkube.integrationtests.springboot.watch;
+package org.eclipse.jkube.integrationtests.springbootwatch;
 
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.parallel.Isolated;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import static org.eclipse.jkube.integrationtests.Tags.KUBERNETES;
+@RestController
+public class SpringBootWatchResource {
 
-@Tag(KUBERNETES)
-@Isolated
-public class WatchK8sITCase extends WatchMaven {
-  @Override
-  String getPrefix() {
-    return "k8s";
+  @GetMapping
+  public String zeroConfig() {
+    return "Spring Boot Watch v1";
   }
 }

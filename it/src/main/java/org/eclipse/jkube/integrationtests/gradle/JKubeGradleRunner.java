@@ -13,14 +13,23 @@
  */
 package org.eclipse.jkube.integrationtests.gradle;
 
+import org.gradle.testkit.runner.BuildResult;
 import org.gradle.testkit.runner.GradleRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
 import java.util.stream.Stream;
 
+import static org.eclipse.jkube.integrationtests.AsyncUtil.executorService;
 import static org.eclipse.jkube.integrationtests.JKubeCase.JKUBE_VERSION_SYSTEM_PROPERTY;
 
 public class JKubeGradleRunner {
@@ -57,6 +66,71 @@ public class JKubeGradleRunner {
     }
     log.info("Running 'gradle {}'", String.join(" ", arguments));
     return gradleRunner.withArguments(arguments);
+  }
+
+  public CompletableFuture<BuildResult> tasksAsync(OutputStream out, String... tasks) {
+    return tasksAsync(out, true, true, tasks);
+  }
+
+  public CompletableFuture<BuildResult> tasksAsync(OutputStream out, boolean offline, boolean forModule, String... tasks) {
+    final GradleRunner configuredRunner = tasks(offline, forModule, tasks);
+    final Writer stdOutWriter = out != null ? newAutoFlushWriter(out) : null;
+    final Writer stdErrWriter = out != null ? newAutoFlushWriter(out) : null;
+    if (stdOutWriter != null) {
+      configuredRunner.forwardStdOutput(stdOutWriter);
+      configuredRunner.forwardStdError(stdErrWriter);
+    }
+    final CompletableFuture<BuildResult> future = new CompletableFuture<>();
+    final Future<?> asyncRun = executorService().submit(() -> {
+      try {
+        future.complete(configuredRunner.build());
+      } catch (Exception e) {
+        future.completeExceptionally(e);
+      } finally {
+        resetOutputForwarding(configuredRunner, stdOutWriter, stdErrWriter);
+      }
+    });
+    future.whenComplete((result, throwable) -> {
+      if (!asyncRun.isDone()) {
+        asyncRun.cancel(true);
+      }
+    });
+    return future;
+  }
+
+  private static Writer newAutoFlushWriter(OutputStream out) {
+    return new OutputStreamWriter(out, StandardCharsets.UTF_8) {
+      @Override
+      public void write(char[] cbuf, int off, int len) throws IOException {
+        super.write(cbuf, off, len);
+        super.flush();
+      }
+
+      @Override
+      public void write(int c) throws IOException {
+        super.write(c);
+        super.flush();
+      }
+
+      @Override
+      public void write(String str, int off, int len) throws IOException {
+        super.write(str, off, len);
+        super.flush();
+      }
+    };
+  }
+
+  private static void resetOutputForwarding(GradleRunner runner, Writer... writers) {
+    for (Writer writer : writers) {
+      if (writer != null) {
+        try {
+          writer.flush();
+        } catch (IOException ignored) {
+        }
+      }
+    }
+    runner.forwardStdOutput(Writer.nullWriter());
+    runner.forwardStdError(Writer.nullWriter());
   }
 
   public Path getProjectPath() {

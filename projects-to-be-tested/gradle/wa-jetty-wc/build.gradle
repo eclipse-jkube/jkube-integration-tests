@@ -11,18 +11,13 @@
  * Contributors:
  *   Red Hat, Inc. - initial API and implementation
  */
-package org.eclipse.jkube.integrationtests.springboot.watch;
+plugins {
+  id 'org.eclipse.jkube.kubernetes' version "${jkube_version}"
+  id 'org.eclipse.jkube.openshift' version "${jkube_version}"
+  id 'war'
+}
 
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.parallel.Isolated;
-
-import static org.eclipse.jkube.integrationtests.Tags.KUBERNETES;
-
-@Tag(KUBERNETES)
-@Isolated
-public class WatchK8sITCase extends WatchMaven {
-  @Override
-  String getPrefix() {
-    return "k8s";
-  }
+ext {
+  set('jkube.watch.mode', 'copy')
+  set('jkube.enricher.jkube-service.type', 'NodePort')
 }

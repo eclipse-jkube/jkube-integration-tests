@@ -31,7 +31,7 @@ import static org.eclipse.jkube.integrationtests.assertions.InvocationResultAsse
 import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 
 @Tag(KUBERNETES)
-class JettyK8sWatchCopyITCase extends JettyK8sWatch {
+class JettyK8sWatchCopyITCase extends JettyK8sWatchMaven {
 
   @Override
   public String getProject() {
