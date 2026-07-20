@@ -93,7 +93,8 @@ public class WatchOcGradleITCase extends Watch {
       gradle.tasks(false, true, "build").build();
       stopKeepalive(keepalive);
       // Then — LiveReload/Started log lines go through SLF4J which falls back to NOP in
-      // Gradle TestKit due to SLF4J 2.x vs logback 1.2.x classpath conflict (jkube#3960)
+      // Gradle TestKit due to SLF4J 2.x vs logback 1.2.x classpath conflict (jkube#3960).
+      // TODO: revisit when upgrading to Spring Boot 3.x/4.x (ships logback 1.4+ with native SLF4J 2.x support)
       assertThat(baos.toString(StandardCharsets.UTF_8), stringContainsInOrder(
         "Running watcher spring-boot",
         ":: Spring Boot Remote ::"
