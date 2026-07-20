@@ -33,6 +33,10 @@
   </description>
 
   <properties>
+    <!-- Spring Boot 2.7.12+ breaks DevTools remote restart due to Tomcat 9.0.83
+         TomcatURLStreamHandlerFactory regression (spring-boot#39733).
+         See https://github.com/eclipse-jkube/jkube-integration-tests/issues/417 -->
+    <spring-boot.version>2.7.11</spring-boot.version>
     <jkube.enricher.jkube-service.type>NodePort</jkube.enricher.jkube-service.type>
   </properties>
 

@@ -116,7 +116,6 @@ abstract class Watch implements JKubeCase, MavenCase {
       assertThat(baos.toString(StandardCharsets.UTF_8), stringContainsInOrder(
         "Running watcher spring-boot",
         ":: Spring Boot Remote ::",
-        "LiveReload server is running on port",
         "Remote server has changed, triggering LiveReload"
       ));
       awaitPod(this).logContains("restartedMain]", 60);

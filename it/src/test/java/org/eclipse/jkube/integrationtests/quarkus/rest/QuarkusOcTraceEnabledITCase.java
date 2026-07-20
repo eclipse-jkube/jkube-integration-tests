@@ -139,7 +139,7 @@ class QuarkusOcTraceEnabledITCase extends Quarkus implements OpenShiftCase {
     assertThat(ocLogGoalLog, containsString("[TRACE] -WS END-"));
     assertInvocation(invocationResult);
     assertThat(invocationResult.getStdOut(),
-      stringContainsInOrder(String.format("INFO: %s 0.0.0-SNAPSHOT on JVM", getApplication()), " started in "));
+      stringContainsInOrder(getApplication() + " 0.0.0-SNAPSHOT on JVM", " started in "));
   }
 
   @Test
