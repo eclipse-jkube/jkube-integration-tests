@@ -34,17 +34,17 @@ import java.util.concurrent.TimeUnit;
 
 import static org.eclipse.jkube.integrationtests.AsyncUtil.await;
 import static org.eclipse.jkube.integrationtests.Locks.CLUSTER_RESOURCE_INTENSIVE;
-import static org.eclipse.jkube.integrationtests.Tags.KUBERNETES;
+import static org.eclipse.jkube.integrationtests.Tags.OPEN_SHIFT;
 import static org.eclipse.jkube.integrationtests.assertions.PodAssertion.awaitPod;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.stringContainsInOrder;
 import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 
-@Tag(KUBERNETES)
+@Tag(OPEN_SHIFT)
 @Application(Watch.GRADLE_APPLICATION)
 @KubernetesTest(createEphemeralNamespace = false)
 @Isolated
-public class WatchK8sGradleITCase extends Watch {
+public class WatchOcGradleITCase extends Watch {
 
   @Gradle(project = "sb-watch")
   private JKubeGradleRunner gradle;
@@ -58,7 +58,7 @@ public class WatchK8sGradleITCase extends Watch {
       .resolve("org").resolve("eclipse").resolve("jkube").resolve("integrationtests")
       .resolve("springbootwatch").resolve("SpringBootWatchResource.java").toFile();
     originalFileContent = FileUtils.readFileToString(fileToChange, StandardCharsets.UTF_8);
-    gradle.tasks(false, true, "k8sBuild", "k8sResource", "k8sApply").build();
+    gradle.tasks(false, true, "ocBuild", "ocResource", "ocApply").build();
     originalPod = assertThatShouldApplyResources("Spring Boot Watch v1");
   }
 
@@ -71,7 +71,7 @@ public class WatchK8sGradleITCase extends Watch {
       if (originalPod != null) {
         kubernetesClient.resource(originalPod).withGracePeriod(0).delete();
       }
-      gradle.tasks(false, true, "k8sUndeploy").build();
+      gradle.tasks(false, true, "ocUndeploy").build();
     } finally {
       FileUtils.write(fileToChange, originalFileContent, StandardCharsets.UTF_8);
     }
@@ -79,11 +79,11 @@ public class WatchK8sGradleITCase extends Watch {
 
   @Test
   @ResourceLock(value = CLUSTER_RESOURCE_INTENSIVE, mode = READ_WRITE)
-  @DisplayName("k8sWatch, SHOULD hot reload application on changes (Gradle)")
+  @DisplayName("ocWatch, SHOULD hot reload application on changes (Gradle)")
   void watch_whenSourceModified_shouldLiveReloadChanges() throws Exception {
     try (final ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
       // Given
-      gradleWatch = gradle.tasksAsync(baos, false, true, "k8sWatch");
+      gradleWatch = gradle.tasksAsync(baos, false, true, "ocWatch");
       await(baos::toString).apply(log -> log.contains(":: Spring Boot Remote ::")).get(2, TimeUnit.MINUTES);
       // When
       FileUtils.write(fileToChange, originalFileContent.replace(
