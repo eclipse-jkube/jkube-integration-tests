@@ -38,7 +38,7 @@
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <wildfly.version>4.2.0.Final</wildfly.version>
+    <wildfly.version>5.0.1.Final</wildfly.version>
     <artifact-suffix></artifact-suffix>
     <jkube.enricher.jkube-service.type>NodePort</jkube.enricher.jkube-service.type>
   </properties>
