@@ -13,6 +13,9 @@
  */
 package org.eclipse.jkube.integrationtests.springboot.springboot4layered;
 
+import io.fabric8.kubernetes.api.model.Pod;
+import io.fabric8.kubernetes.client.DefaultKubernetesClient;
+import io.fabric8.kubernetes.client.KubernetesClient;
 import org.apache.maven.shared.invoker.InvocationResult;
 import org.eclipse.jkube.integrationtests.jupiter.api.Application;
 import org.eclipse.jkube.integrationtests.jupiter.api.DockerRegistry;
@@ -23,18 +26,26 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.parallel.ResourceLock;
 
 import java.util.List;
 
+import static org.eclipse.jkube.integrationtests.Locks.CLUSTER_RESOURCE_INTENSIVE;
 import static org.eclipse.jkube.integrationtests.Tags.KUBERNETES;
+import static org.eclipse.jkube.integrationtests.assertions.DeploymentAssertion.awaitDeployment;
 import static org.eclipse.jkube.integrationtests.assertions.DockerAssertion.assertImageWasRecentlyBuilt;
 import static org.eclipse.jkube.integrationtests.assertions.InvocationResultAssertion.assertInvocation;
+import static org.eclipse.jkube.integrationtests.assertions.PodAssertion.assertPod;
+import static org.eclipse.jkube.integrationtests.assertions.PodAssertion.awaitPod;
+import static org.eclipse.jkube.integrationtests.assertions.ServiceAssertion.awaitService;
 import static org.eclipse.jkube.integrationtests.docker.DockerUtils.getImageHistory;
 import static org.eclipse.jkube.integrationtests.docker.DockerUtils.listImageFiles;
 import static org.eclipse.jkube.integrationtests.springboot.springboot4layered.SpringBoot4Layered.PROJECT_SPRING_BOOT_4_LAYERED;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
+import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 
 @Tag(KUBERNETES)
 @Application(PROJECT_SPRING_BOOT_4_LAYERED)
@@ -82,6 +93,35 @@ class SpringBoot4LayeredK8sITCase implements SpringBoot4Layered, MavenCase {
   void k8sResource() throws Exception {
     // When
     final InvocationResult invocationResult = maven("k8s:resource");
+    // Then
+    assertInvocation(invocationResult);
+  }
+
+  @Test
+  @Order(3)
+  @ResourceLock(value = CLUSTER_RESOURCE_INTENSIVE, mode = READ_WRITE)
+  @DisplayName("k8s:apply, should deploy pod and start Spring Boot application")
+  void k8sApply() throws Exception {
+    // When
+    final InvocationResult invocationResult = maven("k8s:apply");
+    // Then
+    assertInvocation(invocationResult);
+    final KubernetesClient kc = new DefaultKubernetesClient();
+    final Pod pod = awaitPod(kc, this).getKubernetesResource();
+    assertPod(pod).apply(this).logContains("Started SpringBootSampleApplication", 60);
+    awaitService(kc, this, pod.getMetadata().getNamespace())
+      .assertIsNodePort()
+      .assertPorts(hasItem(8080))
+      .assertNodePortResponse("http", containsString("Hello from Spring Boot 4.1 with Layered Jars!"));
+  }
+
+  @Test
+  @Order(4)
+  @ResourceLock(value = CLUSTER_RESOURCE_INTENSIVE, mode = READ_WRITE)
+  @DisplayName("k8s:undeploy, should delete all applied resources")
+  void k8sUndeploy() throws Exception {
+    // When
+    final InvocationResult invocationResult = maven("k8s:undeploy");
     // Then
     assertInvocation(invocationResult);
   }
