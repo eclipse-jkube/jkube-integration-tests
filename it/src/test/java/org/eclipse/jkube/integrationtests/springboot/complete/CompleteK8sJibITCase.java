@@ -60,6 +60,7 @@ class CompleteK8sJibITCase extends Complete {
   void setUp() {
     mvnProperties = new Properties();
     mvnProperties.setProperty("jkube.generator.name", registry + "/sb/sb-complete");
+    mvnProperties.setProperty("jkube.docker.allowInsecureRegistries", "true");
   }
 
   @Override
