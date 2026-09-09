@@ -118,7 +118,7 @@ public abstract class JavaVersionGradle implements JKubeCase {
   @DisplayName("k8sBuild without jkube.java.version, should use default jkube-java base image")
   protected void k8sBuildDefault() {
     // When
-    final var result = getGradle().tasks("clean", "build","k8sBuild").build();
+    final var result = getGradle().tasks("k8sBuild").build();
     // Then
     assertThat(result.getOutput(), containsString("/jkube-java:"));
     assertThat(result.getOutput(), not(matchesPattern("(?s).*jkube-java-\\d+.*")));
