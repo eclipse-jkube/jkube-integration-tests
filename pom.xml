@@ -402,6 +402,30 @@
       </build>
     </profile>
     <profile>
+      <!-- Profile for tests requiring JDK 17+ (currently Spring Boot 4.x) -->
+      <id>jdk17</id>
+      <modules>
+        <module>projects-to-be-tested/maven/spring/spring-boot-4-layered</module>
+        <!-- Add additional JDK 17+ required modules here -->
+      </modules>
+      <activation>
+        <jdk>[17,)</jdk>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <configuration>
+              <includes>
+                <include>**/integrationtests/springboot/**/*ITCase.java</include>
+              </includes>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
       <id>webapp</id>
       <modules>
         <module>projects-to-be-tested/maven/webapp/jetty</module>

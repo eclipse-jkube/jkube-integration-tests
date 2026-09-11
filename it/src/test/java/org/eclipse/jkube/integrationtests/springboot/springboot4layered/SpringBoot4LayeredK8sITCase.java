@@ -14,12 +14,7 @@
 package org.eclipse.jkube.integrationtests.springboot.springboot4layered;
 
 import io.fabric8.kubernetes.api.model.Pod;
-import io.fabric8.kubernetes.client.DefaultKubernetesClient;
-import io.fabric8.kubernetes.client.KubernetesClient;
-import org.apache.maven.shared.invoker.InvocationResult;
-import org.eclipse.jkube.integrationtests.jupiter.api.Application;
-import org.eclipse.jkube.integrationtests.jupiter.api.DockerRegistry;
-import org.eclipse.jkube.integrationtests.maven.MavenCase;
+import org.eclipse.jkube.integrationtests.maven.MavenInvocationResult;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Order;
@@ -28,44 +23,44 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.parallel.ResourceLock;
 
+import java.io.File;
 import java.util.List;
 
 import static org.eclipse.jkube.integrationtests.Locks.CLUSTER_RESOURCE_INTENSIVE;
 import static org.eclipse.jkube.integrationtests.Tags.KUBERNETES;
-import static org.eclipse.jkube.integrationtests.assertions.DeploymentAssertion.awaitDeployment;
 import static org.eclipse.jkube.integrationtests.assertions.DockerAssertion.assertImageWasRecentlyBuilt;
 import static org.eclipse.jkube.integrationtests.assertions.InvocationResultAssertion.assertInvocation;
+import static org.eclipse.jkube.integrationtests.assertions.JKubeAssertions.assertJKube;
+import static org.eclipse.jkube.integrationtests.assertions.KubernetesListAssertion.assertListResource;
 import static org.eclipse.jkube.integrationtests.assertions.PodAssertion.assertPod;
 import static org.eclipse.jkube.integrationtests.assertions.PodAssertion.awaitPod;
 import static org.eclipse.jkube.integrationtests.assertions.ServiceAssertion.awaitService;
+import static org.eclipse.jkube.integrationtests.assertions.YamlAssertion.yaml;
 import static org.eclipse.jkube.integrationtests.docker.DockerUtils.getImageHistory;
 import static org.eclipse.jkube.integrationtests.docker.DockerUtils.listImageFiles;
-import static org.eclipse.jkube.integrationtests.springboot.springboot4layered.SpringBoot4Layered.PROJECT_SPRING_BOOT_4_LAYERED;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.anEmptyMap;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.not;
 import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 
 @Tag(KUBERNETES)
-@Application(PROJECT_SPRING_BOOT_4_LAYERED)
-@DockerRegistry
 @TestMethodOrder(OrderAnnotation.class)
-class SpringBoot4LayeredK8sITCase implements SpringBoot4Layered, MavenCase {
-
-  @Override
-  public String getProject() {
-    return PROJECT_SPRING_BOOT_4_LAYERED;
-  }
+class SpringBoot4LayeredK8sITCase extends SpringBoot4Layered {
 
   @Test
   @Order(1)
   @DisplayName("k8s:build, should create layered jar image with Spring Boot 4.1 tools jarmode")
   void k8sBuild() throws Exception {
     // When
-    final InvocationResult invocationResult = maven("k8s:build");
+    final MavenInvocationResult invocationResult = maven("k8s:build");
     // Then
     assertInvocation(invocationResult);
+    // Verify that tools jarmode with --layers flag is used (not layertools)
+    assertThat(invocationResult.getStdOut(), containsString("extract --launcher --layers --destination"));
     assertImageWasRecentlyBuilt("integration-tests", getApplication());
 
     // Verify layered structure in image
@@ -92,9 +87,15 @@ class SpringBoot4LayeredK8sITCase implements SpringBoot4Layered, MavenCase {
   @DisplayName("k8s:resource, should create Kubernetes manifests")
   void k8sResource() throws Exception {
     // When
-    final InvocationResult invocationResult = maven("k8s:resource");
+    final MavenInvocationResult invocationResult = maven("k8s:resource");
     // Then
     assertInvocation(invocationResult);
+    final File metaInfDirectory = new File(
+        String.format("../%s/target/classes/META-INF", getProject()));
+    assertThat(metaInfDirectory.exists(), equalTo(true));
+    assertListResource(new File(metaInfDirectory, "jkube/kubernetes.yml"));
+    assertThat(new File(metaInfDirectory, "jkube/kubernetes/spring-boot-4-layered-deployment.yml"), yaml(not(anEmptyMap())));
+    assertThat(new File(metaInfDirectory, "jkube/kubernetes/spring-boot-4-layered-service.yml"), yaml(not(anEmptyMap())));
   }
 
   @Test
@@ -103,15 +104,15 @@ class SpringBoot4LayeredK8sITCase implements SpringBoot4Layered, MavenCase {
   @DisplayName("k8s:apply, should deploy pod and start Spring Boot application")
   void k8sApply() throws Exception {
     // When
-    final InvocationResult invocationResult = maven("k8s:apply");
+    final MavenInvocationResult invocationResult = maven("k8s:apply");
     // Then
     assertInvocation(invocationResult);
-    final KubernetesClient kc = new DefaultKubernetesClient();
-    final Pod pod = awaitPod(kc, this).getKubernetesResource();
-    assertPod(pod).apply(this).logContains("Started SpringBootSampleApplication", 60);
-    awaitService(kc, this, pod.getMetadata().getNamespace())
+    final Pod pod = awaitPod(this).getKubernetesResource();
+    assertPod(pod).apply(this).logContains("Started SpringBoot4LayeredApplication", 60);
+    awaitService(this, pod.getMetadata().getNamespace())
       .assertIsNodePort()
-      .assertPorts(hasItem(8080))
+      .assertPorts(hasSize(1))
+      .assertPort("http", 8080, true)
       .assertNodePortResponse("http", containsString("Hello from Spring Boot 4.1 with Layered Jars!"));
   }
 
@@ -121,8 +122,11 @@ class SpringBoot4LayeredK8sITCase implements SpringBoot4Layered, MavenCase {
   @DisplayName("k8s:undeploy, should delete all applied resources")
   void k8sUndeploy() throws Exception {
     // When
-    final InvocationResult invocationResult = maven("k8s:undeploy");
+    final MavenInvocationResult invocationResult = maven("k8s:undeploy");
     // Then
     assertInvocation(invocationResult);
+    assertJKube(this)
+      .assertThatShouldDeleteAllAppliedResources()
+      .assertDeploymentDeleted();
   }
 }

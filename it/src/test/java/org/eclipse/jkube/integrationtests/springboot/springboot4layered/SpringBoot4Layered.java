@@ -13,11 +13,30 @@
  */
 package org.eclipse.jkube.integrationtests.springboot.springboot4layered;
 
-public interface SpringBoot4Layered {
+import io.fabric8.junit.jupiter.api.KubernetesTest;
+import io.fabric8.kubernetes.client.KubernetesClient;
+import org.eclipse.jkube.integrationtests.JKubeCase;
+import org.eclipse.jkube.integrationtests.maven.MavenCase;
 
-  String PROJECT_SPRING_BOOT_4_LAYERED = "projects-to-be-tested/maven/spring/spring-boot-4-layered";
+@KubernetesTest(createEphemeralNamespace = false)
+abstract class SpringBoot4Layered implements JKubeCase, MavenCase {
 
-  static String getApplication() {
+  private static final String PROJECT_SPRING_BOOT_4_LAYERED = "projects-to-be-tested/maven/spring/spring-boot-4-layered";
+
+  private KubernetesClient kubernetesClient;
+
+  @Override
+  public KubernetesClient getKubernetesClient() {
+    return kubernetesClient;
+  }
+
+  @Override
+  public String getProject() {
+    return PROJECT_SPRING_BOOT_4_LAYERED;
+  }
+
+  @Override
+  public String getApplication() {
     return "spring-boot-4-layered";
   }
 }
