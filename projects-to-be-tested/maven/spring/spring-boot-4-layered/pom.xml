@@ -33,9 +33,8 @@
   </description>
 
   <properties>
-    <maven.compiler.source>17</maven.compiler.source>
-    <maven.compiler.target>17</maven.compiler.target>
-    <maven.compiler.release>17</maven.compiler.release>
+    <!-- Spring Boot 4.x requires Java 17; feeds the parent's maven-compiler-plugin configuration -->
+    <java.version>17</java.version>
     <spring-boot.version>4.1.1</spring-boot.version>
     <jkube.build.strategy>docker</jkube.build.strategy>
     <jkube.enricher.jkube-service.type>NodePort</jkube.enricher.jkube-service.type>

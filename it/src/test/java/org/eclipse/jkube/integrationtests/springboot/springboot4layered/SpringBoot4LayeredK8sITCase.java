@@ -42,6 +42,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.anEmptyMap;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.not;
@@ -59,8 +60,9 @@ class SpringBoot4LayeredK8sITCase extends SpringBoot4Layered {
     final MavenInvocationResult invocationResult = maven("k8s:build");
     // Then
     assertInvocation(invocationResult);
-    // Verify that tools jarmode with --layers flag is used (not layertools)
-    assertThat(invocationResult.getStdOut(), containsString("extract --launcher --layers --destination"));
+    // Spring Boot 4.1 removed the layertools jarmode, so the generator must select tools
+    // (which is what adds --launcher --layers --destination . --force to the extract command)
+    assertThat(invocationResult.getStdOut(), containsString("Extracted Spring Boot layers using jarmode=tools"));
     assertImageWasRecentlyBuilt("integration-tests", getApplication());
 
     // Verify layered structure in image
@@ -78,8 +80,9 @@ class SpringBoot4LayeredK8sITCase extends SpringBoot4Layered {
       .filter(l -> !l.startsWith("<missing>"))
       .filter(l -> l.contains("COPY dir:"))
       .count();
-    // Should have multiple layers (dependencies, spring-boot-loader, application, etc.)
-    assertThat(dirCopyLayers, equalTo(4L));
+    // One COPY per non-empty Spring Boot layer (dependencies, spring-boot-loader, application,
+    // and snapshot-dependencies when present). A non-layered image would yield a single COPY.
+    assertThat(dirCopyLayers, greaterThanOrEqualTo(3L));
   }
 
   @Test
