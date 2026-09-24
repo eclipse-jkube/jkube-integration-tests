@@ -41,6 +41,9 @@ jobs:
         with:
           disable-sudo: true
           egress-policy: block
+          # raw.githubusercontent.com is required by JKube's jkube-kit-helm ITs: fabric8
+          # @KubeAPITest fetches its control-plane binaries from there, and without it the
+          # API server never starts and the ITs fail with "Connection refused".
           allowed-endpoints: >
             downloads.gradle.org:443
             github.com:443
@@ -51,6 +54,7 @@ jobs:
             repository.jboss.org:443
             services.gradle.org:443
             objects.githubusercontent.com:443
+            raw.githubusercontent.com:443
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
       - name: Setup Java 11
