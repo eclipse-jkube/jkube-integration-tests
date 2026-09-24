@@ -86,7 +86,7 @@ jobs:
         run: |
           rm -rf jkube \
           && git clone "$JKUBE_REPOSITORY" --branch "$JKUBE_REVISION" jkube \
-          && mvn -B -f "jkube/pom.xml" -DskipTests clean install
+          && mvn -B -f "jkube/pom.xml" -DskipTests -DskipITs clean install
       - name: Install Integration Tests (Downloads dependencies)
         run: |
           ./mvnw -B -DskipTests clean install \

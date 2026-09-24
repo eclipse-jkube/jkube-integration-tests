@@ -62,7 +62,7 @@ jobs:
       - name: Install JKube
         run: |
           cd $env:JKUBE_DIR
-          mvn -f pom.xml -B -DskipTests clean install
+          mvn -f pom.xml -B -DskipTests -DskipITs clean install
       - name: Install and Run Integration Tests
         run: |
           cd $env:JKUBE_DIR
